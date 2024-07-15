@@ -1,29 +1,51 @@
-import 'package:flutter/material.dart';
+import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
+
+enum Route {
+  contributions,
+  projects;
+
+  GlobalKey get key => GlobalObjectKey(this);
+
+  @override
+  String toString() => switch (this) {
+        contributions => 'Flutter contributions',
+        projects => name,
+      };
+}
 
 class App extends StatelessWidget {
   const App({super.key});
 
+  static const _scaffoldMessengerKey = GlobalObjectKey<ScaffoldMessengerState>(Scaffold);
+  static BuildContext get context => _scaffoldMessengerKey.currentContext!;
+
+  static final GoRouter _router = GoRouter(
+    routes: <RouteBase>[
+      GoRoute(
+        path: '/',
+        builder: (context, state) {
+          return const HomePage();
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: 'details',
+            builder: (context, state) {
+              return const Scaffold();
+            },
+          ),
+        ],
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp.router(
+      scaffoldMessengerKey: _scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      routerConfig: _router,
     );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold();
   }
 }
