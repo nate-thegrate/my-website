@@ -1,5 +1,7 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
+export 'funderline.dart';
+
 class HomePage extends ColoredBox {
   const HomePage({super.key}) : super(color: Colors.white, child: _child);
 
@@ -49,7 +51,6 @@ class FunLink extends StatelessWidget {
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          Text('$route', style: const TextStyle(color: color)),
           Positioned(
             bottom: 0,
             left: 0,
@@ -58,6 +59,19 @@ class FunLink extends StatelessWidget {
               height: 1.5,
               child: ColoredBox(key: route.key, color: color),
             ),
+          ),
+          Text(
+            '$route',
+            style: TextStyle(
+              foreground: Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 2.5
+                ..color = Colors.white,
+            ),
+          ),
+          Text(
+            '$route',
+            style: const TextStyle(color: color),
           ),
           Positioned.fill(
             child: MouseRegion(

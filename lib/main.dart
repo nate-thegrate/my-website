@@ -21,19 +21,21 @@ class App extends StatelessWidget {
   static const _scaffoldMessengerKey = GlobalObjectKey<ScaffoldMessengerState>(Scaffold);
   static BuildContext get context => _scaffoldMessengerKey.currentContext!;
 
+  static void go(String location, {Object? extra}) => context.go(location, extra: extra);
+
   static final GoRouter _router = GoRouter(
     routes: <RouteBase>[
       GoRoute(
         path: '/',
-        builder: (context, state) {
-          return const HomePage();
-        },
+        builder: (context, state) => const HomePage(),
         routes: <RouteBase>[
           GoRoute(
-            path: 'details',
-            builder: (context, state) {
-              return const Scaffold();
-            },
+            path: Route.contributions.toString(),
+            builder: (context, state) => const Contributions(),
+          ),
+          GoRoute(
+            path: Route.projects.toString(),
+            builder: (context, state) => const Projects(),
           ),
         ],
       ),
