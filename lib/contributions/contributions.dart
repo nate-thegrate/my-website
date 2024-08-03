@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:nate_thegrate/the_good_stuff.dart';
 
 class Contributions extends StatefulWidget {
   const Contributions({super.key});
@@ -10,6 +10,6 @@ class Contributions extends StatefulWidget {
 class _ContributionsState extends State<Contributions> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return const TopBar();
   }
 }

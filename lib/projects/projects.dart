@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nate_thegrate/main.dart';
 
 class Projects extends StatefulWidget {
   const Projects({super.key});
@@ -10,6 +11,6 @@ class Projects extends StatefulWidget {
 class _ProjectsState extends State<Projects> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return const TopBar();
   }
 }

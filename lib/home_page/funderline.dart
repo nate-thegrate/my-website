@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class Funderline extends StatefulWidget {
-  Funderline._(this.route, RenderBox box, {super.key})
+  Funderline._(this.route, RenderBox box)
       : topLeft = box.localToGlobal(Offset.zero),
         bottomRight = _screenSize.bottomRight(
           -box.localToGlobal(box.paintBounds.bottomRight),
@@ -54,6 +54,7 @@ class _FunderlineState extends State<Funderline> with SingleTickerProviderStateM
     switch (status) {
       case AnimationStatus.completed:
         controller.reverse();
+        context.go(widget.route);
       case AnimationStatus.dismissed:
         FunLink.entries[widget.route]!.remove();
       case AnimationStatus.forward:
@@ -88,7 +89,7 @@ class _FunderlineState extends State<Funderline> with SingleTickerProviderStateM
     return Positioned.fill(
       child: Opacity(
         opacity: controller.value,
-        child: const ColoredBox(color: TheBestColorsCompletelyUnbiased.lightCyan),
+        child: const ColoredBox(color: GrateColors.lightCyan),
       ),
     );
   }
