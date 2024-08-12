@@ -14,6 +14,7 @@ dependencies:
   go_router: ^14.2.3
   flutter_hooks: ^0.20.5
   meta: ^1.12.0
+  dio: ^5.5.0+1
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +22,14 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Times New Roman
+      fonts:
+        - asset: assets/fonts/times.ttf
+        - asset: assets/fonts/timesbd.ttf
+          weight: 700
+        - asset: assets/fonts/timesi.ttf
+          style: italic
+        - asset: assets/fonts/timesbi.ttf
+          weight: 700
+          style: italic

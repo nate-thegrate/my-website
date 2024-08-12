@@ -9,23 +9,37 @@ class HomePage extends ColoredBox {
     style: TextStyle(
       inherit: false,
       fontFamily: 'Times New Roman',
-      fontFamilyFallback: ['Times', 'serif'],
       fontSize: 16,
       color: Colors.black,
+      height: 1.125,
     ),
     child: Padding(
       padding: EdgeInsets.all(16),
       child: SelectionArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Nate - the grate',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
-            ),
-            FunLink.contributions(),
-            FunLink.projects(),
-          ],
+        child: MouseRegion(
+          cursor: SystemMouseCursors.basic,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(TextSpan(children: [
+                TextSpan(
+                  text: 'Nate - the grate\n',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 32,
+                    height: 2.5,
+                    leadingDistribution: TextLeadingDistribution.even,
+                  ),
+                ),
+                TextSpan(
+                  text: 'Thank you for visiting my website!\n'
+                      'This is where I showcase my passion for Flutter things 🙂',
+                ),
+              ])),
+              FunLink.contributions(),
+              FunLink.projects(),
+            ],
+          ),
         ),
       ),
     ),
@@ -33,14 +47,14 @@ class HomePage extends ColoredBox {
 }
 
 class FunLink extends StatelessWidget {
-  const FunLink.contributions({super.key}) : route = Route.contributions;
+  const FunLink.contributions({super.key}) : route = Route.stats;
   const FunLink.projects({super.key}) : route = Route.projects;
 
   final Route route;
 
   static const color = Color(0xff0000ee);
   static final entries = {
-    Route.contributions: OverlayEntry(builder: Funderline.contributions),
+    Route.stats: OverlayEntry(builder: Funderline.stats),
     Route.projects: OverlayEntry(builder: Funderline.projects),
   };
 

@@ -1,9 +1,13 @@
+import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
+
 import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
 
 enum Route {
-  contributions,
+  stats,
   projects;
 
   factory Route.fromUri(Uri uri) => values.byName(uri.path.split('/').last);
@@ -17,10 +21,7 @@ enum Route {
   GlobalKey get key => GlobalObjectKey(this);
 
   @override
-  String toString() => switch (this) {
-        contributions => 'Flutter contributions',
-        projects => name,
-      };
+  String toString() => name;
 }
 
 class App extends StatelessWidget {
@@ -36,9 +37,9 @@ class App extends StatelessWidget {
         builder: (context, state) => const HomePage(),
         routes: <RouteBase>[
           GoRoute(
-            path: Route.contributions.name,
-            builder: (context, state) => const Contributions(),
-            pageBuilder: (context, state) => const NoTransitionPage(child: Contributions()),
+            path: Route.stats.name,
+            builder: (context, state) => const Stats(),
+            pageBuilder: (context, state) => const NoTransitionPage(child: Stats()),
           ),
           GoRoute(
             path: Route.projects.name,
@@ -58,6 +59,7 @@ class App extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: GrateColors.lightCyan,
         ),
+        textSelectionTheme: const TextSelectionThemeData(selectionColor: GrateColors.lightCyan),
       ),
       scaffoldMessengerKey: _scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
@@ -76,11 +78,13 @@ class TopBar extends StatefulWidget {
 }
 
 class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
-  late final gapController = AnimationController(
-    vsync: this,
-    duration: Durations.long1,
+  late final gapAnimation = ValueAnimation(
+    tickerProvider: this,
+    initialValue: 0.0,
+    duration: Durations.short2,
+    curve: Curves.ease,
+    lerp: ui.lerpDouble,
   )..addListener(() => setState(() {}));
-  double get gapHeight => gapController.value * 16;
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +101,10 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + gapHeight),
+        preferredSize: Size.fromHeight(kToolbarHeight + gapAnimation.value),
         child: MouseRegion(
-          onEnter: (event) => gapController.forward(),
-          onExit: (event) => gapController.reverse(),
+          onEnter: (event) => gapAnimation.value = 12,
+          onExit: (event) => gapAnimation.value = 0,
           child: Column(
             children: [
               SizedBox(
@@ -111,7 +115,9 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Expanded(
-                        child: Center(child: Text('NATE THE GRATE', textAlign: TextAlign.center)),
+                        child: Center(
+                          child: Text('NATE THE GRATE ($kIsWasm)', textAlign: TextAlign.center),
+                        ),
                       ),
                       for (final route in Route.values) routeButton(route),
                     ],
@@ -120,7 +126,7 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
               ),
               SizedBox(
                 width: double.infinity,
-                height: gapHeight,
+                height: gapAnimation.value,
                 child: const ColoredBox(color: Color(0xff002040)),
               ),
             ],

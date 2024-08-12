@@ -10,7 +10,7 @@ export 'package:go_router/go_router.dart' hide GoRouterHelper;
 export 'main.dart';
 
 export 'home_page/home_page.dart';
-export 'contributions/contributions.dart';
+export 'stats/stats.dart';
 export 'projects/projects.dart';
 
 /// This class stores the colors which, objectively speaking,

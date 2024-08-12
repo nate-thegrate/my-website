@@ -12,7 +12,7 @@ class Funderline extends StatefulWidget {
   Funderline._fromRoute(Route route)
       : this._(route, route.key.currentContext!.findRenderObject()! as RenderBox);
 
-  Funderline.contributions(BuildContext _) : this._fromRoute(Route.contributions);
+  Funderline.stats(BuildContext _) : this._fromRoute(Route.stats);
   Funderline.projects(BuildContext _) : this._fromRoute(Route.projects);
 
   static Size get _screenSize =>
