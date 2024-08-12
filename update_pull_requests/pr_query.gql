@@ -1,0 +1,17 @@
+query flutterPRs() {
+  user(login: "nate-thegrate") {
+    pullRequests(states: [MERGED], first: 100, labels: ["autosubmit"]) {
+      nodes {
+        title
+        url
+        additions
+        deletions
+        labels(first: 100) {
+          nodes {
+            name
+          }
+        }
+      }
+    }
+  }
+}
