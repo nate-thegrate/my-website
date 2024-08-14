@@ -1,4 +1,3 @@
-import 'package:nate_thegrate/stats/sticky.dart' as sticky;
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class Stats extends StatefulWidget {
@@ -39,7 +38,6 @@ class _TheDeetsState extends State<TheDeets> {
             pinned: true,
             delegate: _TableHeader(),
           ),
-          const TableHeader(),
           SliverFixedExtentList.builder(
             itemCount: prs.length,
             itemExtent: 36.0,
@@ -48,7 +46,6 @@ class _TheDeetsState extends State<TheDeets> {
           SliverToBoxAdapter(
             child: PullRequest.total(onlyRefactor: onlyRefactor),
           ),
-          const TableHeader(),
         ],
       ),
     );
@@ -65,75 +62,6 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(_TableHeader oldDelegate) => false;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    const header = Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Center(
-              child: Text(
-                'pull request title',
-                style: TextStyle(fontWeight: FontWeight.w600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 50,
-            child: Center(
-              child: Text(
-                '+',
-                style: TextStyle(
-                  color: Diffs.green,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 50,
-            child: Center(
-              child: Text(
-                '–',
-                style: TextStyle(
-                  color: Diffs.red,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 50,
-            child: Center(
-              child: Text(
-                'Δ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (shrinkOffset == 0) return header;
-    return const ColoredBox(color: Color(0xe0f8ffff), child: header);
-  }
-}
-
-class TableHeader extends sticky.SliverSticky {
-  const TableHeader({super.key});
-
-  @override
-  final double extent = 36.0;
-
-  @override
-  bool shouldRebuild(TableHeader oldWidget) => false;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
