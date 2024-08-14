@@ -1,15 +1,166 @@
+import 'package:nate_thegrate/the_good_stuff.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
 part 'pr_data.g.dart';
 
-class PullRequest {
+final refactorPRs = flutterPRs.where((pr) => pr.refactor).toList();
+
+enum PRLayout {
+  compact,
+  spaced;
+
+  factory PRLayout._compute(BuildContext context, PRLayout? _) {
+    return MediaQuery.sizeOf(context).width < 500 ? compact : spaced;
+  }
+
+  factory PRLayout.of(BuildContext context) => Provider.of<PRLayout>(context);
+}
+
+class PRLayoutProvider extends ProxyProvider0<PRLayout> {
+  PRLayoutProvider({super.key, required Widget super.child}) : super(update: PRLayout._compute);
+}
+
+class PullRequest extends StatefulWidget implements PreferredSizeWidget {
   const PullRequest({
+    super.key,
     required this.title,
     required this.url,
     required this.diffs,
     required this.refactor,
   });
 
+  factory PullRequest.total({required bool onlyRefactor}) {
+    if (onlyRefactor ? _refactoring : _overall case final cached?) {
+      return cached;
+    }
+
+    final pulls = onlyRefactor ? refactorPRs : flutterPRs;
+
+    int additions = 0, deletions = 0;
+    for (final PullRequest(:diffs) in pulls) {
+      additions += diffs.$1;
+      deletions += diffs.$2;
+    }
+
+    String url = 'https://github.com/flutter/flutter/pulls?q=author%3Anate-thegrate+is%3Amerged';
+    if (onlyRefactor) url += '+label%3Arefactor';
+
+    final pr = PullRequest(
+      title: 'Total',
+      url: url,
+      diffs: (additions, deletions),
+      refactor: onlyRefactor,
+    );
+
+    return onlyRefactor ? _refactoring = pr : _overall = pr;
+  }
+
+  static PullRequest? _overall, _refactoring;
+
   final String title;
   final String url;
   final (int, int) diffs;
   final bool refactor;
+
+  static const color = Color(0xff80c0c0);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(24.0);
+
+  @override
+  State<PullRequest> createState() => _PullRequestState();
+}
+
+class _PullRequestState extends State<PullRequest> {
+  @override
+  Widget build(BuildContext context) {
+    final focusNode = Focus.of(context);
+    final focused = focusNode.hasFocus;
+    void focus(_) {
+      if (!focusNode.hasFocus) focusNode.requestFocus();
+    }
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: focus,
+      onHover: focus,
+      onExit: (_) => Future.microtask(focusNode.unfocus),
+      child: TapRegion(
+        onTapInside: (event) => launchUrlString(widget.url),
+        child: ColoredBox(
+          color: focused ? Colors.white70 : Colors.transparent,
+          child: Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(color: focused ? PullRequest.color : null),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Diffs(widget.diffs),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Diffs extends StatelessWidget {
+  const Diffs(this.diffs, {super.key});
+
+  final (int, int) diffs;
+
+  @override
+  Widget build(BuildContext context) {
+    final (additions, deletions) = diffs;
+    final delta = additions - deletions;
+    final stuff = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 50,
+            child: Center(
+              child: Text(
+                '+$additions',
+                style: const TextStyle(color: Color(0xff007060)),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 50,
+            child: Center(
+              child: Text(
+                '-$deletions',
+                style: const TextStyle(color: Color(0xffc00060)),
+              ),
+            ),
+          ),
+          const Text(
+            '  Δ',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          SizedBox(
+            width: 50,
+            child: Center(
+              child: Text(
+                '$delta',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (Focus.of(context).hasFocus) return stuff;
+
+    return ColoredBox(color: Colors.white54, child: stuff);
+  }
 }

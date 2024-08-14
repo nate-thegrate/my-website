@@ -1,7 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
-
 import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
@@ -53,17 +51,23 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: GrateColors.lightCyan,
-        ),
-        textSelectionTheme: const TextSelectionThemeData(selectionColor: GrateColors.lightCyan),
+    final theme = ThemeData(
+      scaffoldBackgroundColor: Colors.white,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: GrateColors.lightCyan,
       ),
-      scaffoldMessengerKey: _scaffoldMessengerKey,
-      debugShowCheckedModeBanner: false,
-      routerConfig: _router,
+      textSelectionTheme: const TextSelectionThemeData(
+        selectionColor: GrateColors.lightCyan,
+      ),
+    );
+
+    return PRLayoutProvider(
+      child: MaterialApp.router(
+        theme: theme,
+        scaffoldMessengerKey: _scaffoldMessengerKey,
+        debugShowCheckedModeBanner: false,
+        routerConfig: _router,
+      ),
     );
   }
 }
@@ -116,7 +120,7 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
                     children: [
                       const Expanded(
                         child: Center(
-                          child: Text('NATE THE GRATE ($kIsWasm)', textAlign: TextAlign.center),
+                          child: Text('NATE THE GRATE', textAlign: TextAlign.center),
                         ),
                       ),
                       for (final route in Route.values) routeButton(route),

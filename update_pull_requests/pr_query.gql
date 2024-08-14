@@ -1,6 +1,11 @@
 query flutterPRs() {
   user(login: "nate-thegrate") {
-    pullRequests(states: [MERGED], first: 100, labels: ["autosubmit"]) {
+    pullRequests(
+      states: [MERGED]
+      labels: ["autosubmit"]
+      orderBy: {field: CREATED_AT, direction: DESC}
+      first: 100
+    ) {
       nodes {
         title
         url

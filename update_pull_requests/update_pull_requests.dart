@@ -17,7 +17,7 @@ part of 'pr_data.dart';
 const flutterPRs = <PullRequest>[$prList];
 """;
 
-  File('lib/stats/pr_data.g.dart').writeAsString(text);
+  File('lib/stats/pr_data/pr_data.g.dart').writeAsString(text);
 }
 
 Future<String> query(String filepath) async {
@@ -47,7 +47,7 @@ String parse(Map<String, dynamic> data) {
       'additions': additions as int,
       'deletions': deletions as int,
       'labels': {'nodes': labels as List},
-    } = pr;
+    } = pr as Map;
 
     final bool refactor = labels.any((label) => label['name'] == 'refactor');
 
@@ -55,7 +55,7 @@ String parse(Map<String, dynamic> data) {
   PullRequest(
     title: '''$title''',
     url: '''$url''',
-    diffs: ($additions, -$deletions),
+    diffs: ($additions, $deletions),
     refactor: $refactor,
   ),
 """;
