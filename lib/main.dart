@@ -91,6 +91,12 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
   )..addListener(() => setState(() {}));
 
   @override
+  void dispose() {
+    gapAnimation.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentRoute = Route.of(context);
 

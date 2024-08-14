@@ -3,7 +3,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 part 'pr_data.g.dart';
 
-final refactorPRs = flutterPRs.where((pr) => pr.refactor).toList();
+final List<PullRequest> refactorPRs = flutterPRs.where((pr) => pr.refactor).toList();
 
 enum PRLayout {
   compact,
@@ -20,7 +20,7 @@ class PRLayoutProvider extends ProxyProvider0<PRLayout> {
   PRLayoutProvider({super.key, required Widget super.child}) : super(update: PRLayout._compute);
 }
 
-class PullRequest extends StatefulWidget implements PreferredSizeWidget {
+class PullRequest extends StatefulWidget {
   const PullRequest({
     super.key,
     required this.title,
@@ -62,10 +62,8 @@ class PullRequest extends StatefulWidget implements PreferredSizeWidget {
   final (int, int) diffs;
   final bool refactor;
 
-  static const color = Color(0xff80c0c0);
-
-  @override
-  Size get preferredSize => const Size.fromHeight(24.0);
+  static const color = Color(0xff00a0a0);
+  static const borderColor = Color(0xffd0e0e0);
 
   @override
   State<PullRequest> createState() => _PullRequestState();
@@ -74,39 +72,60 @@ class PullRequest extends StatefulWidget implements PreferredSizeWidget {
 class _PullRequestState extends State<PullRequest> {
   @override
   Widget build(BuildContext context) {
-    final focusNode = Focus.of(context);
-    final focused = focusNode.hasFocus;
-    void focus(_) {
-      if (!focusNode.hasFocus) focusNode.requestFocus();
-    }
+    return Focus(
+      child: Builder(builder: (context) {
+        final focusNode = Focus.of(context);
+        final focused = focusNode.hasFocus;
+        void focus(_) {
+          if (!focusNode.hasFocus) focusNode.requestFocus();
+        }
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: focus,
-      onHover: focus,
-      onExit: (_) => Future.microtask(focusNode.unfocus),
-      child: TapRegion(
-        onTapInside: (event) => launchUrlString(widget.url),
-        child: ColoredBox(
-          color: focused ? Colors.white70 : Colors.transparent,
-          child: Row(
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.title,
-                    style: TextStyle(color: focused ? PullRequest.color : null),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+        const border = Border.symmetric(
+          vertical: BorderSide(color: PullRequest.borderColor),
+          horizontal: BorderSide(color: PullRequest.borderColor, width: 0),
+        );
+
+        final diffs = Diffs(
+          widget.diffs,
+          key: GlobalObjectKey((widget.diffs, widget.url)),
+        );
+        final contents = Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.title,
+                  style: TextStyle(color: focused ? PullRequest.color : null),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Diffs(widget.diffs),
-            ],
+            ),
+            if (focused) diffs else ColoredBox(color: Colors.white54, child: diffs),
+          ],
+        );
+
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: focus,
+          onHover: focus,
+          onExit: (_) => Future.microtask(focusNode.unfocus),
+          child: GestureDetector(
+            onTap: () => launchUrlString(widget.url),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: focused ? Colors.white70 : Colors.transparent,
+                border: border,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 1.0),
+                child: contents,
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
@@ -116,11 +135,14 @@ class Diffs extends StatelessWidget {
 
   final (int, int) diffs;
 
+  static const green = Color(0xff007060);
+  static const red = Color(0xffc00060);
+
   @override
   Widget build(BuildContext context) {
     final (additions, deletions) = diffs;
     final delta = additions - deletions;
-    final stuff = Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
@@ -129,7 +151,7 @@ class Diffs extends StatelessWidget {
             child: Center(
               child: Text(
                 '+$additions',
-                style: const TextStyle(color: Color(0xff007060)),
+                style: const TextStyle(color: green),
               ),
             ),
           ),
@@ -138,13 +160,9 @@ class Diffs extends StatelessWidget {
             child: Center(
               child: Text(
                 '-$deletions',
-                style: const TextStyle(color: Color(0xffc00060)),
+                style: const TextStyle(color: red),
               ),
             ),
-          ),
-          const Text(
-            '  Δ',
-            style: TextStyle(fontWeight: FontWeight.w600),
           ),
           SizedBox(
             width: 50,
@@ -158,9 +176,5 @@ class Diffs extends StatelessWidget {
         ],
       ),
     );
-
-    if (Focus.of(context).hasFocus) return stuff;
-
-    return ColoredBox(color: Colors.white54, child: stuff);
   }
 }
