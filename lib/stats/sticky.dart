@@ -1,53 +1,29 @@
-// ignore_for_file: library_private_types_in_public_api
-
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/rendering.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class SliverPinnedPersistentHeader extends RenderObjectWidget {
-  const SliverPinnedPersistentHeader({
-    super.key,
-    required this.delegate,
-  });
+abstract class SliverSticky extends RenderObjectWidget {
+  const SliverSticky({super.key});
 
-  final SliverPersistentHeaderDelegate delegate;
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent);
 
-  @override
-  _SliverPersistentHeaderElement createElement() => _SliverPersistentHeaderElement(this);
+  double get extent;
+
+  bool shouldRebuild(covariant SliverSticky oldWidget);
 
   @override
-  _RenderSliverPinnedPersistentHeaderForWidgets createRenderObject(BuildContext context) {
-    return _RenderSliverPinnedPersistentHeaderForWidgets(
-      stretchConfiguration: delegate.stretchConfiguration,
-      showOnScreenConfiguration: delegate.showOnScreenConfiguration,
-    );
-  }
+  RenderObjectElement createElement() => _SliverPersistentHeaderElement(this);
 
   @override
-  void updateRenderObject(BuildContext context,
-      covariant _RenderSliverPinnedPersistentHeaderForWidgets renderObject) {
-    renderObject
-      ..stretchConfiguration = delegate.stretchConfiguration
-      ..showOnScreenConfiguration = delegate.showOnScreenConfiguration;
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-      DiagnosticsProperty<SliverPersistentHeaderDelegate>(
-        'delegate',
-        delegate,
-      ),
-    );
-  }
+  RenderSliver createRenderObject(BuildContext context) => _RenderSliverSticky();
 }
 
 class _SliverPersistentHeaderElement extends RenderObjectElement {
-  _SliverPersistentHeaderElement(SliverPinnedPersistentHeader super.widget);
+  _SliverPersistentHeaderElement(SliverSticky super.widget);
 
   @override
-  _RenderSliverPinnedPersistentHeaderForWidgets get renderObject =>
-      super.renderObject as _RenderSliverPinnedPersistentHeaderForWidgets;
+  _RenderSliverSticky get renderObject => super.renderObject as _RenderSliverSticky;
 
   @override
   void mount(Element? parent, Object? newSlot) {
@@ -62,34 +38,27 @@ class _SliverPersistentHeaderElement extends RenderObjectElement {
   }
 
   @override
-  void update(SliverPinnedPersistentHeader newWidget) {
-    final SliverPinnedPersistentHeader oldWidget = widget as SliverPinnedPersistentHeader;
+  void update(SliverSticky newWidget) {
+    final SliverSticky oldWidget = widget as SliverSticky;
     super.update(newWidget);
-    final SliverPersistentHeaderDelegate newDelegate = newWidget.delegate;
-    final SliverPersistentHeaderDelegate oldDelegate = oldWidget.delegate;
-    if (newDelegate != oldDelegate &&
-        (newDelegate.runtimeType != oldDelegate.runtimeType ||
-            newDelegate.shouldRebuild(oldDelegate))) {
-      renderObject.triggerRebuild();
+    if (newWidget != oldWidget && newWidget.shouldRebuild(oldWidget)) {
+      renderObject.markNeedsLayout();
     }
   }
 
   @override
   void performRebuild() {
     super.performRebuild();
-    renderObject.triggerRebuild();
+    renderObject.markNeedsLayout();
   }
 
   Element? child;
 
   void _build(double shrinkOffset, bool overlapsContent) {
     owner!.buildScope(this, () {
-      final SliverPinnedPersistentHeader sliverPersistentHeaderRenderObjectWidget =
-          widget as SliverPinnedPersistentHeader;
       child = updateChild(
         child,
-        sliverPersistentHeaderRenderObjectWidget.delegate
-            .build(this, shrinkOffset, overlapsContent),
+        (widget as SliverSticky).build(this, shrinkOffset, overlapsContent),
         null,
       );
     });
@@ -103,18 +72,15 @@ class _SliverPersistentHeaderElement extends RenderObjectElement {
   }
 
   @override
-  void insertRenderObjectChild(covariant RenderBox child, Object? slot) {
-    assert(renderObject.debugValidateChild(child));
+  void insertRenderObjectChild(RenderBox child, Object? slot) {
     renderObject.child = child;
   }
 
   @override
-  void moveRenderObjectChild(covariant RenderObject child, Object? oldSlot, Object? newSlot) {
-    assert(false);
-  }
+  void moveRenderObjectChild(RenderObject child, Object? oldSlot, Object? newSlot) {}
 
   @override
-  void removeRenderObjectChild(covariant RenderObject child, Object? slot) {
+  void removeRenderObjectChild(RenderObject child, Object? slot) {
     renderObject.child = null;
   }
 
@@ -126,89 +92,249 @@ class _SliverPersistentHeaderElement extends RenderObjectElement {
   }
 }
 
-class _RenderSliverPinnedPersistentHeaderForWidgets extends RenderSliverPinnedPersistentHeader {
-  _RenderSliverPinnedPersistentHeaderForWidgets({
-    super.stretchConfiguration,
-    super.showOnScreenConfiguration,
-  });
+class _RenderSliverSticky extends RenderSliver with RenderObjectWithChildMixin<RenderBox> {
+  _RenderSliverSticky({RenderBox? child}) {
+    this.child = child;
+  }
 
   _SliverPersistentHeaderElement? _element;
 
-  @override
-  double get minExtent => (_element!.widget as SliverPinnedPersistentHeader).delegate.minExtent;
+  double get extent => (_element!.widget as SliverSticky).extent;
 
-  @override
-  double get maxExtent => (_element!.widget as SliverPinnedPersistentHeader).delegate.maxExtent;
-
-  @override
   void updateChild(double shrinkOffset, bool overlapsContent) {
     assert(_element != null);
     _element!._build(shrinkOffset, overlapsContent);
   }
 
+  @override
+  void performLayout() {
+    final SliverConstraints constraints = this.constraints;
+    final extent = this.extent;
+    final bool overlapsContent = constraints.overlap > 0.0;
+    layoutChild(constraints.scrollOffset, extent, overlapsContent: overlapsContent);
+    final double effectiveRemainingPaintExtent =
+        math.max(0, constraints.remainingPaintExtent - constraints.overlap);
+    final double layoutExtent =
+        clampDouble(extent - constraints.scrollOffset, 0.0, effectiveRemainingPaintExtent);
+    final double stretchOffset = stretchConfiguration != null ? constraints.overlap.abs() : 0.0;
+    geometry = SliverGeometry(
+      scrollExtent: extent,
+      paintOrigin: constraints.overlap,
+      paintExtent: math.min(childExtent, effectiveRemainingPaintExtent),
+      layoutExtent: layoutExtent,
+      maxPaintExtent: extent + stretchOffset,
+      maxScrollObstructionExtent: extent,
+      cacheExtent: layoutExtent > 0.0 ? -constraints.cacheOrigin + layoutExtent : layoutExtent,
+      hasVisualOverflow: true, // Conservatively say we do have overflow to avoid complexity.
+    );
+  }
+
+  @override
+  double childMainAxisPosition(RenderBox child) => 0.0;
+
+  @override
+  void showOnScreen({
+    RenderObject? descendant,
+    Rect? rect,
+    Duration duration = Duration.zero,
+    Curve curve = Curves.ease,
+  }) {
+    final Rect? localBounds = descendant != null
+        ? MatrixUtils.transformRect(
+            descendant.getTransformTo(this), rect ?? descendant.paintBounds)
+        : rect;
+
+    final Rect? newRect = switch (applyGrowthDirectionToAxisDirection(
+      constraints.axisDirection,
+      constraints.growthDirection,
+    )) {
+      AxisDirection.up => _trim(localBounds, bottom: childExtent),
+      AxisDirection.left => _trim(localBounds, right: childExtent),
+      AxisDirection.right => _trim(localBounds, left: 0),
+      AxisDirection.down => _trim(localBounds, top: 0),
+    };
+
+    super.showOnScreen(
+      descendant: this,
+      rect: newRect,
+      duration: duration,
+      curve: curve,
+    );
+  }
+
   @protected
-  void triggerRebuild() {
-    markNeedsLayout();
+  double get childExtent {
+    if (child == null) {
+      return 0.0;
+    }
+    assert(child!.hasSize);
+    return switch (constraints.axis) {
+      Axis.vertical => child!.size.height,
+      Axis.horizontal => child!.size.width,
+    };
+  }
+
+  bool _needsUpdateChild = true;
+  double _lastShrinkOffset = 0.0;
+  bool _lastOverlapsContent = false;
+
+  OverScrollHeaderStretchConfiguration? stretchConfiguration;
+
+  late double _lastStretchOffset;
+
+  @override
+  void markNeedsLayout() {
+    // This is automatically called whenever the child's intrinsic dimensions
+    // change, at which point we should remeasure them during the next layout.
+    _needsUpdateChild = true;
+    super.markNeedsLayout();
+  }
+
+  @protected
+  void layoutChild(double scrollOffset, double maxExtent, {bool overlapsContent = false}) {
+    final double shrinkOffset = math.min(scrollOffset, maxExtent);
+    if (_needsUpdateChild ||
+        _lastShrinkOffset != shrinkOffset ||
+        _lastOverlapsContent != overlapsContent) {
+      invokeLayoutCallback<SliverConstraints>((constraints) {
+        assert(constraints == this.constraints);
+        updateChild(shrinkOffset, overlapsContent);
+      });
+      _lastShrinkOffset = shrinkOffset;
+      _lastOverlapsContent = overlapsContent;
+      _needsUpdateChild = false;
+    }
+    double stretchOffset = 0.0;
+    if (stretchConfiguration != null && constraints.scrollOffset == 0.0) {
+      stretchOffset += constraints.overlap.abs();
+    }
+
+    child?.layout(
+      constraints.asBoxConstraints(
+        maxExtent: math.max(extent, maxExtent - shrinkOffset) + stretchOffset,
+      ),
+      parentUsesSize: true,
+    );
+
+    if (stretchConfiguration != null &&
+        stretchConfiguration!.onStretchTrigger != null &&
+        stretchOffset >= stretchConfiguration!.stretchTriggerOffset &&
+        _lastStretchOffset <= stretchConfiguration!.stretchTriggerOffset) {
+      stretchConfiguration!.onStretchTrigger!();
+    }
+    _lastStretchOffset = stretchOffset;
+  }
+
+  @override
+  bool hitTestChildren(SliverHitTestResult result,
+      {required double mainAxisPosition, required double crossAxisPosition}) {
+    assert(geometry!.hitTestExtent > 0.0);
+    if (child != null) {
+      return hitTestBoxChild(BoxHitTestResult.wrap(result), child!,
+          mainAxisPosition: mainAxisPosition, crossAxisPosition: crossAxisPosition);
+    }
+    return false;
+  }
+
+  @override
+  void applyPaintTransform(RenderObject child, Matrix4 transform) {
+    assert(child == this.child);
+    applyPaintTransformForBoxChild(child as RenderBox, transform);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child != null && geometry!.visible) {
+      offset += switch (applyGrowthDirectionToAxisDirection(
+          constraints.axisDirection, constraints.growthDirection)) {
+        AxisDirection.up =>
+          Offset(0.0, geometry!.paintExtent - childMainAxisPosition(child!) - childExtent),
+        AxisDirection.left =>
+          Offset(geometry!.paintExtent - childMainAxisPosition(child!) - childExtent, 0.0),
+        AxisDirection.right => Offset(childMainAxisPosition(child!), 0.0),
+        AxisDirection.down => Offset(0.0, childMainAxisPosition(child!)),
+      };
+      context.paintChild(child!, offset);
+    }
+  }
+
+  @override
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    super.describeSemanticsConfiguration(config);
+    config.addTagForChildren(RenderViewport.excludeFromScrolling);
+  }
+
+  bool _getRightWayUp(SliverConstraints constraints) {
+    final bool reversed = axisDirectionIsReversed(constraints.axisDirection);
+    return switch (constraints.growthDirection) {
+      GrowthDirection.forward => !reversed,
+      GrowthDirection.reverse => reversed,
+    };
+  }
+
+  @protected
+  bool hitTestBoxChild(
+    BoxHitTestResult result,
+    RenderBox child, {
+    required double mainAxisPosition,
+    required double crossAxisPosition,
+  }) {
+    final bool rightWayUp = _getRightWayUp(constraints);
+    double delta = childMainAxisPosition(child);
+    final double crossAxisDelta = childCrossAxisPosition(child);
+    double absolutePosition = mainAxisPosition - delta;
+    final double absoluteCrossAxisPosition = crossAxisPosition - crossAxisDelta;
+    Offset paintOffset, transformedPosition;
+    switch (constraints.axis) {
+      case Axis.horizontal:
+        if (!rightWayUp) {
+          absolutePosition = child.size.width - absolutePosition;
+          delta = geometry!.paintExtent - child.size.width - delta;
+        }
+        paintOffset = Offset(delta, crossAxisDelta);
+        transformedPosition = Offset(absolutePosition, absoluteCrossAxisPosition);
+      case Axis.vertical:
+        if (!rightWayUp) {
+          absolutePosition = child.size.height - absolutePosition;
+          delta = geometry!.paintExtent - child.size.height - delta;
+        }
+        paintOffset = Offset(crossAxisDelta, delta);
+        transformedPosition = Offset(absoluteCrossAxisPosition, absolutePosition);
+    }
+    return result.addWithOutOfBandPosition(
+      paintOffset: paintOffset,
+      hitTest: (result) {
+        return child.hitTest(result, position: transformedPosition);
+      },
+    );
+  }
+
+  @protected
+  void applyPaintTransformForBoxChild(RenderBox child, Matrix4 transform) {
+    final bool rightWayUp = _getRightWayUp(constraints);
+    double delta = childMainAxisPosition(child);
+    final double crossAxisDelta = childCrossAxisPosition(child);
+    switch (constraints.axis) {
+      case Axis.horizontal:
+        if (!rightWayUp) {
+          delta = geometry!.paintExtent - child.size.width - delta;
+        }
+        transform.translate(delta, crossAxisDelta);
+      case Axis.vertical:
+        if (!rightWayUp) {
+          delta = geometry!.paintExtent - child.size.height - delta;
+        }
+        transform.translate(crossAxisDelta, delta);
+    }
   }
 }
 
-class _FloatingHeader extends StatefulWidget {
-  const _FloatingHeader({required this.child});
-
-  final Widget child;
-
-  @override
-  _FloatingHeaderState createState() => _FloatingHeaderState();
-}
-
-// A wrapper for the widget created by _SliverPersistentHeaderElement that
-// starts and stops the floating app bar's snap-into-view or snap-out-of-view
-// animation. It also informs the float when pointer scrolling by updating the
-// last known ScrollDirection when scrolling began.
-class _FloatingHeaderState extends State<_FloatingHeader> {
-  ScrollPosition? _position;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_position != null) {
-      _position!.isScrollingNotifier.removeListener(_isScrollingListener);
-    }
-    _position = Scrollable.maybeOf(context)?.position;
-    if (_position != null) {
-      _position!.isScrollingNotifier.addListener(_isScrollingListener);
-    }
-  }
-
-  @override
-  void dispose() {
-    if (_position != null) {
-      _position!.isScrollingNotifier.removeListener(_isScrollingListener);
-    }
-    super.dispose();
-  }
-
-  RenderSliverFloatingPersistentHeader? _headerRenderer() {
-    return context.findAncestorRenderObjectOfType<RenderSliverFloatingPersistentHeader>();
-  }
-
-  void _isScrollingListener() {
-    assert(_position != null);
-
-    // When a scroll stops, then maybe snap the app bar into view.
-    // Similarly, when a scroll starts, then maybe stop the snap animation.
-    // Update the scrolling direction as well for pointer scrolling updates.
-    final RenderSliverFloatingPersistentHeader? header = _headerRenderer();
-    if (_position!.isScrollingNotifier.value) {
-      header?.updateScrollStartDirection(_position!.userScrollDirection);
-      // Only SliverAppBars support snapping, headers will not snap.
-      header?.maybeStopSnapAnimation(_position!.userScrollDirection);
-    } else {
-      // Only SliverAppBars support snapping, headers will not snap.
-      header?.maybeStartSnapAnimation(_position!.userScrollDirection);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
+Rect? _trim(
+  Rect? original, {
+  double top = -double.infinity,
+  double right = double.infinity,
+  double bottom = double.infinity,
+  double left = -double.infinity,
+}) {
+  return original?.intersect(Rect.fromLTRB(left, top, right, bottom));
 }
