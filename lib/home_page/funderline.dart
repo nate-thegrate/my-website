@@ -28,7 +28,7 @@ class Funderline extends StatefulWidget {
 class _FunderlineState extends State<Funderline> with SingleTickerProviderStateMixin {
   late double left, top, right, bottom;
 
-  late final controller = AnimationController(
+  late final controller = ToggleAnimation(
     vsync: this,
     duration: const Duration(milliseconds: 1750),
     reverseDuration: const Duration(milliseconds: 1000),
@@ -47,14 +47,15 @@ class _FunderlineState extends State<Funderline> with SingleTickerProviderStateM
     controller
       ..addListener(() => setState(() {}))
       ..addStatusListener(statusUpdate)
-      ..forward();
+      ..animateTo(1);
   }
 
   void statusUpdate(AnimationStatus status) {
     switch (status) {
       case AnimationStatus.completed:
-        controller.reverse();
         context.go(widget.route);
+        // TODO: should be preloaded
+        Future.delayed(Durations.short1, () => controller.animateTo(0));
       case AnimationStatus.dismissed:
         FunLink.entries[widget.route]!.remove();
       case AnimationStatus.forward:
