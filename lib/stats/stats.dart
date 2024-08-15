@@ -28,7 +28,6 @@ class _TheDeetsState extends State<TheDeets> {
   final controller = ScrollController();
   @override
   Widget build(BuildContext context) {
-    final prs = onlyRefactor ? refactorPRs : flutterPRs;
     return ColoredBox(
       color: TheDeets.color,
       child: CustomScrollView(
@@ -38,10 +37,9 @@ class _TheDeetsState extends State<TheDeets> {
             pinned: true,
             delegate: _TableHeader(),
           ),
-          SliverFixedExtentList.builder(
-            itemCount: prs.length,
+          SliverFixedExtentList.list(
             itemExtent: 36.0,
-            itemBuilder: (context, index) => prs[index],
+            children: onlyRefactor ? refactorPRs : flutterPRs,
           ),
           SliverToBoxAdapter(
             child: PullRequest.total(onlyRefactor: onlyRefactor),
@@ -72,7 +70,7 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
           Expanded(
             child: Center(
               child: Text(
-                'pull request title',
+                'Flutter contribution diffs',
                 style: TextStyle(fontWeight: FontWeight.w600),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
