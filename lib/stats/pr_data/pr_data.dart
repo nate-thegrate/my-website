@@ -64,12 +64,14 @@ class PullRequest extends StatefulWidget {
 
   static const color = Color(0xff00a0a0);
   static const borderColor = Color(0xffd0e0e0);
+  static const border = BorderSide(color: borderColor);
 
   @override
   State<PullRequest> createState() => _PullRequestState();
 }
 
 class _PullRequestState extends State<PullRequest> {
+  late final bool isTotal = widget.title == 'Total';
   @override
   Widget build(BuildContext context) {
     return Focus(
@@ -81,29 +83,36 @@ class _PullRequestState extends State<PullRequest> {
         }
 
         const border = Border.symmetric(
-          vertical: BorderSide(color: PullRequest.borderColor),
-          horizontal: BorderSide(color: PullRequest.borderColor, width: 0),
+          vertical: BorderSide(color: Colors.transparent),
+          horizontal: PullRequest.border,
         );
 
         final diffs = Diffs(
           widget.diffs,
           key: GlobalObjectKey((widget.diffs, widget.url)),
         );
-        final contents = Row(
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.title,
-                  style: TextStyle(color: focused ? PullRequest.color : null),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+        final contents = Padding(
+          padding: const EdgeInsets.symmetric(vertical: 1),
+          child: Row(
+            children: [
+              const SizedBox(width: 8),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(
+                      color: focused ? PullRequest.color : null,
+                      fontWeight: isTotal ? FontWeight.w600 : null,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
-            ),
-            if (focused) diffs else ColoredBox(color: Colors.white54, child: diffs),
-          ],
+              if (focused) diffs else ColoredBox(color: Colors.white54, child: diffs),
+            ],
+          ),
         );
 
         return MouseRegion(
@@ -118,10 +127,7 @@ class _PullRequestState extends State<PullRequest> {
                 color: focused ? Colors.white70 : Colors.transparent,
                 border: border,
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 1.0),
-                child: contents,
-              ),
+              child: contents,
             ),
           ),
         );
