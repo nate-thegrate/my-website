@@ -20,6 +20,12 @@ const flutterPRs = <PullRequest>[
     refactor: true,
   ),
   PullRequest(
+    title: '''Style Guide updates''',
+    url: '''https://github.com/flutter/flutter/pull/152525''',
+    diffs: (106, 103),
+    refactor: false,
+  ),
+  PullRequest(
     title: '''Implementing null-aware logic in `/packages/flutter/`''',
     url: '''https://github.com/flutter/flutter/pull/152294''',
     diffs: (159, 298),
@@ -53,6 +59,12 @@ const flutterPRs = <PullRequest>[
     title: '''Add a message about spam/brigading''',
     url: '''https://github.com/flutter/flutter/pull/150583''',
     diffs: (2, 2),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Fix breakages introduced by `SplashFactory`''',
+    url: '''https://github.com/flutter/packages/pull/6952''',
+    diffs: (12, 12),
     refactor: false,
   ),
   PullRequest(

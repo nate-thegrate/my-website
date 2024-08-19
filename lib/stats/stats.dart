@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
@@ -11,6 +11,7 @@ class Stats extends StatefulWidget {
 }
 
 class _StatsState extends State<Stats> {
+  // Refactor once TopBar is functional
   @override
   Widget build(BuildContext context) {
     return const TopBar(body: TheDeets());
@@ -28,22 +29,19 @@ class TheDeets extends StatefulWidget {
 
 class _TheDeetsState extends State<TheDeets> {
   bool onlyRefactor = false;
+  bool floatingFooter = true;
   final controller = ScrollController();
-  final footerVisibility = ValueNotifier(true);
   double targetExtent = double.infinity;
 
   @override
   void initState() {
     super.initState();
     controller.addListener(() {
-      footerVisibility.value = controller.offset < targetExtent;
+      final shouldFloat = controller.offset < targetExtent;
+      if (shouldFloat != floatingFooter) {
+        setState(() => floatingFooter = shouldFloat);
+      }
     });
-  }
-
-  @override
-  void dispose() {
-    footerVisibility.dispose();
-    super.dispose();
   }
 
   Widget _buildFooter(BuildContext context, SliverConstraints constraints) {
@@ -59,7 +57,9 @@ class _TheDeetsState extends State<TheDeets> {
 
   @override
   Widget build(BuildContext context) {
-    final double maxWidth = min(720.0, MediaQuery.sizeOf(context).width - 28);
+    final padding = EdgeInsets.symmetric(
+      horizontal: math.max(14, (MediaQuery.sizeOf(context).width - 720) / 2),
+    );
     final slivers = [
       SliverMainAxisGroup(
         slivers: [
@@ -96,38 +96,20 @@ class _TheDeetsState extends State<TheDeets> {
           CustomScrollView(
             controller: controller,
             slivers: [
-              for (final sliver in slivers)
-                SliverCrossAxisGroup(
-                  slivers: [
-                    const SliverCrossAxisExpanded(
-                      flex: 1,
-                      sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
-                    ),
-                    SliverConstrainedCrossAxis(
-                      maxExtent: maxWidth,
-                      sliver: sliver,
-                    ),
-                    const SliverCrossAxisExpanded(
-                      flex: 1,
-                      sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
-                    ),
-                  ],
-                ),
+              for (final sliver in slivers) SliverPadding(padding: padding, sliver: sliver),
             ],
           ),
-          ValueListenableBuilder(
-            valueListenable: footerVisibility,
-            builder: (context, value, child) => value
-                ? SizedBox(
-                    height: 36.0,
-                    width: maxWidth,
-                    child: ColoredBox(
-                      color: const Color(0xe0f8ffff),
-                      child: PullRequest.total(onlyRefactor: onlyRefactor),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
+          if (floatingFooter)
+            Padding(
+              padding: padding,
+              child: SizedBox(
+                height: 36.0,
+                child: ColoredBox(
+                  color: const Color(0xe0f8ffff),
+                  child: PullRequest.total(onlyRefactor: onlyRefactor),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -148,6 +130,7 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     const header = Row(
+      key: GlobalObjectKey('header'),
       children: [
         Expanded(
           child: Center(

@@ -35,3 +35,10 @@ flutter:
         - asset: assets/fonts/timesbi.ttf
           weight: 700
           style: italic
+    - family: gaegu
+      fonts:
+        - asset: assets/fonts/gaegu.ttf
+        - asset: assets/fonts/gaegu_bold.ttf
+          weight: 700
+        - asset: assets/fonts/gaegu_light.ttf
+          weight: 300

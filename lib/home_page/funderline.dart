@@ -30,8 +30,8 @@ class _FunderlineState extends State<Funderline> with SingleTickerProviderStateM
 
   late final controller = ToggleAnimation(
     vsync: this,
-    duration: const Duration(milliseconds: 1750),
-    reverseDuration: const Duration(milliseconds: 1000),
+    duration: const Seconds(1.75),
+    reverseDuration: const Seconds(1),
   );
 
   @override

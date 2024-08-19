@@ -1,5 +1,4 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 part 'pr_data.g.dart';
 
@@ -10,7 +9,7 @@ enum PRLayout {
   spaced;
 
   factory PRLayout._compute(BuildContext context, PRLayout? _) {
-    return MediaQuery.sizeOf(context).width < 500 ? compact : spaced;
+    return MediaQuery.sizeOf(context).width < 720 ? compact : spaced;
   }
 
   factory PRLayout.of(BuildContext context) => Provider.of<PRLayout>(context);

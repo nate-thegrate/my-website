@@ -1,12 +1,17 @@
-import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
 
 enum Route {
+  home,
   stats,
-  projects;
+  projects,
+  hueman,
+  flutterApis,
+  recipes,
+  heartCenter;
 
   factory Route.fromUri(Uri uri) => values.byName(uri.path.split('/').last);
 
@@ -15,6 +20,16 @@ enum Route {
   }
 
   static Route get current => Route.fromUri(App._router.routerDelegate.currentConfiguration.uri);
+
+  String get target {
+    if (this == home) return '/';
+
+    final parent = switch (this) {
+      home || stats || projects => '/',
+      hueman || flutterApis || recipes || heartCenter => '/projects/',
+    };
+    return parent + name;
+  }
 
   GlobalKey get key => GlobalObjectKey(this);
 
@@ -43,6 +58,27 @@ class App extends StatelessWidget {
             path: Route.projects.name,
             builder: (context, state) => const Projects(),
             pageBuilder: (context, state) => const NoTransitionPage(child: Projects()),
+            routes: <RouteBase>[
+              GoRoute(
+                path: Route.flutterApis.name,
+                builder: (context, state) => const FlutterApis(),
+                pageBuilder: (context, state) => const NoTransitionPage(child: FlutterApis()),
+              ),
+              GoRoute(
+                path: Route.hueman.name,
+                redirect: (context, state) => Route.projects.target,
+              ),
+              GoRoute(
+                path: Route.recipes.name,
+                builder: (context, state) => const Recipes(),
+                pageBuilder: (context, state) => const NoTransitionPage(child: Recipes()),
+              ),
+              GoRoute(
+                path: Route.heartCenter.name,
+                builder: (context, state) => const SizedBox.shrink(),
+                pageBuilder: (context, state) => const NoTransitionPage(child: SizedBox.shrink()),
+              ),
+            ],
           ),
         ],
       ),
@@ -83,11 +119,11 @@ class TopBar extends StatefulWidget {
 
 class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
   late final gapAnimation = ValueAnimation(
-    tickerProvider: this,
+    vsync: this,
     initialValue: 0.0,
     duration: Durations.short2,
     curve: Curves.ease,
-    lerp: ui.lerpDouble,
+    lerp: lerpDouble,
   )..addListener(() => setState(() {}));
 
   @override
@@ -98,17 +134,6 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final currentRoute = Route.of(context);
-
-    Widget routeButton(Route route) {
-      Widget widget = Center(child: Text('$route', textAlign: TextAlign.center));
-
-      if (route == currentRoute) {
-        widget = ColoredBox(color: Colors.white54, child: widget);
-      }
-      return Expanded(child: widget);
-    }
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + gapAnimation.value),
@@ -117,19 +142,20 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
           onExit: (event) => gapAnimation.value = 0,
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: kToolbarHeight,
                 child: ColoredBox(
                   color: GrateColors.lightCyan,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Center(
                           child: Text('NATE THE GRATE', textAlign: TextAlign.center),
                         ),
                       ),
-                      for (final route in Route.values) routeButton(route),
+                      _RouteButton(Route.stats),
+                      _RouteButton(Route.projects),
                     ],
                   ),
                 ),
@@ -145,5 +171,21 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
       ),
       body: widget.body,
     );
+  }
+}
+
+class _RouteButton extends StatelessWidget {
+  const _RouteButton(this.route);
+
+  final Route route;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget widget = Center(child: Text('$route', textAlign: TextAlign.center));
+
+    if (route == Route.of(context)) {
+      widget = ColoredBox(color: Colors.white54, child: widget);
+    }
+    return Expanded(child: widget);
   }
 }
