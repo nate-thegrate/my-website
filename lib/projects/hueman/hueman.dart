@@ -3,10 +3,11 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class HuemanCard extends StatelessWidget {
+class HuemanCard extends StatelessWidget implements Project {
   const HuemanCard({super.key});
 
-  static void launch() => launchUrlString('https://hue-man.app/');
+  @override
+  void launch() => launchUrlString('https://hue-man.app/');
 
   static const _graphic = Column(
     mainAxisSize: MainAxisSize.min,
@@ -63,11 +64,11 @@ class HuemanCard extends StatelessWidget {
 
     return AnimatedScale(
       scale: scale.resolve(states),
-      duration: ProjectCard.duration,
+      duration: ProjectButton.duration,
       curve: Curves.ease,
       child: AnimatedValue.builder(
         value,
-        duration: ProjectCard.duration,
+        duration: ProjectButton.duration,
         lerp: lerpDouble,
         curve: Curves.easeInOutSine,
         builder: (context, value, child) => ProjectCardTemplate(

@@ -3,9 +3,13 @@ import 'dart:math' as math;
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'flutter_apis/flutter_apis.dart';
-export 'games/games.dart';
+export 'hueman/hueman.dart';
 export 'heart_center/heart_center.dart';
 export 'recipes/recipes.dart';
+
+abstract interface class Project implements Widget {
+  void launch();
+}
 
 class Projects extends StatefulWidget {
   const Projects({super.key});
@@ -18,19 +22,10 @@ class _ProjectsState extends State<Projects> {
   @override
   Widget build(BuildContext context) {
     const projects = [
-      ProjectCard(route: Route.hueman, child: HuemanCard()),
-      ProjectCard(
-        route: Route.flutterApis,
-        child: ProjectCardTemplate(),
-      ),
-      ProjectCard(
-        route: Route.recipes,
-        child: ProjectCardTemplate(),
-      ),
-      ProjectCard(
-        route: Route.heartCenter,
-        child: ProjectCardTemplate(),
-      ),
+      ProjectButton(HuemanCard()),
+      ProjectButton(FlutterApis()),
+      ProjectButton(Recipes()),
+      ProjectButton(HeartCenter()),
     ];
 
     if (isMobile) {
@@ -85,22 +80,20 @@ class _SpacedGrid extends StatelessWidget {
   }
 }
 
-class ProjectCard extends StatefulWidget {
-  const ProjectCard({super.key, required this.route, this.child, this.onClicked});
+class ProjectButton extends StatefulWidget {
+  const ProjectButton(this.project, {super.key});
 
-  final Route route;
-  final Widget? child;
-  final VoidCallback? onClicked;
+  final Project project;
 
   static const duration = Durations.short4;
 
   Future<void> get pause => Future.delayed(const Seconds(0.0125));
 
   @override
-  State<ProjectCard> createState() => _ProjectCardState();
+  State<ProjectButton> createState() => _ProjectButtonState();
 }
 
-class _ProjectCardState extends State<ProjectCard> {
+class _ProjectButtonState extends State<ProjectButton> {
   /// The [BlocProvider] will [dispose] of it automatically!
   final states = WidgetStates();
 
@@ -114,24 +107,21 @@ class _ProjectCardState extends State<ProjectCard> {
     if (_controller.isShowing && !states.contains(WidgetState.selected)) {
       setState(_controller.hide);
     }
-    states.remove(WidgetState.hovered);
-  }
-
-  void handleTapDown(_) async {
-    Future.delayed(const Seconds(0.025), () => states.add(WidgetState.pressed));
-  }
-
-  void handleTapCancel() async {
-    Future.delayed(const Seconds(0.025), () => states.remove(WidgetState.pressed));
-  }
-
-  void handleTapUp(_) async {
     states
-      ..add(WidgetState.selected)
+      ..remove(WidgetState.hovered)
       ..remove(WidgetState.pressed);
+  }
 
-    await Future.delayed(const Seconds(10));
-    widget.onClicked?.call();
+  void handleDownpress(_) async {
+    states.add(WidgetState.pressed);
+  }
+
+  void handlePressEnd(_) async {
+    states.add(WidgetState.selected);
+    if (states.remove(WidgetState.pressed)) {
+      await Future.delayed(ProjectButton.duration);
+      widget.project.launch();
+    }
 
     if (_controller.isShowing) setState(_controller.hide);
     if (!context.mounted) return;
@@ -149,22 +139,20 @@ class _ProjectCardState extends State<ProjectCard> {
         onEnter: hover,
         onExit: endHover,
         child: GestureDetector(
-          onTapDown: handleTapDown,
-          onTapUp: handleTapUp,
-          onTapCancel: handleTapCancel,
-          child: widget.child,
+          onPanDown: handleDownpress,
+          onPanEnd: handlePressEnd,
+          child: widget.project,
         ),
       ),
     );
+
     return OverlayPortal(
       controller: _controller,
       overlayChildBuilder: (_) {
         final renderBox = context.findRenderObject()! as RenderBox;
         final offset = renderBox.localToGlobal(renderBox.paintBounds.topLeft);
-        return Positioned.fromRect(
-          rect: offset & renderBox.size,
-          child: card,
-        );
+
+        return Positioned.fromRect(rect: offset & renderBox.size, child: card);
       },
       child: _controller.isShowing ? null : card,
     );
