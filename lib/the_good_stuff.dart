@@ -1,3 +1,4 @@
+import 'package:collection_notifiers/collection_notifiers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:go_router/go_router.dart';
@@ -8,7 +9,7 @@ import 'main.dart';
 export 'package:flutter/material.dart' hide Route;
 export 'package:flutter/gestures.dart';
 export 'package:go_router/go_router.dart' hide GoRouterHelper;
-export 'package:provider/provider.dart';
+export 'package:provider/provider.dart' hide ChangeNotifierProvider;
 export 'package:url_launcher/url_launcher_string.dart';
 
 export 'main.dart';
@@ -31,6 +32,13 @@ extension ContextRoute on BuildContext {
 typedef Bloc = ChangeNotifier;
 typedef Cubit<T> = ValueNotifier<T>;
 typedef BlocProvider<T extends Bloc?> = ChangeNotifierProvider<T>;
+
+extension type WidgetStates._(SetNotifier<WidgetState> _states)
+    implements SetNotifier<WidgetState> {
+  WidgetStates([_]) : this._(SetNotifier<WidgetState>());
+
+  factory WidgetStates.of(BuildContext context) => context.watch();
+}
 
 const root2 = 1.4142135623730951;
 

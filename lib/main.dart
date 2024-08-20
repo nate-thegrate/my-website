@@ -19,7 +19,13 @@ enum Route {
     return Route.fromUri(GoRouter.of(context).routeInformationProvider.value.uri);
   }
 
-  static Route get current => Route.fromUri(App._router.routerDelegate.currentConfiguration.uri);
+  static GoRouterDelegate get _delegate => App._router.routerDelegate;
+  static Route get current => Route.fromUri(_delegate.currentConfiguration.uri);
+
+  static void go(Route route, {Object? extra}) {
+    final BuildContext context = _delegate.navigatorKey.currentContext!;
+    context.go(route, extra: extra);
+  }
 
   String get target {
     if (this == home) return '/';

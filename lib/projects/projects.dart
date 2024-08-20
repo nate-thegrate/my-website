@@ -17,6 +17,22 @@ class Projects extends StatefulWidget {
 class _ProjectsState extends State<Projects> {
   @override
   Widget build(BuildContext context) {
+    const projects = [
+      ProjectCard(route: Route.hueman, child: HuemanCard()),
+      ProjectCard(
+        route: Route.flutterApis,
+        child: ProjectCardTemplate(),
+      ),
+      ProjectCard(
+        route: Route.recipes,
+        child: ProjectCardTemplate(),
+      ),
+      ProjectCard(
+        route: Route.heartCenter,
+        child: ProjectCardTemplate(),
+      ),
+    ];
+
     if (isMobile) {
       return const TopBar(
         body: Center(
@@ -24,24 +40,7 @@ class _ProjectsState extends State<Projects> {
             height: 720,
             child: CarouselView(
               itemExtent: 720 * root2 / 2,
-              children: [
-                ProjectCard(
-                  route: Route.hueman,
-                  child: ColoredBox(color: Color(0xFFE6D6BC)),
-                ),
-                ProjectCard(
-                  route: Route.flutterApis,
-                  child: ColoredBox(color: Color(0xFFE6D6BC)),
-                ),
-                ProjectCard(
-                  route: Route.recipes,
-                  child: ColoredBox(color: Color(0xFFE6D6BC)),
-                ),
-                ProjectCard(
-                  route: Route.heartCenter,
-                  child: ColoredBox(color: Color(0xFFE6D6BC)),
-                ),
-              ],
+              children: projects,
             ),
           ),
         ),
@@ -50,38 +49,7 @@ class _ProjectsState extends State<Projects> {
     return const TopBar(
       body: Center(
         child: CustomScrollView(
-          slivers: [
-            // SliverAppBar(
-            //   expandedHeight: 64.0,
-            //   collapsedHeight: kToolbarHeight,
-            //   pinned: true,
-            //   automaticallyImplyLeading: false,
-            //   title: Text('Published'),
-            // ),
-            SliverPadding(
-              padding: EdgeInsets.zero,
-              sliver: _SpacedGrid(
-                children: [
-                  ProjectCard(
-                    route: Route.hueman,
-                    child: ColoredBox(color: Color(0xFFE6D6BC)),
-                  ),
-                  ProjectCard(
-                    route: Route.flutterApis,
-                    child: ColoredBox(color: Color(0xFFE6D6BC)),
-                  ),
-                  ProjectCard(
-                    route: Route.recipes,
-                    child: ColoredBox(color: Color(0xFFE6D6BC)),
-                  ),
-                  ProjectCard(
-                    route: Route.heartCenter,
-                    child: ColoredBox(color: Color(0xFFE6D6BC)),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          slivers: [_SpacedGrid(children: projects)],
         ),
       ),
     );
@@ -99,7 +67,10 @@ class _SpacedGrid extends StatelessWidget {
     final spacing = 24.0 + math.max(720, screenWidth) / 20;
     final padding = (screenWidth - 720 - spacing) / 2;
     return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: spacing),
+      padding: EdgeInsets.symmetric(
+        horizontal: math.max(padding, spacing),
+        vertical: spacing,
+      ),
       sliver: SliverConstrainedCrossAxis(
         maxExtent: 720,
         sliver: SliverGrid.count(
@@ -115,101 +86,73 @@ class _SpacedGrid extends StatelessWidget {
 }
 
 class ProjectCard extends StatefulWidget {
-  const ProjectCard({super.key, required this.route, this.child});
+  const ProjectCard({super.key, required this.route, this.child, this.onClicked});
 
   final Route route;
   final Widget? child;
+  final VoidCallback? onClicked;
 
   static const duration = Durations.short4;
+
+  Future<void> get pause => Future.delayed(const Seconds(0.0125));
 
   @override
   State<ProjectCard> createState() => _ProjectCardState();
 }
 
 class _ProjectCardState extends State<ProjectCard> {
+  /// The [BlocProvider] will [dispose] of it automatically!
+  final states = WidgetStates();
+
   final _controller = OverlayPortalController();
-  final states = <WidgetState>{};
-
-  void _hover(_) {
-    if (states.add(WidgetState.hovered)) setState(() {});
+  void hover(_) async {
+    if (!_controller.isShowing) setState(_controller.show);
+    states.add(WidgetState.hovered);
   }
 
-  void _endHover(_) {
-    if (states.remove(WidgetState.hovered)) setState(() {});
-  }
-
-  void _handleTapDown(_) {
-    _controller.show();
-    setState(() => states.add(WidgetState.pressed));
-  }
-
-  void _handleTapCancel() {
-    _controller.hide();
-    setState(() => states.remove(WidgetState.pressed));
-  }
-
-  void _handleTapUp(_) async {
-    setState(() {
-      states
-        ..add(WidgetState.selected)
-        ..remove(WidgetState.pressed);
-    });
-    await Future.delayed(ProjectCard.duration);
-    if (!mounted) return;
-
-    if (widget.route == Route.hueman) {
-      launchUrlString('https://hue-man.app/');
-      await Future.delayed(ProjectCard.duration);
-      if (mounted) {
-        _controller.hide();
-        setState(() => states.remove(WidgetState.selected));
-      }
-    } else {
-      context.go(widget.route);
+  void endHover(_) async {
+    if (_controller.isShowing && !states.contains(WidgetState.selected)) {
+      setState(_controller.hide);
     }
+    states.remove(WidgetState.hovered);
+  }
+
+  void handleTapDown(_) async {
+    Future.delayed(const Seconds(0.025), () => states.add(WidgetState.pressed));
+  }
+
+  void handleTapCancel() async {
+    Future.delayed(const Seconds(0.025), () => states.remove(WidgetState.pressed));
+  }
+
+  void handleTapUp(_) async {
+    states
+      ..add(WidgetState.selected)
+      ..remove(WidgetState.pressed);
+
+    await Future.delayed(const Seconds(10));
+    widget.onClicked?.call();
+
+    if (_controller.isShowing) setState(_controller.hide);
+    if (!context.mounted) return;
+
+    states.remove(WidgetState.selected);
   }
 
   @override
   Widget build(BuildContext context) {
-    const scale = WidgetStateProperty<double>.fromMap({
-      WidgetState.selected: 8,
-      WidgetState.pressed: 1.1,
-      WidgetState.hovered: 1.05,
-      WidgetState.any: 1.0,
-    });
-    final Widget? child = switch (widget.route) {
-      Route.hueman => HuemanCard(expanding: states.contains(WidgetState.selected)),
-      _ => widget.child
-    };
-    final card = MouseRegion(
-      key: GlobalObjectKey(widget.route),
-      cursor: SystemMouseCursors.click,
-      onEnter: _hover,
-      onExit: _endHover,
-      child: GestureDetector(
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        onTapCancel: _handleTapCancel,
-        child: AnimatedScale(
-          scale: scale.resolve(states),
-          duration: ProjectCard.duration,
-          curve: Curves.ease,
-          child: PhysicalShape(
-            clipper: const ShapeBorderClipper(
-              shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(16.0),
-                ),
-              ),
-            ),
-            elevation: 5,
-            clipBehavior: Clip.antiAlias,
-            color: Colors.grey,
-            shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
-                ? Colors.black
-                : Colors.black45,
-            child: child,
-          ),
+    final card = BlocProvider(
+      key: GlobalObjectKey(states),
+      create: (_) => states,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: hover,
+        onExit: endHover,
+        child: GestureDetector(
+          onTapDown: handleTapDown,
+          onTapUp: handleTapUp,
+          onTapCancel: handleTapCancel,
+          child: widget.child,
         ),
       ),
     );
@@ -226,4 +169,25 @@ class _ProjectCardState extends State<ProjectCard> {
       child: _controller.isShowing ? null : card,
     );
   }
+}
+
+class ProjectCardTemplate extends PhysicalShape {
+  const ProjectCardTemplate({
+    super.key,
+    super.elevation = defaultElevation,
+    super.color = const Color(0xFFF8F1E5),
+    super.shadowColor = Colors.black45,
+    Widget super.child = const SizedBox.expand(),
+  }) : super(
+          clipper: const ShapeBorderClipper(
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(16.0),
+              ),
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+        );
+
+  static const defaultElevation = 5.0;
 }

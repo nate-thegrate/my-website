@@ -1,15 +1,12 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class HuemanCard extends AnimatedValue<double> {
-  const HuemanCard({super.key, required bool expanding})
-      : super(
-          expanding ? 1.0 : 0.0,
-          duration: ProjectCard.duration,
-          lerp: lerpDouble,
-          curve: Curves.easeInOutSine,
-        );
+class HuemanCard extends StatelessWidget {
+  const HuemanCard({super.key});
+
+  static void launch() => launchUrlString('https://hue-man.app/');
 
   static const _graphic = Column(
     mainAxisSize: MainAxisSize.min,
@@ -53,14 +50,39 @@ class HuemanCard extends AnimatedValue<double> {
   );
 
   @override
-  Widget build(BuildContext context, double value) {
-    return ColoredBox(
-      color: Color.lerp(const Color(0xffeef3f8), Colors.white, value)!,
-      child: Center(
-        child: Opacity(
-          opacity: 1 - value,
-          child: _graphic,
+  Widget build(BuildContext context) {
+    final states = WidgetStates.of(context);
+    final value = states.contains(WidgetState.selected) ? 1.0 : 0.0;
+
+    const scale = WidgetStateProperty<double>.fromMap({
+      WidgetState.selected: 8,
+      WidgetState.pressed: 1.1,
+      WidgetState.hovered: 1.05,
+      WidgetState.any: 1.0,
+    });
+
+    return AnimatedScale(
+      scale: scale.resolve(states),
+      duration: ProjectCard.duration,
+      curve: Curves.ease,
+      child: AnimatedValue.builder(
+        value,
+        duration: ProjectCard.duration,
+        lerp: lerpDouble,
+        curve: Curves.easeInOutSine,
+        builder: (context, value, child) => ProjectCardTemplate(
+          shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
+              ? Colors.black
+              : Colors.black45,
+          color: Color.lerp(const Color(0xffeef3f8), Colors.white, value)!,
+          child: Center(
+            child: Opacity(
+              opacity: 1 - math.min(value * 2, 1),
+              child: child,
+            ),
+          ),
         ),
+        child: _graphic,
       ),
     );
   }
