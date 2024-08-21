@@ -3,11 +3,8 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class HuemanCard extends StatelessWidget implements Project {
+class HuemanCard extends StatelessWidget {
   const HuemanCard({super.key});
-
-  @override
-  void launch() => launchUrlString('https://hue-man.app/');
 
   static const _graphic = Column(
     mainAxisSize: MainAxisSize.min,
@@ -54,6 +51,12 @@ class HuemanCard extends StatelessWidget implements Project {
   Widget build(BuildContext context) {
     final states = WidgetStates.of(context);
     final value = states.contains(WidgetState.selected) ? 1.0 : 0.0;
+    void launch() async {
+      launchUrlString('https://hue-man.app/');
+
+      await Future.delayed(ProjectButton.duration);
+      states.remove(WidgetState.selected);
+    }
 
     const scale = WidgetStateProperty<double>.fromMap({
       WidgetState.selected: 8,
@@ -83,6 +86,7 @@ class HuemanCard extends StatelessWidget implements Project {
             ),
           ),
         ),
+        onEnd: value == 1.0 ? launch : null,
         child: _graphic,
       ),
     );

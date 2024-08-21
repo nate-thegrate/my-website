@@ -1,21 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:nate_thegrate/projects/projects.dart';
+import 'package:nate_thegrate/the_good_stuff.dart';
 
-class FlutterApis extends StatefulWidget implements Project {
+class FlutterApis extends StatelessWidget {
   const FlutterApis({super.key});
 
   @override
-  State<FlutterApis> createState() => _FlutterApisState();
-
-  @override
-  void launch() {
-    // TODO: implement launch
-  }
-}
-
-class _FlutterApisState extends State<FlutterApis> {
-  @override
   Widget build(BuildContext context) {
-    return const ProjectCardTemplate();
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xff28ffff), Color(0xffa0a0ff)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SizedBox.expand(),
+    );
   }
 }

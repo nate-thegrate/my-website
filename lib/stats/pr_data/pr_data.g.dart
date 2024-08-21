@@ -2,6 +2,12 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''`_InteractiveViewerState` code cleanup''',
+    url: '''https://github.com/flutter/flutter/pull/153645''',
+    diffs: (83, 134),
+    refactor: true,
+  ),
+  PullRequest(
     title: '''Add Nate Wilson to authors''',
     url: '''https://github.com/flutter/flutter/pull/152907''',
     diffs: (1, 0),

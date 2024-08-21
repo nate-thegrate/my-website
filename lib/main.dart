@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:nate_thegrate/projects/flutter_apis/flutter_apis.dart';
+
 import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
@@ -66,10 +68,14 @@ class App extends StatelessWidget {
             pageBuilder: (context, state) => const NoTransitionPage(child: Projects()),
             routes: <RouteBase>[
               GoRoute(
-                path: Route.flutterApis.name,
-                builder: (context, state) => const FlutterApis(),
-                pageBuilder: (context, state) => const NoTransitionPage(child: FlutterApis()),
-              ),
+                  path: Route.flutterApis.name,
+                  builder: (context, state) => const FlutterApis(),
+                  pageBuilder: (context, state) {
+                    if (state.extra != null) {
+                      return const NoTransitionPage(child: FlutterApisTransition.stack);
+                    }
+                    return const NoTransitionPage(child: FlutterApis());
+                  }),
               GoRoute(
                 path: Route.hueman.name,
                 redirect: (context, state) => Route.projects.target,

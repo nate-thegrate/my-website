@@ -2,14 +2,10 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-export 'flutter_apis/flutter_apis.dart';
-export 'hueman/hueman.dart';
+export 'flutter_apis/flutter_apis_card.dart';
+export 'hueman/hueman_card.dart';
 export 'heart_center/heart_center.dart';
 export 'recipes/recipes.dart';
-
-abstract interface class Project implements Widget {
-  void launch();
-}
 
 class Projects extends StatefulWidget {
   const Projects({super.key});
@@ -23,7 +19,7 @@ class _ProjectsState extends State<Projects> {
   Widget build(BuildContext context) {
     const projects = [
       ProjectButton(HuemanCard()),
-      ProjectButton(FlutterApis()),
+      ProjectButton(FlutterApisCard()),
       ProjectButton(Recipes()),
       ProjectButton(HeartCenter()),
     ];
@@ -83,7 +79,7 @@ class _SpacedGrid extends StatelessWidget {
 class ProjectButton extends StatefulWidget {
   const ProjectButton(this.project, {super.key});
 
-  final Project project;
+  final Widget project;
 
   static const duration = Durations.short4;
 
@@ -98,35 +94,37 @@ class _ProjectButtonState extends State<ProjectButton> {
   final states = WidgetStates();
 
   final _controller = OverlayPortalController();
-  void hover(_) async {
+  void _show() {
     if (!_controller.isShowing) setState(_controller.show);
+  }
+
+  void _hide() {
+    if (_controller.isShowing) setState(_controller.hide);
+  }
+
+  void hover(_) async {
     states.add(WidgetState.hovered);
   }
 
   void endHover(_) async {
-    if (_controller.isShowing && !states.contains(WidgetState.selected)) {
-      setState(_controller.hide);
+    if (!states.contains(WidgetState.selected)) {
+      _hide();
     }
-    states
-      ..remove(WidgetState.hovered)
-      ..remove(WidgetState.pressed);
+    states.removeAll({WidgetState.hovered, WidgetState.pressed});
   }
 
   void handleDownpress(_) async {
     states.add(WidgetState.pressed);
+    _show();
   }
 
   void handlePressEnd(_) async {
-    states.add(WidgetState.selected);
-    if (states.remove(WidgetState.pressed)) {
-      await Future.delayed(ProjectButton.duration);
-      widget.project.launch();
+    if (states.contains(WidgetState.hovered)) {
+      states.add(WidgetState.selected);
     }
+    states.remove(WidgetState.pressed);
 
-    if (_controller.isShowing) setState(_controller.hide);
-    if (!context.mounted) return;
-
-    states.remove(WidgetState.selected);
+    _hide();
   }
 
   @override
@@ -167,15 +165,13 @@ class ProjectCardTemplate extends PhysicalShape {
     super.shadowColor = Colors.black45,
     Widget super.child = const SizedBox.expand(),
   }) : super(
-          clipper: const ShapeBorderClipper(
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(16.0),
-              ),
-            ),
-          ),
+          clipper: const ShapeBorderClipper(shape: shape),
           clipBehavior: Clip.antiAlias,
         );
+
+  static const shape = ContinuousRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(16.0)),
+  );
 
   static const defaultElevation = 5.0;
 }
