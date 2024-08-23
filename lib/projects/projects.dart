@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'flutter_apis/flutter_apis_card.dart';
+export 'flutter_apis/flutter_apis.dart';
 export 'hueman/hueman_card.dart';
 export 'heart_center/heart_center.dart';
 export 'recipes/recipes.dart';
@@ -124,7 +125,8 @@ class _ProjectButtonState extends State<ProjectButton> {
     }
     states.remove(WidgetState.pressed);
 
-    _hide();
+    await Future.delayed(ProjectButton.duration);
+    if (mounted) _hide();
   }
 
   @override

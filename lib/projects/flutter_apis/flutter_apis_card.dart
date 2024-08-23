@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:nate_thegrate/projects/flutter_apis/flutter_apis.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class FlutterApisCard extends StatefulWidget {
@@ -55,7 +54,9 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
   @override
   void initState() {
     super.initState();
+    (widthAnimation, depthAnimation, launchAnimation);
     states.addListener(_updateAnimations);
+    Future.microtask(() => precacheImage(FlutterApis.bgImage, context));
   }
 
   @override
@@ -63,6 +64,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
     states.removeListener(_updateAnimations);
     widthAnimation.dispose();
     depthAnimation.dispose();
+    launchAnimation.dispose();
     super.dispose();
   }
 

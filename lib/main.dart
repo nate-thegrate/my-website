@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-import 'package:nate_thegrate/projects/flutter_apis/flutter_apis.dart';
-
 import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
@@ -10,6 +8,8 @@ enum Route {
   home,
   stats,
   projects,
+  mapping,
+  animation,
   hueman,
   flutterApis,
   recipes,
@@ -17,6 +17,7 @@ enum Route {
 
   factory Route.fromUri(Uri uri) => values.byName(uri.path.split('/').last);
 
+  @Deprecated('probably not necessary')
   factory Route.of(BuildContext context) {
     return Route.fromUri(GoRouter.of(context).routeInformationProvider.value.uri);
   }
@@ -33,10 +34,12 @@ enum Route {
     if (this == home) return '/';
 
     final parent = switch (this) {
-      home || stats || projects => '/',
-      hueman || flutterApis || recipes || heartCenter => '/projects/',
+      home => throw Error(),
+      stats || projects => '',
+      hueman || flutterApis || recipes || heartCenter => projects.target,
+      mapping || animation => flutterApis.target,
     };
-    return parent + name;
+    return '$parent/$name';
   }
 
   GlobalKey get key => GlobalObjectKey(this);
@@ -68,14 +71,31 @@ class App extends StatelessWidget {
             pageBuilder: (context, state) => const NoTransitionPage(child: Projects()),
             routes: <RouteBase>[
               GoRoute(
-                  path: Route.flutterApis.name,
-                  builder: (context, state) => const FlutterApis(),
-                  pageBuilder: (context, state) {
-                    if (state.extra != null) {
-                      return const NoTransitionPage(child: FlutterApisTransition.stack);
-                    }
-                    return const NoTransitionPage(child: FlutterApis());
-                  }),
+                path: Route.flutterApis.name,
+                builder: (context, state) => const FlutterApis(),
+                pageBuilder: (context, state) {
+                  if (state.extra != null) {
+                    return const NoTransitionPage(child: FlutterApisTransition.stack);
+                  }
+                  return const NoTransitionPage(child: FlutterApis());
+                },
+                routes: [
+                  GoRoute(
+                    path: Route.mapping.name,
+                    builder: (context, state) => const WidgetStateMapping(),
+                    pageBuilder: (context, state) {
+                      return const NoTransitionPage(child: WidgetStateMapping());
+                    },
+                  ),
+                  GoRoute(
+                    path: Route.animation.name,
+                    builder: (context, state) => const WidgetStateMapping(),
+                    pageBuilder: (context, state) {
+                      return const NoTransitionPage(child: WidgetStateMapping());
+                    },
+                  ),
+                ],
+              ),
               GoRoute(
                 path: Route.hueman.name,
                 redirect: (context, state) => Route.projects.target,
@@ -136,7 +156,7 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
     duration: Durations.short2,
     curve: Curves.ease,
     lerp: lerpDouble,
-  )..addListener(() => setState(() {}));
+  )..addListener(rebuild);
 
   @override
   void dispose() {
@@ -195,7 +215,7 @@ class _RouteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget widget = Center(child: Text('$route', textAlign: TextAlign.center));
 
-    if (route == Route.of(context)) {
+    if (route == Route.current) {
       widget = ColoredBox(color: Colors.white54, child: widget);
     }
     return Expanded(child: widget);

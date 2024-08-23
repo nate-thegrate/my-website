@@ -45,7 +45,7 @@ class _FunderlineState extends State<Funderline> with SingleTickerProviderStateM
     bottom = bottomRight.dy;
 
     controller
-      ..addListener(() => setState(() {}))
+      ..addListener(rebuild)
       ..addStatusListener(statusUpdate)
       ..animateTo(1);
   }

@@ -29,6 +29,11 @@ extension ContextRoute on BuildContext {
   void go(Route route, {Object? extra}) => GoRouter.of(this).go(route.target, extra: extra);
 }
 
+extension Rebuild on State {
+  // ignore: invalid_use_of_protected_member, screw that
+  void rebuild() => setState(() {});
+}
+
 typedef Bloc = ChangeNotifier;
 typedef Cubit<T> = ValueNotifier<T>;
 typedef BlocProvider<T extends Bloc?> = ChangeNotifierProvider<T>;
