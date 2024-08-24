@@ -3,16 +3,29 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class GetRekt extends Cubit<Rect?> {
-  GetRekt([_]) : super(null);
+class GetRekt extends Bloc {
+  GetRekt([_]);
 
   static const duration = Durations.medium1;
 
   static double opacityOf(BuildContext context) {
-    return context.watch<GetRekt>().value == null ? 1.0 : 0.0;
+    return context.watch<GetRekt>()._rekt == null ? 1.0 : 0.0;
   }
 
-  late final OverlayEntry entry;
+  static bool selected(BuildContext context, Route route) {
+    return context.read<GetRekt>()._route == route;
+  }
+
+  void giveRekt(Rect rekt, Route route) {
+    _rekt = rekt;
+    _route = route;
+    notifyListeners();
+  }
+
+  Rect? _rekt;
+  Route? _route;
+
+  late OverlayEntry entry;
 
   void absolutelyRekt(Route route, OverlayState overlay) {
     entry = OverlayEntry(
@@ -21,7 +34,7 @@ class GetRekt extends Cubit<Rect?> {
         child: Align(
           alignment: Alignment.topLeft,
           child: _AnimatedRekt(
-            Rekt.start(value!),
+            Rekt.start(_rekt!),
             Rekt.end(MediaQuery.sizeOf(context)),
             onEnd: () async {
               await Future.delayed(Durations.short4);

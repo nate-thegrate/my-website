@@ -5,6 +5,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 class FlutterApisCard extends StatefulWidget {
   const FlutterApisCard({super.key});
+  static bool launching = false;
 
   @override
   State<FlutterApisCard> createState() => _FlutterApisCardState();
@@ -25,7 +26,6 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
   late final states = context.read<WidgetStates>();
 
   bool prepareToLaunch = false;
-  static bool launching = false;
 
   void _updateAnimations() async {
     widthAnimation.animateTo(states.contains(WidgetState.hovered) ? 1.0 : 0.0);
@@ -39,14 +39,18 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
         } on TickerCanceled {
           return;
         }
-        launching = true;
+        FlutterApisCard.launching = true;
 
         await Future.delayed(Durations.medium1);
         if (!mounted) return;
 
         Route.go(Route.flutterApis, extra: const Projects());
         await Future.delayed(const Seconds(1));
-        launching = false;
+
+        FlutterApisCard.launching = false;
+        prepareToLaunch = false;
+        states.remove(WidgetState.selected);
+        launchAnimation.animateTo(0, from: 0.01);
       }
     }
   }
@@ -70,7 +74,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    if (launching) {
+    if (FlutterApisCard.launching) {
       return const SizedBox.shrink();
     }
     return LayoutBuilder(
