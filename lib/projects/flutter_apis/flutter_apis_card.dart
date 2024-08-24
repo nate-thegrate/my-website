@@ -23,7 +23,8 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
   );
 
   late final listenables = Listenable.merge({widthAnimation, depthAnimation, launchAnimation});
-  late final states = context.read<WidgetStates>();
+  late final states =
+      ThisSiteCard.encapulates(context) ? WidgetStates() : context.read<WidgetStates>();
 
   bool prepareToLaunch = false;
 

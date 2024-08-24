@@ -5,7 +5,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 export 'flutter_apis/flutter_apis_card.dart';
 export 'flutter_apis/flutter_apis.dart';
 export 'hueman/hueman_card.dart';
-export 'heart_center/heart_center.dart';
+export 'this_site/this_site_card.dart';
 export 'recipes/recipes.dart';
 
 class Projects extends StatefulWidget {
@@ -22,7 +22,7 @@ class _ProjectsState extends State<Projects> {
       ProjectButton(HuemanCard()),
       ProjectButton(FlutterApisCard()),
       ProjectButton(Recipes()),
-      ProjectButton(HeartCenter()),
+      ThisSiteCard(),
     ];
 
     if (isMobile) {
@@ -125,7 +125,7 @@ class _ProjectButtonState extends State<ProjectButton> {
     }
     states.remove(WidgetState.pressed);
 
-    await Future.delayed(ProjectButton.duration);
+    await Future.delayed(const Seconds(2));
     if (mounted) _hide();
   }
 

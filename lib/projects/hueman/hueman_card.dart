@@ -49,12 +49,12 @@ class HuemanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final states = WidgetStates.of(context);
+    final states = ThisSiteCard.encapulates(context) ? <WidgetState>{} : WidgetStates.of(context);
     final value = states.contains(WidgetState.selected) ? 1.0 : 0.0;
     void launch() async {
       launchUrlString('https://hue-man.app/');
 
-      await Future.delayed(ProjectButton.duration);
+      await Future.delayed(const Seconds(1.5));
       states.remove(WidgetState.selected);
     }
 
