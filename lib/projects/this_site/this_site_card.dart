@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -34,10 +35,12 @@ class _ThisSiteCardState extends State<ThisSiteCard> {
       key: _cardKey,
       scale,
       duration: const Seconds(1.5),
+      lerp: lerpDouble,
       builder: (context, scale, child) => AnimatedValue.builder(
         _active.isSatisfiedBy(states) ? Colors.white : const Color(0xffe0e0e0),
         duration: Durations.medium1,
         curve: Curves.ease,
+        lerp: Color.lerp,
         builder: (context, color, child) {
           return _CardRecursion(scale: scale, color: color);
         },

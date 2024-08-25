@@ -129,6 +129,17 @@ class App extends StatelessWidget {
       textSelectionTheme: const TextSelectionThemeData(
         selectionColor: GrateColors.lightCyan,
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: const Color(0xff0060ff),
+          shape: const ContinuousRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(16),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+        ),
+      ),
     );
 
     return PRLayoutProvider(

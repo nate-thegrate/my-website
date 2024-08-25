@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class ApiButton extends StatefulWidget {
@@ -98,11 +96,10 @@ class _ApiButtonState extends State<ApiButton> {
                 onEnter: (event) => states.add(WidgetState.hovered),
                 onExit: (event) => states.remove(WidgetState.hovered),
                 cursor: SystemMouseCursors.click,
-                child: AnimatedValue.builder(
-                  active.isSatisfiedBy(states) ? 1.0 : 0.0,
+                child: AnimatedToggle(
+                  active.isSatisfiedBy(states),
                   duration: Durations.medium1,
                   curve: Curves.ease,
-                  lerp: lerpDouble,
                   builder: (context, value, child) => _ButtonBox(depth: value, child: text),
                 ),
               ),
@@ -142,10 +139,9 @@ class _ButtonBox extends StatelessWidget {
   }
 
   Widget _buildStyle(context) {
-    return AnimatedValue.builder(
-      GetRekt.opacityOf(context),
+    return AnimatedToggle(
+      !GetRekt.hasRekt(context),
       duration: GetRekt.duration,
-      lerp: lerpDouble,
       builder: (context, value, _) => DefaultTextStyle(
         style: TextStyle(
           color: HSLColor.fromAHSL(value, 0, 0, (1 - depth) / 5).toColor(),

@@ -8,8 +8,8 @@ class GetRekt extends Bloc {
 
   static const duration = Durations.medium1;
 
-  static double opacityOf(BuildContext context) {
-    return context.watch<GetRekt>()._rekt == null ? 1.0 : 0.0;
+  static bool hasRekt(BuildContext context) {
+    return context.watch<GetRekt>()._rekt == null;
   }
 
   static bool selected(BuildContext context, Route route) {

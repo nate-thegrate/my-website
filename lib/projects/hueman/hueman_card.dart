@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -50,8 +49,9 @@ class HuemanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final states = ThisSiteCard.encapulates(context) ? <WidgetState>{} : WidgetStates.of(context);
-    final value = states.contains(WidgetState.selected) ? 1.0 : 0.0;
     void launch() async {
+      if (!states.contains(WidgetState.selected)) return;
+
       launchUrlString('https://hue-man.app/');
 
       await Future.delayed(const Seconds(1.5));
@@ -69,10 +69,9 @@ class HuemanCard extends StatelessWidget {
       scale: scale.resolve(states),
       duration: ProjectButton.duration,
       curve: Curves.ease,
-      child: AnimatedValue.builder(
-        value,
+      child: AnimatedToggle(
+        states.contains(WidgetState.selected),
         duration: ProjectButton.duration,
-        lerp: lerpDouble,
         curve: Curves.easeInOutSine,
         builder: (context, value, child) => ProjectCardTemplate(
           shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
@@ -86,7 +85,7 @@ class HuemanCard extends StatelessWidget {
             ),
           ),
         ),
-        onEnd: value == 1.0 ? launch : null,
+        onEnd: launch,
         child: _graphic,
       ),
     );
