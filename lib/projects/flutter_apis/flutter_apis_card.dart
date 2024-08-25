@@ -23,16 +23,16 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
   );
 
   late final listenables = Listenable.merge({widthAnimation, depthAnimation, launchAnimation});
-  late final states =
-      ThisSiteCard.encapulates(context) ? WidgetStates() : context.read<WidgetStates>();
+  late final states = context.read<WidgetStates?>();
+  bool _contains(WidgetState state) => states?.contains(state) ?? false;
 
   bool prepareToLaunch = false;
 
   void _updateAnimations() async {
-    widthAnimation.animateTo(states.contains(WidgetState.hovered) ? 1.0 : 0.0);
-    depthAnimation.animateTo(states.contains(WidgetState.pressed) ? 1.0 : 0.0);
+    widthAnimation.animateTo(_contains(WidgetState.hovered) ? 1.0 : 0.0);
+    depthAnimation.animateTo(_contains(WidgetState.pressed) ? 1.0 : 0.0);
 
-    if (states.contains(WidgetState.selected) != prepareToLaunch) {
+    if (_contains(WidgetState.selected) != prepareToLaunch) {
       setState(() => prepareToLaunch = !prepareToLaunch);
       if (launchAnimation.isDismissed) {
         try {
@@ -50,7 +50,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
 
         FlutterApisCard.launching = false;
         prepareToLaunch = false;
-        states.remove(WidgetState.selected);
+        states?.remove(WidgetState.selected);
         launchAnimation.animateTo(0, from: 0.01);
       }
     }
@@ -60,13 +60,13 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
   void initState() {
     super.initState();
     (widthAnimation, depthAnimation, launchAnimation);
-    states.addListener(_updateAnimations);
+    states?.addListener(_updateAnimations);
     Future.microtask(() => precacheImage(FlutterApis.bgImage, context));
   }
 
   @override
   void dispose() {
-    states.removeListener(_updateAnimations);
+    states?.removeListener(_updateAnimations);
     widthAnimation.dispose();
     depthAnimation.dispose();
     launchAnimation.dispose();

@@ -163,7 +163,7 @@ class ProjectCardTemplate extends PhysicalShape {
   const ProjectCardTemplate({
     super.key,
     super.elevation = defaultElevation,
-    super.color = const Color(0xFFF8F1E5),
+    required super.color,
     super.shadowColor = Colors.black45,
     Widget super.child = const SizedBox.expand(),
   }) : super(

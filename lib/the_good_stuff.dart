@@ -2,6 +2,7 @@ import 'package:collection_notifiers/collection_notifiers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:go_router/go_router.dart';
+import 'package:nate_thegrate/projects/projects.dart';
 import 'package:provider/provider.dart';
 
 import 'main.dart';
@@ -44,7 +45,11 @@ extension type WidgetStates._(SetNotifier<WidgetState> _states)
     implements SetNotifier<WidgetState> {
   WidgetStates([_]) : this._(SetNotifier<WidgetState>());
 
-  factory WidgetStates.of(BuildContext context) => context.watch();
+  static Set<WidgetState> of(BuildContext context) {
+    return context.findAncestorWidgetOfExactType<ThisSiteCard>() != null
+        ? <WidgetState>{}
+        : context.watch<WidgetStates>();
+  }
 }
 
 const root2 = 1.4142135623730951;

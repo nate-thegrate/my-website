@@ -11,6 +11,6 @@ class Recipes extends StatefulWidget {
 class _RecipesState extends State<Recipes> {
   @override
   Widget build(BuildContext context) {
-    return const ProjectCardTemplate();
+    return const ProjectCardTemplate(color: Color(0xffddffbb));
   }
 }

@@ -6,10 +6,6 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 class ThisSiteCard extends StatefulWidget {
   const ThisSiteCard({super.key});
 
-  static bool encapulates(BuildContext context) {
-    return context.findAncestorWidgetOfExactType<_CardRecursion>() != null;
-  }
-
   @override
   State<ThisSiteCard> createState() => _ThisSiteCardState();
 }
@@ -41,9 +37,7 @@ class _ThisSiteCardState extends State<ThisSiteCard> {
         duration: Durations.medium1,
         curve: Curves.ease,
         lerp: Color.lerp,
-        builder: (context, color, child) {
-          return _CardRecursion(scale: scale, color: color);
-        },
+        builder: (context, color, child) => _CardRecursion(scale: scale, color: color),
       ),
     );
 

@@ -48,7 +48,7 @@ class HuemanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final states = ThisSiteCard.encapulates(context) ? <WidgetState>{} : WidgetStates.of(context);
+    final states = WidgetStates.of(context);
     void launch() async {
       if (!states.contains(WidgetState.selected)) return;
 
