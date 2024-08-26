@@ -1,14 +1,14 @@
 import 'package:nate_thegrate/projects/recipes/stache.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class Recipes extends StatefulWidget {
-  const Recipes({super.key});
+class RecipeCard extends StatefulWidget {
+  const RecipeCard({super.key});
 
   @override
-  State<Recipes> createState() => _RecipesState();
+  State<RecipeCard> createState() => _RecipeCardState();
 }
 
-class _RecipesState extends State<Recipes> {
+class _RecipeCardState extends State<RecipeCard> {
   @override
   Widget build(BuildContext context) {
     final states = WidgetStates.of(context);

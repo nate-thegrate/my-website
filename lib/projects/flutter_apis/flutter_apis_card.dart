@@ -250,14 +250,13 @@ class CardPainter extends BoxPainter {
   }
 }
 
-class FlutterApisTransition extends AnimatedValue<Offset> {
+class FlutterApisTransition extends AnimatedSlide {
   const FlutterApisTransition({super.key})
       : super(
-          const Offset(0, 1),
+          offset: const Offset(0, 1),
           initialValue: Offset.zero,
           duration: Durations.medium1,
           curve: Curves.easeIn,
-          lerp: Offset.lerp,
           child: const Projects(),
         );
 
@@ -265,9 +264,4 @@ class FlutterApisTransition extends AnimatedValue<Offset> {
     fit: StackFit.expand,
     children: [FlutterApis(), FlutterApisTransition()],
   );
-
-  @override
-  Widget build(BuildContext context, Offset value) {
-    return FractionalTranslation(translation: value, child: child);
-  }
 }

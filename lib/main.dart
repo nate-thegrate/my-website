@@ -104,8 +104,8 @@ class App extends StatelessWidget {
               ),
               GoRoute(
                 path: Route.recipes.name,
-                builder: (context, state) => const Recipes(),
-                pageBuilder: (context, state) => const NoTransitionPage(child: Recipes()),
+                builder: (context, state) => const RecipeCard(),
+                pageBuilder: (context, state) => const NoTransitionPage(child: RecipeCard()),
               ),
               GoRoute(
                 path: Route.thisSite.name,

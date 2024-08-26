@@ -15,18 +15,9 @@ class Void extends UniqueWidget<TheVoidProvides> {
   TheVoidProvides createState() => TheVoidProvides();
 }
 
+enum Journey { whiteVoid, sourceOfWisdom, activated }
+
 Journey useTheVoid() => useValueListenable(useMemoized(() => Void.provide().journey));
-
-enum Journey implements Comparable<Journey> {
-  whiteVoid,
-  sourceOfWisdom,
-  activated;
-
-  bool operator >=(Journey other) => compareTo(other) >= 0;
-
-  @override
-  int compareTo(Journey other) => index.compareTo(other.index);
-}
 
 class TheVoidProvides extends State<Void> with TickerProviderStateMixin {
   final journey = ValueNotifier(Journey.whiteVoid);
@@ -68,7 +59,7 @@ class _Deeper extends HookWidget {
     final journey = useTheVoid();
 
     return AnimatedToggle(
-      journey >= Journey.sourceOfWisdom,
+      journey != Journey.whiteVoid,
       duration: const Seconds(TheSource.seconds),
       builder: (context, value, child) => AnimatedToggle(
         journey == Journey.activated,

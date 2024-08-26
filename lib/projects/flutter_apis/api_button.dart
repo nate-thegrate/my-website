@@ -100,7 +100,7 @@ class _ApiButtonState extends State<ApiButton> {
                   active.isSatisfiedBy(states),
                   duration: Durations.medium1,
                   curve: Curves.ease,
-                  builder: (context, value, child) => _ButtonBox(depth: value, child: text),
+                  builder: (context, depth, child) => _ButtonBox(depth, child: text),
                 ),
               ),
             ),
@@ -112,7 +112,7 @@ class _ApiButtonState extends State<ApiButton> {
 }
 
 class _ButtonBox extends StatelessWidget {
-  const _ButtonBox({required this.depth, required this.child});
+  const _ButtonBox(this.depth, {required this.child});
 
   final double depth;
   final Widget child;

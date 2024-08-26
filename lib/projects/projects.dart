@@ -21,7 +21,7 @@ class _ProjectsState extends State<Projects> {
     const projects = [
       ProjectButton(HuemanCard()),
       ProjectButton(FlutterApisCard()),
-      ProjectButton(Recipes()),
+      ProjectButton(RecipeCard()),
       ThisSiteCard(),
     ];
 

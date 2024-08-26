@@ -86,7 +86,7 @@ class _CardRecursion extends StatelessWidget {
       const Expanded(
         child: Column(children: [
           Expanded(child: _Pad(HuemanCard())),
-          Expanded(child: _Pad(Recipes())),
+          Expanded(child: _Pad(RecipeCard())),
         ]),
       ),
       Expanded(
