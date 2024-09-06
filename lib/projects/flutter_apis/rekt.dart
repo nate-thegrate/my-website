@@ -142,10 +142,10 @@ class _DecorationPainter extends BoxPainter {
         ..blendMode = BlendMode.overlay,
     );
     if (rekt?.color case final color?) {
-      final opacity = color.opacity;
+      final alpha = color.a;
       canvas.drawPath(
         path,
-        Paint()..color = color.withOpacity(opacity * opacity),
+        Paint()..color = color.withValues(alpha: alpha * alpha),
       );
     }
     canvas.clipPath(path);

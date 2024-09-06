@@ -96,7 +96,7 @@ class _ApiButtonState extends State<ApiButton> {
                 onEnter: (event) => states.add(WidgetState.hovered),
                 onExit: (event) => states.remove(WidgetState.hovered),
                 cursor: SystemMouseCursors.click,
-                child: AnimatedToggle(
+                child: ToggleBuilder(
                   active.isSatisfiedBy(states),
                   duration: Durations.medium1,
                   curve: Curves.ease,
@@ -139,7 +139,7 @@ class _ButtonBox extends StatelessWidget {
   }
 
   Widget _buildStyle(context) {
-    return AnimatedToggle(
+    return ToggleBuilder(
       !GetRekt.hasRekt(context),
       duration: GetRekt.duration,
       builder: (context, value, _) => DefaultTextStyle(
@@ -149,7 +149,7 @@ class _ButtonBox extends StatelessWidget {
           fontWeight: FontWeight.w600,
           shadows: [
             Shadow(
-              color: Colors.white.withOpacity((1 - depth) * value / 4),
+              color: Colors.white.withValues(alpha: (1 - depth) * value / 4),
               blurRadius: 4.0,
             ),
           ],

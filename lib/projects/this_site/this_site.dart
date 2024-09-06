@@ -3,23 +3,140 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-typedef ThisSite = Void;
-
 /// https://github.com/flutter/flutter/issues/150459
-class Void extends UniqueWidget<TheVoidProvides> {
-  const Void() : super(key: const GlobalObjectKey(ThisSite));
-
-  static TheVoidProvides provide() => const Void().currentState!;
+class ThisSite extends UniqueWidget<TheVoidProvides> implements TheVoid {
+  const ThisSite() : super(key: const GlobalObjectKey(<void>[]));
 
   @override
-  TheVoidProvides createState() => TheVoidProvides();
+  TheVoidProvides createState() => TheVoidProvides.createState();
+}
+
+sealed class TheVoid extends Widget {
+  const factory TheVoid() = ThisSite;
+
+  const factory TheVoid.gateway() = _GatewayToTheVoid;
+
+  const factory TheVoid.consume({required Widget child}) = _ConsumeTheVoid;
+
+  static TheVoidProvides provide() => TheVoidProvides();
+
+  static void approach() => _ApproachTheVoid.instance.approach();
+
+  static void transcend() => Overlay.of(_GatewayToTheVoid.context).insert(_FadeToWhite.entry);
+
+  static bool of(BuildContext context) => !context.watch<_ApproachTheVoid>().approaching;
+}
+
+class _FadeToWhite extends AnimatedValue<Color> {
+  const _FadeToWhite()
+      : super(
+          Colors.white,
+          initialValue: const Color(0x00ffffff),
+          duration: const Seconds(0.5),
+          lerp: Color.lerp,
+          onEnd: _end,
+        );
+
+  static final entry = OverlayEntry(builder: (context) => const _FadeToWhite());
+  static void _end() async {
+    await Future.delayed(const Seconds(0.5));
+    Route.go(Route.thisSite);
+    entry.remove();
+  }
+
+  @override
+  Widget build(BuildContext context, Color value) {
+    return Positioned.fill(child: ColoredBox(color: value));
+  }
+}
+
+class _GatewayToTheVoid extends SizedBox implements TheVoid {
+  const _GatewayToTheVoid() : super.expand(key: _key);
+  static const _key = GlobalObjectKey(<void>{});
+
+  static BuildContext get context => _key.currentContext!;
+}
+
+class _ApproachTheVoid extends Bloc {
+  bool approaching = false;
+  void approach() => notifyListeners();
+
+  @override
+  void notifyListeners() {
+    approaching = true;
+    super.notifyListeners();
+  }
+
+  static _ApproachTheVoid get instance => _GatewayToTheVoid.context.read();
+}
+
+class _ConsumeTheVoid extends StatelessWidget implements TheVoid {
+  const _ConsumeTheVoid({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => _ApproachTheVoid(),
+      child: Consumer(builder: _consume, child: child),
+    );
+  }
+
+  Widget _consume(BuildContext context, _ApproachTheVoid theVoid, Widget? child) {
+    return theVoid.approaching ? _ConsumedByTheVoid(context, child: child) : child!;
+  }
+}
+
+class Dilation extends Curve {
+  const Dilation();
+
+  static const a = 2 << 16;
+  static const aInverse = 1 / a;
+
+  @override
+  double transformInternal(double t) => (pow(a, t - 1) - aInverse) / (1 - aInverse);
+}
+
+class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
+  _ConsumedByTheVoid(BuildContext context, {super.child})
+      : super(
+          curve: const Dilation(),
+          Matrix4.fromList(() {
+            final list = [..._box(context).getTransformTo(_box()).storage];
+            // list[12] += 250;
+            // list[13] += 400;
+            return list;
+          }()),
+          duration: const Seconds(2.5),
+          initialValue: Matrix4.identity(),
+          lerp: _lerp,
+        );
+
+  static RenderBox _box([BuildContext? context]) {
+    context ??= _GatewayToTheVoid.context;
+    return context.findRenderObject()! as RenderBox;
+  }
+
+  static Matrix4 _lerp(Matrix4 a, Matrix4 b, double t) {
+    return Matrix4Tween(begin: a, end: b).transform(t);
+  }
+
+  @override
+  Widget build(BuildContext context, Matrix4 value) {
+    return Transform(transform: value, child: child);
+  }
 }
 
 enum Journey { whiteVoid, sourceOfWisdom, activated }
 
-Journey useTheVoid() => useValueListenable(useMemoized(() => Void.provide().journey));
+Journey useTheVoid() => useValueListenable(useMemoized(() => TheVoid.provide().journey));
 
-class TheVoidProvides extends State<Void> with TickerProviderStateMixin {
+class TheVoidProvides extends State<ThisSite> with TickerProviderStateMixin {
+  factory TheVoidProvides() => const ThisSite().currentState!;
+
+  TheVoidProvides.createState();
+
   final journey = ValueNotifier(Journey.whiteVoid);
 
   @override
@@ -58,10 +175,10 @@ class _Deeper extends HookWidget {
   Widget build(BuildContext context) {
     final journey = useTheVoid();
 
-    return AnimatedToggle(
+    return ToggleBuilder(
       journey != Journey.whiteVoid,
       duration: const Seconds(TheSource.seconds),
-      builder: (context, value, child) => AnimatedToggle(
+      builder: (context, value, child) => ToggleBuilder(
         journey == Journey.activated,
         duration: const Seconds(TheSource.endTransitionSeconds),
         curve: Curves.easeInExpo,
@@ -76,7 +193,7 @@ class _Deeper extends HookWidget {
         child: DefaultTextStyle(
           style: TextStyle(
             inherit: false,
-            color: fromLight.withOpacity(value),
+            color: fromLight.withValues(alpha: value),
             fontSize: 32,
             fontWeight: FontWeight.w600,
           ),
@@ -113,22 +230,22 @@ class _GitHubButton extends StatelessWidget {
   const _GitHubButton();
 
   static void _viewTheSource() {
-    Void.provide().journey.value = Journey.activated;
+    TheVoid.provide().journey.value = Journey.activated;
   }
 
   @override
   Widget build(BuildContext context) {
-    final opacity = DefaultTextStyle.of(context).style.color!.opacity;
+    final alpha = DefaultTextStyle.of(context).style.color!.a;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: TextButton(
-        onPressed: opacity > 0 ? _viewTheSource : null,
+        onPressed: alpha > 0 ? _viewTheSource : null,
         child: Text(
           'GitHub',
           style: TextStyle(
             fontSize: 32,
             height: 0,
-            color: const Color(0xff70a8ff).withOpacity(opacity),
+            color: const Color(0xff70a8ff).withValues(alpha: alpha),
           ),
         ),
       ),
@@ -151,7 +268,7 @@ class _Passage extends LeafRenderObjectWidget {
 
 class TheSource extends RenderBox {
   TheSource() {
-    final theVoidProvides = Void.provide();
+    final theVoidProvides = TheVoid.provide();
     journey = theVoidProvides.journey;
 
     void theVoid() {

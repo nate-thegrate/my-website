@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'flutter_apis/flutter_apis_card.dart';
@@ -38,13 +36,7 @@ class _ProjectsState extends State<Projects> {
         ),
       );
     }
-    return const TopBar(
-      body: Center(
-        child: CustomScrollView(
-          slivers: [_SpacedGrid(children: projects)],
-        ),
-      ),
-    );
+    return const TopBar(body: _SpacedGrid(children: projects));
   }
 }
 
@@ -55,24 +47,23 @@ class _SpacedGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final spacing = 24.0 + math.max(720, screenWidth) / 20;
-    final padding = (screenWidth - 720 - spacing) / 2;
-    return SliverPadding(
-      padding: EdgeInsets.symmetric(
-        horizontal: math.max(padding, spacing),
-        vertical: spacing,
-      ),
-      sliver: SliverConstrainedCrossAxis(
-        maxExtent: 720,
-        sliver: SliverGrid.count(
-          childAspectRatio: root2 / 2,
-          crossAxisSpacing: spacing,
-          mainAxisSpacing: spacing,
-          crossAxisCount: screenWidth < 720 ? 1 : 2,
-          children: children,
+    // final screenWidth = MediaQuery.sizeOf(context).width;
+    final [first, second, third, fourth] = children;
+    return Column(
+      children: [
+        Expanded(
+          child: Row(children: [
+            Expanded(child: first),
+            Expanded(child: second),
+          ]),
         ),
-      ),
+        Expanded(
+          child: Row(children: [
+            Expanded(child: third),
+            Expanded(child: fourth),
+          ]),
+        ),
+      ],
     );
   }
 }

@@ -179,42 +179,44 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + gapAnimation.value),
-        child: MouseRegion(
-          onEnter: (event) => gapAnimation.value = 12,
-          onExit: (event) => gapAnimation.value = 0,
-          child: Column(
-            children: [
-              const SizedBox(
-                height: kToolbarHeight,
-                child: ColoredBox(
-                  color: GrateColors.lightCyan,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text('NATE THE GRATE', textAlign: TextAlign.center),
+    return TheVoid.consume(
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight + gapAnimation.value),
+          child: MouseRegion(
+            onEnter: (event) => gapAnimation.value = 12,
+            onExit: (event) => gapAnimation.value = 0,
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: kToolbarHeight,
+                  child: ColoredBox(
+                    color: GrateColors.lightCyan,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text('NATE THE GRATE', textAlign: TextAlign.center),
+                          ),
                         ),
-                      ),
-                      _RouteButton(Route.stats),
-                      _RouteButton(Route.projects),
-                    ],
+                        _RouteButton(Route.stats),
+                        _RouteButton(Route.projects),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                height: gapAnimation.value,
-                child: const ColoredBox(color: Color(0xff002040)),
-              ),
-            ],
+                SizedBox(
+                  width: double.infinity,
+                  height: gapAnimation.value,
+                  child: const ColoredBox(color: Color(0xff002040)),
+                ),
+              ],
+            ),
           ),
         ),
+        body: widget.body,
       ),
-      body: widget.body,
     );
   }
 }

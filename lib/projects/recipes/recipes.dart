@@ -13,7 +13,7 @@ class _RecipeCardState extends State<RecipeCard> {
   Widget build(BuildContext context) {
     final states = WidgetStates.of(context);
     const background = Color(0xffddffbb);
-    return AnimatedToggle(
+    return ToggleBuilder(
       states.contains(WidgetState.hovered),
       duration: Durations.medium1,
       curve: Curves.ease,
@@ -28,7 +28,7 @@ class _RecipeCardState extends State<RecipeCard> {
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: background.withOpacity(t),
+                color: background.withValues(alpha: t),
                 blurRadius: 20 * t,
                 spreadRadius: 20 * t,
               ),
