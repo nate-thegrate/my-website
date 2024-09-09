@@ -178,16 +178,16 @@ const button = FilledButton(
     backgroundColor: WidgetStateProperty.fromMap({
       WidgetState.pressed: black,
       WidgetState.hovered: spring2,
-      WidgetState.any: spring,
+      WidgetState.any:     spring,
     }),
     foregroundColor: WidgetStateProperty.fromMap({
       WidgetState.pressed: pink,
-      WidgetState.any: black,
+      WidgetState.any:     black,
     }),
     overlayColor: WidgetStateProperty.fromMap({
       WidgetState.pressed: pink2,
       WidgetState.hovered: clear,
-      WidgetState.any: spring3,
+      WidgetState.any:     spring3,
     }),
   ),
   onPressed: _switch,
@@ -206,16 +206,24 @@ final elevation = WidgetStateProperty.resolveWith((states) {
 final button = FilledButton(
   style: ButtonStyle(
     backgroundColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.pressed)) return black;
-      if (states.contains(WidgetState.hovered)) return spring2;
+      if (states.contains(WidgetState.pressed)) {
+        return black;
+      }
+      if (states.contains(WidgetState.hovered)) {
+        return spring2;
+      }
       return spring;
     }),
     foregroundColor: WidgetStateProperty.resolveWith(
       (states) => states.contains(WidgetState.pressed) ? pink : black,
     ),
     overlayColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.pressed)) return pink2;
-      if (states.contains(WidgetState.hovered)) return clear;
+      if (states.contains(WidgetState.pressed)) {
+        return pink2;
+      }
+      if (states.contains(WidgetState.hovered)) {
+        return clear;
+      }
       return spring3;
     }),
   ),
@@ -267,7 +275,7 @@ class CodeSample extends StatelessWidget {
       alignment: Alignment.topLeft,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
-        child: SizedBox(width: 600, height: 475, child: VsCode.of(context)),
+        child: SizedBox(width: 600, height: 625, child: VsCode.of(context)),
       ),
     );
   }

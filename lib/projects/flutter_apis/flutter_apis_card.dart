@@ -78,10 +78,13 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
     if (FlutterApisCard.launching) {
       return const SizedBox.shrink();
     }
-    return LayoutBuilder(
-      builder: (context, constraints) => ListenableBuilder(
-        listenable: listenables,
-        builder: (context, _) => _build(context, constraints),
+    return Stached(
+      direction: AxisDirection.right,
+      child: LayoutBuilder(
+        builder: (context, constraints) => ListenableBuilder(
+          listenable: listenables,
+          builder: (context, _) => _build(context, constraints),
+        ),
       ),
     );
   }
@@ -116,6 +119,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
             padding: EdgeInsets.zero,
             child: Text.rich(
               text,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: 'roboto mono',
                 fontSize: 22,
@@ -127,7 +131,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
       ],
     );
 
-    final overflowWidth = constraints.maxWidth * (1 + width / 3);
+    final overflowWidth = constraints.maxWidth * (1 + width / 10);
     final height = constraints.maxHeight;
     final launchWidth = overflowWidth * (1 - launchAnimation.value);
 
@@ -197,10 +201,10 @@ class _RenderFlutterLogo extends RenderBox {
     ..lineTo(67, 73)
     ..lineTo(100, 46)
     ..close()
-    ..moveTo(62, 00)
+    ..moveTo(62, 0)
     ..lineTo(0, 50)
     ..lineTo(18, 66)
-    ..lineTo(100, 00)
+    ..lineTo(100, 0)
     ..close();
 
   @override

@@ -7,7 +7,8 @@ class ThisSiteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (RecursionCount.of(context).value > 0) return const _CardRecursion();
-    return const _ThisSiteCard();
+
+    return const Stached(direction: AxisDirection.right, child: _ThisSiteCard());
   }
 }
 
@@ -37,7 +38,7 @@ class _ThisSiteCardState extends State<_ThisSiteCard> with SingleTickerProviderS
   late final colorAnimation = ColorAnimation(
     vsync: this,
     initialValue: ColorAnimation.lightGray,
-    duration: Durations.medium1,
+    duration: Durations.short2,
   );
   final states = WidgetStates();
   static final active = WidgetState.hovered | WidgetState.selected;
@@ -96,7 +97,12 @@ class _CardRecursion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final recursions = RecursionCount.of(context);
-    if (recursions.value > 6) return const TheVoid.gateway();
+    if (recursions.value > 6) {
+      if (context.findAncestorWidgetOfExactType<FlutterApisTransition>() != null) {
+        return const SizedBox.shrink();
+      }
+      return const TheVoid.gateway();
+    }
 
     return ToggleBuilder(
       TheVoid.of(context),

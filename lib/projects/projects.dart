@@ -4,7 +4,7 @@ export 'flutter_apis/flutter_apis_card.dart';
 export 'flutter_apis/flutter_apis.dart';
 export 'hueman/hueman_card.dart';
 export 'this_site/this_site_card.dart';
-export 'recipes/recipes.dart';
+export 'recipes/recipe_card.dart';
 
 class Projects extends StatefulWidget {
   const Projects({super.key});
@@ -149,10 +149,10 @@ class ProjectCardTemplate extends PhysicalShape {
     super.elevation = defaultElevation,
     required super.color,
     super.shadowColor = Colors.black45,
+    super.clipBehavior = Clip.antiAlias,
     Widget super.child = const SizedBox.expand(),
   }) : super(
           clipper: const ShapeBorderClipper(shape: shape),
-          clipBehavior: Clip.antiAlias,
         );
 
   static const shape = ContinuousRectangleBorder(

@@ -65,28 +65,31 @@ class HuemanCard extends StatelessWidget {
       WidgetState.any: 1.0,
     });
 
-    return AnimatedScale(
-      scale: scale.resolve(states),
-      duration: ProjectButton.duration,
-      curve: Curves.ease,
-      child: ToggleBuilder(
-        states.contains(WidgetState.selected),
+    return Stached(
+      direction: AxisDirection.left,
+      child: AnimatedScale(
+        scale: scale.resolve(states),
         duration: ProjectButton.duration,
-        curve: Curves.easeInOutSine,
-        builder: (context, value, child) => ProjectCardTemplate(
-          shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
-              ? Colors.black
-              : Colors.black45,
-          color: Color.lerp(const Color(0xffeef3f8), Colors.white, value)!,
-          child: Center(
-            child: Opacity(
-              opacity: 1 - math.min(value * 2, 1),
-              child: child,
+        curve: Curves.ease,
+        child: ToggleBuilder(
+          states.contains(WidgetState.selected),
+          duration: ProjectButton.duration,
+          curve: Curves.easeInOutSine,
+          builder: (context, value, child) => ProjectCardTemplate(
+            shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
+                ? Colors.black
+                : Colors.black45,
+            color: Color.lerp(const Color(0xffeef3f8), Colors.white, value)!,
+            child: Center(
+              child: Opacity(
+                opacity: 1 - math.min(value * 2, 1),
+                child: child,
+              ),
             ),
           ),
+          onEnd: launch,
+          child: _graphic,
         ),
-        onEnd: launch,
-        child: _graphic,
       ),
     );
   }
