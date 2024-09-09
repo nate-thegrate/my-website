@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-/// https://github.com/flutter/flutter/issues/150459
-class ThisSite extends UniqueWidget<TheVoidProvides> implements TheVoid {
+/// I sure hope this class isn't deprecated anytime soon!
+class ThisSite extends UniqueWidget<TheVoidProvides> {
   const ThisSite() : super(key: const GlobalObjectKey(<void>[]));
 
   @override
@@ -12,8 +12,6 @@ class ThisSite extends UniqueWidget<TheVoidProvides> implements TheVoid {
 }
 
 sealed class TheVoid extends Widget {
-  const factory TheVoid() = ThisSite;
-
   const factory TheVoid.gateway() = _GatewayToTheVoid;
 
   const factory TheVoid.consume({required Widget child}) = _ConsumeTheVoid;
@@ -51,7 +49,9 @@ class _FadeToWhite extends AnimatedValue<Color> {
 }
 
 class _GatewayToTheVoid extends SizedBox implements TheVoid {
-  const _GatewayToTheVoid() : super.expand(key: _key);
+  const _GatewayToTheVoid()
+      : super.expand(key: _key, child: const ColoredBox(color: Colors.white));
+
   static const _key = GlobalObjectKey(<void>{});
 
   static BuildContext get context => _key.currentContext!;
@@ -59,12 +59,9 @@ class _GatewayToTheVoid extends SizedBox implements TheVoid {
 
 class _ApproachTheVoid extends Bloc {
   bool approaching = false;
-  void approach() => notifyListeners();
-
-  @override
-  void notifyListeners() {
+  void approach() {
     approaching = true;
-    super.notifyListeners();
+    notifyListeners();
   }
 
   static _ApproachTheVoid get instance => _GatewayToTheVoid.context.read();
@@ -102,12 +99,7 @@ class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
   _ConsumedByTheVoid(BuildContext context, {super.child})
       : super(
           curve: const Dilation(),
-          Matrix4.fromList(() {
-            final list = [..._box(context).getTransformTo(_box()).storage];
-            // list[12] += 250;
-            // list[13] += 400;
-            return list;
-          }()),
+          _box(context).getTransformTo(_box()),
           duration: const Seconds(2.5),
           initialValue: Matrix4.identity(),
           lerp: _lerp,
@@ -254,9 +246,7 @@ class _GitHubButton extends StatelessWidget {
 }
 
 class FromLight extends Color {
-  const FromLight(double lightness) : this._same((lightness * 0xff) ~/ 1);
-
-  const FromLight._same(int val) : super.fromARGB(0xff, val, val, val);
+  const FromLight(double light) : super.from(alpha: 1, red: light, green: light, blue: light);
 }
 
 class _Passage extends LeafRenderObjectWidget {
@@ -339,7 +329,6 @@ class TheSource extends RenderBox {
     await Future.delayed(Durations.long4);
 
     Route.go(Route.home);
-    return;
   }
 
   @override

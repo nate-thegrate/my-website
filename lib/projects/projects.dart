@@ -9,6 +9,30 @@ export 'recipes/recipes.dart';
 class Projects extends StatefulWidget {
   const Projects({super.key});
 
+  static const grid = Column(children: [
+    Spacer(),
+    _Expanded(
+      Row(children: [
+        Spacer(),
+        _Expanded(ProjectButton(HuemanCard())),
+        Spacer(),
+        _Expanded(ProjectButton(FlutterApisCard())),
+        Spacer(),
+      ]),
+    ),
+    Spacer(),
+    _Expanded(
+      Row(children: [
+        Spacer(),
+        _Expanded(ProjectButton(RecipeCard())),
+        Spacer(),
+        _Expanded(ThisSiteCard()),
+        Spacer(),
+      ]),
+    ),
+    Spacer(),
+  ]);
+
   @override
   State<Projects> createState() => _ProjectsState();
 }
@@ -16,72 +40,41 @@ class Projects extends StatefulWidget {
 class _ProjectsState extends State<Projects> {
   @override
   Widget build(BuildContext context) {
-    const projects = [
-      ProjectButton(HuemanCard()),
-      ProjectButton(FlutterApisCard()),
-      ProjectButton(RecipeCard()),
-      ThisSiteCard(),
-    ];
-
-    if (isMobile) {
-      return const TopBar(
-        body: Center(
-          child: SizedBox(
-            height: 720,
-            child: CarouselView(
-              itemExtent: 720 * root2 / 2,
-              children: projects,
-            ),
-          ),
-        ),
-      );
-    }
-    return const TopBar(body: _SpacedGrid(children: projects));
+    return const TopBar(body: Projects.grid);
   }
 }
 
-class _SpacedGrid extends StatelessWidget {
-  const _SpacedGrid({required this.children});
+class _Expanded extends Expanded {
+  const _Expanded(Widget child) : super(flex: 12, child: child);
+}
 
-  final List<Widget> children;
+class ProjectButton extends StatelessWidget {
+  const ProjectButton(this.child, {super.key});
+
+  final Widget child;
+
+  static const duration = Durations.short4;
 
   @override
   Widget build(BuildContext context) {
-    // final screenWidth = MediaQuery.sizeOf(context).width;
-    final [first, second, third, fourth] = children;
-    return Column(
-      children: [
-        Expanded(
-          child: Row(children: [
-            Expanded(child: first),
-            Expanded(child: second),
-          ]),
-        ),
-        Expanded(
-          child: Row(children: [
-            Expanded(child: third),
-            Expanded(child: fourth),
-          ]),
-        ),
-      ],
-    );
+    if (RecursionCount.of(context).value > 0) return child;
+
+    return _ProjectButton(child);
   }
 }
 
-class ProjectButton extends StatefulWidget {
-  const ProjectButton(this.project, {super.key});
+class _ProjectButton extends StatefulWidget {
+  const _ProjectButton(this.child);
 
-  final Widget project;
-
-  static const duration = Durations.short4;
+  final Widget child;
 
   Future<void> get pause => Future.delayed(const Seconds(0.0125));
 
   @override
-  State<ProjectButton> createState() => _ProjectButtonState();
+  State<_ProjectButton> createState() => _ProjectButtonState();
 }
 
-class _ProjectButtonState extends State<ProjectButton> {
+class _ProjectButtonState extends State<_ProjectButton> {
   /// The [BlocProvider] will [dispose] of it automatically!
   final states = WidgetStates();
 
@@ -132,7 +125,7 @@ class _ProjectButtonState extends State<ProjectButton> {
         child: GestureDetector(
           onPanDown: handleDownpress,
           onPanEnd: handlePressEnd,
-          child: widget.project,
+          child: widget.child,
         ),
       ),
     );
