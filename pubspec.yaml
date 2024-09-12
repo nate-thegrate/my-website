@@ -50,3 +50,6 @@ flutter:
         - asset: assets/fonts/roboto_mono.ttf
         - asset: assets/fonts/roboto_mono_italic.ttf
           style: italic
+    - family: annie use your telescope
+      fonts:
+        - asset: assets/fonts/annie_use_your_telescope.ttf
