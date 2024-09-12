@@ -1,4 +1,3 @@
-import 'package:nate_thegrate/projects/this_site/this_site.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class ThisSiteCard extends StatelessWidget {

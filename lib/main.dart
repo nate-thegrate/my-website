@@ -1,8 +1,5 @@
 import 'dart:ui';
 
-import 'package:nate_thegrate/projects/recipes/recipes.dart';
-import 'package:nate_thegrate/projects/this_site/this_site.dart';
-
 import 'the_good_stuff.dart';
 
 void main() => runApp(const App());
@@ -18,19 +15,35 @@ enum Route {
   recipes,
   thisSite;
 
-  factory Route.fromUri(Uri uri) => values.byName(uri.path.split('/').last);
+  factory Route.fromUri(Uri uri) {
+    final segments = uri.pathSegments.toList();
+    String last = segments.last;
+
+    if (last.contains('true') || last.contains('false')) {
+      segments.removeLast();
+      last = segments.last;
+    }
+
+    try {
+      return values.byName(last);
+    } on Object {
+      throw ArgumentError('uri: $uri, segments: $segments');
+    }
+  }
 
   @Deprecated('probably not necessary')
   factory Route.of(BuildContext context) {
-    return Route.fromUri(GoRouter.of(context).routeInformationProvider.value.uri);
+    final uri = GoRouter.of(context).routeInformationProvider.value.uri;
+    return Route.fromUri(uri);
   }
 
-  static GoRouterDelegate get _delegate => App._router.routerDelegate;
-  static Route get current => Route.fromUri(_delegate.currentConfiguration.uri);
+  static Route get current {
+    final uri = App._router.routerDelegate.currentConfiguration.uri;
+    return Route.fromUri(uri);
+  }
 
-  static void go(Route route, {Object? extra}) {
-    final BuildContext context = _delegate.navigatorKey.currentContext!;
-    context.go(route, extra: extra);
+  static void go(Route route, {Map<String, String>? params, Object? extra}) {
+    App.context.go(route, params: params, extra: extra);
   }
 
   String get target {
@@ -54,8 +67,7 @@ enum Route {
 class App extends StatelessWidget {
   const App({super.key});
 
-  static const _scaffoldMessengerKey = GlobalObjectKey<ScaffoldMessengerState>(Scaffold);
-  static BuildContext get context => _scaffoldMessengerKey.currentContext!;
+  static BuildContext get context => _router.routerDelegate.navigatorKey.currentContext!;
 
   static final GoRouter _router = GoRouter(
     routes: <RouteBase>[
@@ -65,7 +77,12 @@ class App extends StatelessWidget {
         routes: <RouteBase>[
           GoRoute(
             path: Route.stats.name,
-            pageBuilder: (context, state) => const NoTransitionPage(child: Stats()),
+            redirect: (context, state) => '/stats/refactor=false',
+          ),
+          GoRoute(
+            name: Route.stats.name,
+            path: 'stats/:refactor',
+            pageBuilder: Stats.pageBuilder,
           ),
           GoRoute(
             path: Route.projects.name,
@@ -137,7 +154,6 @@ class App extends StatelessWidget {
     return PRLayoutProvider(
       child: MaterialApp.router(
         theme: theme,
-        scaffoldMessengerKey: _scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
         routerConfig: _router,
       ),

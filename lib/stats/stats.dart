@@ -1,10 +1,31 @@
 import 'dart:math' as math;
 
-import 'package:flutter/rendering.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
+class Refactoring extends InheritedWidget {
+  const Refactoring({required this.refactor, required super.child})
+      : super(key: const GlobalObjectKey(Refactoring));
+  final bool refactor;
+
+  static bool of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<Refactoring>()!.refactor;
+  }
+
+  @override
+  bool updateShouldNotify(Refactoring oldWidget) => refactor != oldWidget.refactor;
+}
+
 class Stats extends StatefulWidget {
-  const Stats() : super(key: const GlobalObjectKey(Stats));
+  const Stats({super.key});
+
+  static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
+    return NoTransitionPage(
+      child: Refactoring(
+        refactor: state.pathParameters['refactor'] == 'true',
+        child: const Stats(),
+      ),
+    );
+  }
 
   @override
   State<Stats> createState() => _StatsState();
@@ -28,7 +49,7 @@ class TheDeets extends StatefulWidget {
 }
 
 class _TheDeetsState extends State<TheDeets> {
-  bool onlyRefactor = false;
+  bool onlyRefactorPRs = false;
   bool floatingFooter = true;
   final controller = ScrollController();
   double targetExtent = double.infinity;
@@ -44,19 +65,9 @@ class _TheDeetsState extends State<TheDeets> {
     });
   }
 
-  Widget _buildFooter(BuildContext context, SliverConstraints constraints) {
-    targetExtent = constraints.precedingScrollExtent + 36.0 - constraints.viewportMainAxisExtent;
-    final shouldShow = constraints.remainingPaintExtent >= 36.0;
-    return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 36.0,
-        child: shouldShow ? PullRequest.total(onlyRefactor: onlyRefactor) : null,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    onlyRefactorPRs = Refactoring.of(context);
     final padding = EdgeInsets.symmetric(
       horizontal: math.max(14, (MediaQuery.sizeOf(context).width - 720) / 2),
     );
@@ -69,21 +80,37 @@ class _TheDeetsState extends State<TheDeets> {
           ),
           SliverFixedExtentList.list(
             itemExtent: 36.0,
-            children: onlyRefactor ? refactorPRs : flutterPRs,
+            children: onlyRefactorPRs ? refactorPRs : flutterPRs,
           ),
         ],
       ),
-      SliverLayoutBuilder(builder: _buildFooter),
-      const SliverToBoxAdapter(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: PullRequest.borderColor),
-            ),
-          ),
+      SliverLayoutBuilder(builder: (context, constraints) {
+        final SliverConstraints(
+          :precedingScrollExtent,
+          :viewportMainAxisExtent,
+          :remainingPaintExtent,
+        ) = constraints;
+
+        targetExtent = precedingScrollExtent + 36.0 - viewportMainAxisExtent;
+        final shouldShow = remainingPaintExtent >= 36.0;
+        return SliverToBoxAdapter(
           child: SizedBox(
-            width: double.infinity,
-            height: 200,
+            height: 36.0,
+            child: shouldShow ? PullRequest.total(onlyRefactor: onlyRefactorPRs) : null,
+          ),
+        );
+      }),
+      const SliverToBoxAdapter(
+        child: SizedBox(
+          width: double.infinity,
+          height: 200,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: PullRequest.borderColor),
+              ),
+            ),
+            child: Center(child: _RefactorButton()),
           ),
         ),
       ),
@@ -95,6 +122,7 @@ class _TheDeetsState extends State<TheDeets> {
         children: [
           CustomScrollView(
             controller: controller,
+            physics: const StickToBottom(),
             slivers: [
               for (final sliver in slivers) SliverPadding(padding: padding, sliver: sliver),
             ],
@@ -106,7 +134,7 @@ class _TheDeetsState extends State<TheDeets> {
                 height: 36.0,
                 child: ColoredBox(
                   color: const Color(0xe0f8ffff),
-                  child: PullRequest.total(onlyRefactor: onlyRefactor),
+                  child: PullRequest.total(onlyRefactor: onlyRefactorPRs),
                 ),
               ),
             ),
@@ -114,6 +142,34 @@ class _TheDeetsState extends State<TheDeets> {
       ),
     );
   }
+}
+
+class StickToBottom extends ClampingScrollPhysics {
+  const StickToBottom();
+
+  @override
+  double adjustPositionForNewDimensions({
+    required ScrollMetrics oldPosition,
+    required ScrollMetrics newPosition,
+    required bool isScrolling,
+    required double velocity,
+  }) {
+    if (newPosition.extentTotal != oldPosition.extentTotal) {
+      return newPosition.maxScrollExtent;
+    }
+    return super.adjustPositionForNewDimensions(
+      oldPosition: oldPosition,
+      newPosition: newPosition,
+      isScrolling: isScrolling,
+      velocity: velocity,
+    );
+  }
+
+  @override
+  StickToBottom applyTo(ScrollPhysics? ancestor) => this;
+
+  @override
+  StickToBottom buildParent(ScrollPhysics? ancestor) => this;
 }
 
 class _TableHeader extends SliverPersistentHeaderDelegate {
@@ -132,16 +188,7 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
     const header = Row(
       key: GlobalObjectKey('header'),
       children: [
-        Expanded(
-          child: Center(
-            child: Text(
-              'Flutter contribution diffs',
-              style: TextStyle(fontWeight: FontWeight.w600),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
+        Expanded(child: Center(child: _TableTitle())),
         SizedBox(
           width: 50,
           child: Center(
@@ -189,5 +236,72 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
       );
     }
     return const ColoredBox(color: Color(0xe0f8ffff), child: header);
+  }
+}
+
+class _TableTitle extends StatelessWidget {
+  const _TableTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    final descriptor = Refactoring.of(context) ? 'refactoring' : 'contribution';
+    return Text(
+      'Flutter $descriptor diffs',
+      style: const TextStyle(fontWeight: FontWeight.w600),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _RefactorButton extends StatelessWidget {
+  const _RefactorButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final onlyRefactorPRs = Refactoring.of(context);
+
+    const padding = WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 18));
+    const boringStyle = ButtonStyle(
+      side: WidgetStatePropertyAll(
+        BorderSide(width: 2, color: Color(0xff80a0a0)),
+      ),
+      backgroundColor: WidgetStateProperty<Color?>.fromMap({
+        WidgetState.selected: Color(0xffc0e0e0),
+      }),
+      foregroundColor: WidgetStatePropertyAll(Color(0xff406060)),
+      padding: padding,
+    );
+    const refactorStyle = ButtonStyle(
+      side: WidgetStatePropertyAll(
+        BorderSide(width: 2, color: Color(0xff80ffff)),
+      ),
+      backgroundColor: WidgetStateProperty<Color?>.fromMap({
+        WidgetState.selected: Color(0xff80ffff),
+      }),
+      foregroundColor: WidgetStatePropertyAll(Colors.black),
+      overlayColor: WidgetStateProperty.fromMap({
+        WidgetState.pressed: Color(0x4000c0c0),
+        WidgetState.hovered: Color(0x2000ffff),
+        WidgetState.any: Color(0x2000c0c0),
+      }),
+      padding: padding,
+    );
+
+    return SegmentedButton<bool>(
+      style: onlyRefactorPRs ? refactorStyle : boringStyle,
+      segments: const [
+        ButtonSegment(value: false, label: Text('all')),
+        ButtonSegment(value: true, label: Text('refactor')),
+      ],
+      selected: {onlyRefactorPRs},
+      onSelectionChanged: (selected) {
+        Route.go(
+          Route.stats,
+          params: selected.single ? {'refactor': 'true'} : null,
+        );
+      },
+      showSelectedIcon: false,
+    );
   }
 }

@@ -19,14 +19,14 @@ class PRLayoutProvider extends ProxyProvider0<PRLayout> {
   PRLayoutProvider({super.key, required Widget super.child}) : super(update: PRLayout._compute);
 }
 
-class PullRequest extends StatefulWidget {
+class PullRequest extends StatelessWidget {
   const PullRequest({
     super.key,
     required this.title,
     required this.url,
     required this.diffs,
     required this.refactor,
-  });
+  }) : _isTotal = title == 'Total';
 
   factory PullRequest.total({required bool onlyRefactor}) {
     if (onlyRefactor ? _refactoring : _overall case final cached?) {
@@ -41,7 +41,8 @@ class PullRequest extends StatefulWidget {
       deletions += diffs.$2;
     }
 
-    String url = 'https://github.com/flutter/flutter/pulls?q=author%3Anate-thegrate+is%3Amerged';
+    String url =
+        'https://github.com/pulls?q=author%3Anate-thegrate+is%3Amerged+label%3Aautosubmit';
     if (onlyRefactor) url += '+label%3Arefactor';
 
     final pr = PullRequest(
@@ -57,6 +58,7 @@ class PullRequest extends StatefulWidget {
   static PullRequest? _overall, _refactoring;
 
   final String title;
+  final bool _isTotal;
   final String url;
   final (int, int) diffs;
   final bool refactor;
@@ -65,12 +67,6 @@ class PullRequest extends StatefulWidget {
   static const borderColor = Color(0xffd0e0e0);
   static const border = BorderSide(color: borderColor);
 
-  @override
-  State<PullRequest> createState() => _PullRequestState();
-}
-
-class _PullRequestState extends State<PullRequest> {
-  late final bool isTotal = widget.title == 'Total';
   @override
   Widget build(BuildContext context) {
     return Focus(
@@ -86,28 +82,42 @@ class _PullRequestState extends State<PullRequest> {
           horizontal: PullRequest.border,
         );
 
+        late final prCount = (refactor ? refactorPRs : flutterPRs).length;
+
+        final textStyle = TextStyle(color: focused ? PullRequest.color : null);
+        final Text text;
+        if (_isTotal) {
+          text = Text('$prCount contributions', style: textStyle);
+        } else {
+          text = Text(
+            title,
+            style: textStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+
         final diffs = Diffs(
-          widget.diffs,
-          key: GlobalObjectKey((widget.diffs, widget.url)),
+          this.diffs,
+          key: GlobalObjectKey((this.diffs, url)),
         );
         final contents = Padding(
           padding: const EdgeInsets.symmetric(vertical: 1),
           child: Row(
             children: [
               const SizedBox(width: 8),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
+              if (_isTotal)
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
                   child: Text(
-                    widget.title,
-                    style: TextStyle(
-                      color: focused ? PullRequest.color : null,
-                      fontWeight: isTotal ? FontWeight.w600 : null,
-                    ),
+                    title,
+                    style: textStyle.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+              Expanded(
+                child: Align(alignment: Alignment.centerLeft, child: text),
               ),
               if (focused) diffs else ColoredBox(color: Colors.white54, child: diffs),
             ],
@@ -120,7 +130,7 @@ class _PullRequestState extends State<PullRequest> {
           onHover: focus,
           onExit: (_) => Future.microtask(focusNode.unfocus),
           child: GestureDetector(
-            onTap: () => launchUrlString(widget.url),
+            onTap: () => launchUrlString(url),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: focused ? Colors.white70 : Colors.transparent,

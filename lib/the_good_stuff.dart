@@ -9,6 +9,8 @@ import 'main.dart';
 
 export 'package:flutter/material.dart' hide Route;
 export 'package:flutter/gestures.dart';
+export 'package:flutter/foundation.dart';
+export 'package:flutter/rendering.dart';
 export 'package:flutter/scheduler.dart';
 export 'package:go_router/go_router.dart' hide GoRouterHelper;
 export 'package:provider/provider.dart' hide ChangeNotifierProvider, Dispose;
@@ -20,6 +22,8 @@ export 'home_page/home_page.dart';
 export 'stats/stats.dart';
 export 'stats/pr_data/pr_data.dart';
 export 'projects/projects.dart';
+export 'projects/recipes/recipes.dart';
+export 'projects/this_site/this_site.dart';
 
 /// This class stores the colors which, objectively speaking,
 /// are better than any others.
@@ -29,7 +33,12 @@ abstract final class GrateColors {
 }
 
 extension ContextRoute on BuildContext {
-  void go(Route route, {Object? extra}) => GoRouter.of(this).go(route.target, extra: extra);
+  void go(Route route, {Map<String, String>? params, Object? extra}) {
+    if (params == null) {
+      return GoRouter.of(this).go(route.target, extra: extra);
+    }
+    GoRouter.of(this).goNamed(route.name, pathParameters: params, extra: extra);
+  }
 }
 
 extension Rebuild on State {
