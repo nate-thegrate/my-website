@@ -65,17 +65,14 @@ class App extends StatelessWidget {
         routes: <RouteBase>[
           GoRoute(
             path: Route.stats.name,
-            builder: (context, state) => const Stats(),
             pageBuilder: (context, state) => const NoTransitionPage(child: Stats()),
           ),
           GoRoute(
             path: Route.projects.name,
-            builder: (context, state) => const Projects(),
             pageBuilder: (context, state) => const NoTransitionPage(child: Projects()),
             routes: <RouteBase>[
               GoRoute(
                 path: Route.flutterApis.name,
-                builder: (context, state) => const FlutterApis(),
                 pageBuilder: (context, state) {
                   if (state.extra != null) {
                     return const NoTransitionPage(child: FlutterApisTransition.stack);
@@ -85,14 +82,12 @@ class App extends StatelessWidget {
                 routes: [
                   GoRoute(
                     path: Route.mapping.name,
-                    builder: (context, state) => const WidgetStateMapping(),
                     pageBuilder: (context, state) {
                       return const NoTransitionPage(child: WidgetStateMapping());
                     },
                   ),
                   GoRoute(
                     path: Route.animation.name,
-                    builder: (context, state) => const WidgetStateMapping(),
                     pageBuilder: (context, state) {
                       return const NoTransitionPage(child: WidgetStateMapping());
                     },
@@ -105,12 +100,10 @@ class App extends StatelessWidget {
               ),
               GoRoute(
                 path: Route.recipes.name,
-                builder: (context, state) => const Recipes(),
                 pageBuilder: (context, state) => const NoTransitionPage(child: Recipes()),
               ),
               GoRoute(
                 path: Route.thisSite.name,
-                builder: (context, state) => const ThisSite(),
                 pageBuilder: (context, state) => const NoTransitionPage(child: ThisSite()),
               ),
             ],
@@ -134,9 +127,7 @@ class App extends StatelessWidget {
         style: TextButton.styleFrom(
           foregroundColor: const Color(0xff0060ff),
           shape: const ContinuousRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(16),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 4),
         ),
