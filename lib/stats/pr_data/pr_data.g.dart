@@ -2,9 +2,33 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''un-break `ThemeData` equality''',
+    url: '''https://github.com/flutter/flutter/pull/154695''',
+    diffs: (357, 561),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''Refactor `CircularNotchedRectangle.getOuterPath()`''',
+    url: '''https://github.com/flutter/flutter/pull/154036''',
+    diffs: (22, 31),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''Fix `Drawer` prematurely snapping''',
+    url: '''https://github.com/flutter/flutter/pull/153955''',
+    diffs: (68, 1),
+    refactor: false,
+  ),
+  PullRequest(
     title: '''`_InteractiveViewerState` code cleanup''',
     url: '''https://github.com/flutter/flutter/pull/153645''',
     diffs: (83, 134),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''Factor out `Container` objects''',
+    url: '''https://github.com/flutter/flutter/pull/153619''',
+    diffs: (420, 347),
     refactor: true,
   ),
   PullRequest(
