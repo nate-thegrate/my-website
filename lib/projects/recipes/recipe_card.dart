@@ -21,12 +21,13 @@ class _RecipeCardState extends State<RecipeCard> {
   }
 
   void _select() async {
+    if (selected) return;
+
     final WidgetStates? states = _readStates;
+    if (states == null || !states.contains(WidgetState.selected)) return;
+    selected = true;
     final stash = context.read<_Stached>();
 
-    if (selected || states == null || !states.contains(WidgetState.selected)) return;
-    selected = true;
-    print('calling _select!');
     await Future.delayed(Durations.medium1);
     stash.value = true;
 
@@ -69,7 +70,7 @@ class _RecipeCardState extends State<RecipeCard> {
               builder: (context, t, child) {
                 final Size(:width, :height) = MediaQuery.sizeOf(context);
                 return Transform.translate(
-                  offset: Offset(t * width, (-4 * t + 8 * t * t) * height),
+                  offset: Offset(t * width, (2 * t * t - t) * height * 4),
                   child: Transform.rotate(
                     angle: pow(t, 1.5) * 5,
                     child: const StacheStash(),

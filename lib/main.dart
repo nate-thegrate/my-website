@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:nate_thegrate/projects/recipes/recipes.dart';
 import 'package:nate_thegrate/projects/this_site/this_site.dart';
 
 import 'the_good_stuff.dart';
@@ -104,8 +105,8 @@ class App extends StatelessWidget {
               ),
               GoRoute(
                 path: Route.recipes.name,
-                builder: (context, state) => const RecipeCard(),
-                pageBuilder: (context, state) => const NoTransitionPage(child: RecipeCard()),
+                builder: (context, state) => const Recipes(),
+                pageBuilder: (context, state) => const NoTransitionPage(child: Recipes()),
               ),
               GoRoute(
                 path: Route.thisSite.name,
