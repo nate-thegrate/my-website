@@ -151,12 +151,10 @@ class App extends StatelessWidget {
       ),
     );
 
-    return PRLayoutProvider(
-      child: MaterialApp.router(
-        theme: theme,
-        debugShowCheckedModeBanner: false,
-        routerConfig: _router,
-      ),
+    return MaterialApp.router(
+      theme: theme,
+      debugShowCheckedModeBanner: false,
+      routerConfig: _router,
     );
   }
 }

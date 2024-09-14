@@ -5,6 +5,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 class Refactoring extends InheritedWidget {
   const Refactoring({required this.refactor, required super.child})
       : super(key: const GlobalObjectKey(Refactoring));
+
   final bool refactor;
 
   static bool of(BuildContext context) {
@@ -92,13 +93,12 @@ class _TheDeetsState extends State<TheDeets> {
         ) = constraints;
 
         targetExtent = precedingScrollExtent + 36.0 - viewportMainAxisExtent;
-        final shouldShow = remainingPaintExtent >= 36.0;
-        return SliverToBoxAdapter(
-          child: SizedBox(
-            height: 36.0,
-            child: shouldShow ? PullRequest.total(onlyRefactor: onlyRefactorPRs) : null,
-          ),
-        );
+
+        Widget? total;
+        if (remainingPaintExtent >= 36.0) {
+          total = PullRequest.total(onlyRefactor: onlyRefactorPRs);
+        }
+        return SliverToBoxAdapter(child: SizedBox(height: 36.0, child: total));
       }),
       const SliverToBoxAdapter(
         child: SizedBox(

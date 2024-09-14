@@ -1,23 +1,9 @@
+import 'package:nate_thegrate/stats/ticked_off.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 part 'pr_data.g.dart';
 
 final List<PullRequest> refactorPRs = flutterPRs.where((pr) => pr.refactor).toList();
-
-enum PRLayout {
-  compact,
-  spaced;
-
-  factory PRLayout._compute(BuildContext context, PRLayout? _) {
-    return MediaQuery.sizeOf(context).width < 720 ? compact : spaced;
-  }
-
-  factory PRLayout.of(BuildContext context) => Provider.of<PRLayout>(context);
-}
-
-class PRLayoutProvider extends ProxyProvider0<PRLayout> {
-  PRLayoutProvider({super.key, required Widget super.child}) : super(update: PRLayout._compute);
-}
 
 class PullRequest extends StatelessWidget {
   const PullRequest({
@@ -89,8 +75,8 @@ class PullRequest extends StatelessWidget {
         if (_isTotal) {
           text = Text('$prCount contributions', style: textStyle);
         } else {
-          text = Text(
-            title,
+          text = Text.rich(
+            TickedOff(title),
             style: textStyle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
