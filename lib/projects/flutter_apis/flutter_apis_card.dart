@@ -258,7 +258,7 @@ class FlutterApisTransition extends AnimatedSlide {
   const FlutterApisTransition({super.key})
       : super(
           offset: const Offset(0, 1),
-          initialValue: Offset.zero,
+          initialOffset: Offset.zero,
           duration: Durations.medium1,
           curve: Curves.easeIn,
           child: const Projects(),

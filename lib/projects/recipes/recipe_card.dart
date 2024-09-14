@@ -22,24 +22,26 @@ class _RecipeCardState extends State<RecipeCard> {
 
   void _select() async {
     if (selected) return;
-
     final WidgetStates? states = _readStates;
     if (states == null || !states.contains(WidgetState.selected)) return;
+
     selected = true;
     final stash = context.read<_Stached>();
-
     await Future.delayed(Durations.medium1);
+
     stash.value = true;
-
     await Future.delayed(Durations.medium1);
-    states.add(WidgetState.dragged);
 
+    states.add(WidgetState.dragged);
     await Future.delayed(yeetDuration);
+
     if (!mounted) return;
     Overlay.of(context).insert(_FadeToGreen.entry);
     await Future.delayed(_FadeToGreen._duration);
+
     stash.value = false;
-    states.remove(WidgetState.selected);
+    states.removeAll({WidgetState.selected, WidgetState.dragged});
+    selected = false;
   }
 
   bool selected = false;
@@ -157,6 +159,8 @@ extension type _Stached._(Cubit<bool> cubit) implements Cubit<bool> {
 class Stache extends BlocProvider<_Stached> {
   Stache({super.key, super.child}) : super(create: _Stached.new);
 
+  static const color = Color(0xff403020);
+
   static bool of(BuildContext context) => context.watch<_Stached>().value;
 }
 
@@ -239,7 +243,7 @@ class RenderStache extends RenderBox {
     ..cubicTo(53, 83, 68, 84, 86, 91)
     ..close();
 
-  static final brown = Paint()..color = const Color(0xff403020);
+  static final brown = Paint()..color = Stache.color;
 
   @override
   void performLayout() => size = constraints.biggest;
