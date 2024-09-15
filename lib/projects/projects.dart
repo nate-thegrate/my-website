@@ -125,6 +125,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
         child: GestureDetector(
           onPanDown: handleDownpress,
           onPanEnd: handlePressEnd,
+          behavior: HitTestBehavior.opaque,
           child: widget.child,
         ),
       ),
@@ -160,4 +161,28 @@ class ProjectCardTemplate extends PhysicalShape {
   );
 
   static const defaultElevation = 5.0;
+
+  @override
+  RenderPhysicalShape createRenderObject(BuildContext context) {
+    return _EtherealCard(
+      clipper: clipper,
+      clipBehavior: clipBehavior,
+      elevation: elevation,
+      color: color,
+      shadowColor: shadowColor,
+    );
+  }
+}
+
+class _EtherealCard extends RenderPhysicalShape {
+  _EtherealCard({
+    required super.clipper,
+    super.clipBehavior,
+    super.elevation,
+    required super.color,
+    super.shadowColor,
+  });
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) => false;
 }
