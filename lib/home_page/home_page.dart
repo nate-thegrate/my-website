@@ -53,10 +53,12 @@ class FunLink extends StatelessWidget {
   final Route route;
 
   static const color = Color(0xff0000ee);
-  static final entries = {
-    Route.stats: OverlayEntry(builder: Funderline.stats),
-    Route.projects: OverlayEntry(builder: Funderline.projects),
-  };
+
+  void onTap(PointerDownEvent event) {
+    if (event.buttons != kSecondaryMouseButton) {
+      Funderline.show(route);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +94,7 @@ class FunLink extends StatelessWidget {
               cursor: SystemMouseCursors.click,
               child: TapRegion(
                 behavior: HitTestBehavior.opaque,
-                onTapInside: (event) {
-                  if (event.buttons != kSecondaryMouseButton) {
-                    Overlay.of(context).insert(entries[route]!);
-                  }
-                },
+                onTapInside: onTap,
                 child: const SizedBox.shrink(),
               ),
             ),

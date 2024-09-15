@@ -20,7 +20,7 @@ sealed class TheVoid extends Widget {
 
   static void approach() => _ApproachTheVoid.instance.approach();
 
-  static void transcend() => Overlay.of(_GatewayToTheVoid.context).insert(_FadeToWhite.entry);
+  static void transcend() => App.overlay.insert(_FadeToWhite.entry);
 
   static bool of(BuildContext context) => !context.watch<_ApproachTheVoid>().approaching;
 }

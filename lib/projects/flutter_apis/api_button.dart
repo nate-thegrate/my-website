@@ -44,7 +44,7 @@ class _ApiButtonState extends State<ApiButton> {
       if (!mounted) return;
 
       states.add(WidgetState.disabled);
-      getRekt.absolutelyRekt(widget.route, Overlay.of(context));
+      getRekt.absolutelyRekt(widget.route);
     },
     overlayColor: const WidgetStatePropertyAll(Colors.black12),
     child: Center(

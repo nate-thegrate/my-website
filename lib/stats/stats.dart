@@ -28,6 +28,9 @@ class Stats extends StatefulWidget {
     );
   }
 
+  static const insets = 14.0;
+  static const maxWidth = 720.0;
+
   @override
   State<Stats> createState() => _StatsState();
 }
@@ -44,6 +47,7 @@ class TheDeets extends StatefulWidget {
   const TheDeets({super.key});
 
   static const color = Color(0xfff3f8f8);
+  static const itemExtent = 36.0;
 
   @override
   State<TheDeets> createState() => _TheDeetsState();
@@ -70,7 +74,10 @@ class _TheDeetsState extends State<TheDeets> {
   Widget build(BuildContext context) {
     onlyRefactorPRs = Refactoring.of(context);
     final padding = EdgeInsets.symmetric(
-      horizontal: math.max(14, (MediaQuery.sizeOf(context).width - 720) / 2),
+      horizontal: math.max(
+        Stats.insets,
+        (MediaQuery.sizeOf(context).width - Stats.maxWidth) / 2,
+      ),
     );
     final slivers = [
       SliverMainAxisGroup(
@@ -80,7 +87,7 @@ class _TheDeetsState extends State<TheDeets> {
             delegate: _TableHeader(),
           ),
           SliverFixedExtentList.list(
-            itemExtent: 36.0,
+            itemExtent: TheDeets.itemExtent,
             children: onlyRefactorPRs ? refactorPRs : flutterPRs,
           ),
         ],

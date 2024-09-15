@@ -27,7 +27,7 @@ class GetRekt extends Bloc {
 
   late OverlayEntry entry;
 
-  void absolutelyRekt(Route route, OverlayState overlay) {
+  void absolutelyRekt(Route route) {
     entry = OverlayEntry(
       builder: (context) => DecoratedBox(
         decoration: FlutterApis.decoration,
@@ -45,7 +45,7 @@ class GetRekt extends Bloc {
         ),
       ),
     );
-    overlay.insert(entry);
+    App.overlay.insert(entry);
   }
 }
 

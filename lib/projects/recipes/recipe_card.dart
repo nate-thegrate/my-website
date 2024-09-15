@@ -36,7 +36,7 @@ class _RecipeCardState extends State<RecipeCard> {
     await Future.delayed(yeetDuration);
 
     if (!mounted) return;
-    Overlay.of(context).insert(_FadeToGreen.entry);
+    App.overlay.insert(_FadeToGreen.entry);
     await Future.delayed(_FadeToGreen._duration);
 
     stash.value = false;
@@ -119,7 +119,7 @@ class StacheStash extends LeafRenderObjectWidget {
 
   @override
   RenderStache createRenderObject(BuildContext context) {
-    final jiggle = JiggleStache(vsync: Navigator.of(context));
+    final jiggle = JiggleStache(vsync: App.vsync);
     final states = context.read<WidgetStates?>();
 
     return RenderStache(jiggle, states);

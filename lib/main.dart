@@ -67,7 +67,10 @@ enum Route {
 class App extends StatelessWidget {
   const App({super.key});
 
-  static BuildContext get context => _router.routerDelegate.navigatorKey.currentContext!;
+  static GlobalKey<NavigatorState> get _navigatorKey => _router.routerDelegate.navigatorKey;
+  static BuildContext get context => _navigatorKey.currentContext!;
+  static NavigatorState get vsync => _navigatorKey.currentState!;
+  static OverlayState get overlay => vsync.overlay!;
 
   static final GoRouter _router = GoRouter(
     routes: <RouteBase>[

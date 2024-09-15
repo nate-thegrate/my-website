@@ -1,63 +1,66 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class Funderline extends StatefulWidget {
-  Funderline._(this.route, RenderBox box)
-      : topLeft = box.localToGlobal(Offset.zero),
-        bottomRight = _screenSize.bottomRight(
-          -box.localToGlobal(box.paintBounds.bottomRight),
-        );
+abstract class Funderline extends LeafRenderObjectWidget {
+  const Funderline(this.rect, {super.key});
 
-  Funderline._fromRoute(Route route)
-      : this._(route, route.key.currentContext!.findRenderObject()! as RenderBox);
+  factory Funderline.fromRoute(Route route) {
+    final box = route.key.currentContext!.findRenderObject()! as RenderBox;
+    final rect = box.localToGlobal(Offset.zero) & box.size;
 
-  Funderline.stats(BuildContext _) : this._fromRoute(Route.stats);
-  Funderline.projects(BuildContext _) : this._fromRoute(Route.projects);
+    return switch (route) {
+      Route.stats => _StatsFunderline(rect),
+      Route.projects => _ProjectFunderline(rect),
+      _ => throw Error(),
+    };
+  }
 
-  static Size get _screenSize =>
-      App.context.getInheritedWidgetOfExactType<MediaQuery>()!.data.size;
+  final Rect rect;
 
-  final Offset topLeft, bottomRight;
-  final Route route;
+  static void show(Route route) {
+    final entry = switch (route) {
+      Route.stats => statsEntry,
+      Route.projects => projectsEntry,
+      _ => throw Error(),
+    };
+
+    App.overlay.insert(entry);
+  }
 
   @override
-  State<Funderline> createState() => _FunderlineState();
+  RenderFunder createRenderObject(BuildContext context);
 }
 
-class _FunderlineState extends State<Funderline> with SingleTickerProviderStateMixin {
-  late double left, top, right, bottom;
+final statsEntry = OverlayEntry(builder: (_) => Funderline.fromRoute(Route.stats));
+final projectsEntry = OverlayEntry(builder: (_) => Funderline.fromRoute(Route.projects));
 
-  late final controller = ToggleAnimation(
-    vsync: this,
-    duration: const Seconds(1.75),
-    reverseDuration: const Seconds(1),
-  );
-
-  @override
-  void initState() {
-    super.initState();
-
-    final Funderline(:topLeft, :bottomRight) = widget;
-    left = topLeft.dx;
-    top = topLeft.dy;
-    right = bottomRight.dx;
-    bottom = bottomRight.dy;
-
-    controller
-      ..addListener(rebuild)
+abstract class RenderFunder extends RenderBox {
+  RenderFunder(this.start) {
+    controller = ToggleAnimation(
+      vsync: App.vsync,
+      duration: const Seconds(1.75),
+      reverseDuration: const Seconds(0.75),
+    )
+      ..addListener(markNeedsPaint)
       ..addStatusListener(statusUpdate)
-      ..animateTo(1);
+      ..forward();
   }
+
+  Route get route;
+
+  late final ToggleAnimation controller;
+  final Rect start;
+  late Rect fullScreen;
 
   void statusUpdate(AnimationStatus status) {
     switch (status) {
       case AnimationStatus.completed:
-        context.go(widget.route);
-        // TODO: should be preloaded
-        Future.delayed(Durations.short1, () => controller.animateTo(0));
+        Route.go(route);
+        Future.delayed(const Duration(milliseconds: 90), controller.reverse);
       case AnimationStatus.dismissed:
-        FunLink.entries[widget.route]!.remove();
+        (route == Route.stats ? statsEntry : projectsEntry).remove();
       case AnimationStatus.forward:
       case AnimationStatus.reverse:
         break;
@@ -71,27 +74,147 @@ class _FunderlineState extends State<Funderline> with SingleTickerProviderStateM
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (controller.status case AnimationStatus.forward || AnimationStatus.completed) {
-      final t = controller.value;
-      final x = 1 - Curves.easeOutQuart.transform(math.min(t * 2.5, 1));
-      final y = 1 - Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
-      return Positioned(
-        left: left * x,
-        top: top * y,
-        right: right * x,
-        bottom: bottom * y,
-        child: ColoredBox(
-          color: Color.lerp(FunLink.color, const Color(0xff80ffff), t)!,
-          child: const SizedBox.expand(),
+  void performLayout() {
+    size = constraints.biggest;
+    fullScreen = Offset.zero & size;
+  }
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    if (controller.value > 0.25) {
+      result.add(BoxHitTestEntry(this, position));
+      return true;
+    }
+    return false;
+  }
+}
+
+class _StatsFunderline extends Funderline {
+  const _StatsFunderline(super.rect);
+
+  @override
+  RenderFunder createRenderObject(BuildContext _) => _RenderStatsFunderline(rect);
+}
+
+class _RenderStatsFunderline extends RenderFunder {
+  _RenderStatsFunderline(super.start);
+
+  late double maxWidth;
+  late int rowsDown;
+  late Rect targetRect;
+
+  @override
+  Route get route => Route.stats;
+
+  static const spacing = TheDeets.itemExtent;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    maxWidth = math.min(size.width - 2 * Stats.insets, Stats.maxWidth);
+    final baseline = start.topLeft.dy;
+    rowsDown = (size.height - baseline) ~/ spacing;
+    targetRect = Rect.fromCenter(
+      center: Offset(fullScreen.center.dx, start.center.dy),
+      width: maxWidth,
+      height: 2,
+    );
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final ToggleAnimation(:status, value: t) = controller;
+    final canvas = context.canvas;
+
+    if (status.isForwardOrCompleted) {
+      final alpha = math.min(t * 2.5, 1.0);
+      final x = Curves.easeOutQuart.transform(alpha);
+      final y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
+
+      final rect = Rect.lerp(start, targetRect, x)!;
+      final color = Color.lerp(
+        FunLink.color,
+        PullRequest.borderColor,
+        Curves.easeOutSine.transform(t),
+      )!;
+
+      canvas.drawRect(start, Paint()..color = Colors.white);
+      canvas.drawRect(
+        fullScreen,
+        Paint()..color = TheDeets.color.withValues(alpha: alpha),
+      );
+      if (y == 0) {
+        canvas.drawRect(rect, Paint()..color = color);
+      } else {
+        for (int i = -2; i < rowsDown; i++) {
+          canvas.drawRect(
+            rect.translate(0, y * i * spacing - 0.5),
+            Paint()..color = color,
+          );
+        }
+      }
+    } else {
+      final reveal = Curves.easeInOutSine.transform(t);
+      canvas.drawRect(
+        Offset.zero & Size(size.width, (targetRect.top - 2 * spacing) * reveal),
+        Paint()..color = TheDeets.color,
+      );
+      for (int i = -2; i < rowsDown; i++) {
+        final rect = targetRect.translate(0, i * spacing);
+        canvas.drawRect(
+          Rect.fromLTWH(0, rect.top - spacing + 1, size.width, (spacing - 2) * reveal),
+          Paint()..color = TheDeets.color,
+        );
+        canvas.drawRect(
+          Rect.fromCenter(center: rect.center, width: rect.width, height: rect.height * reveal),
+          Paint()..color = PullRequest.borderColor.withValues(alpha: reveal),
+        );
+      }
+      final top = targetRect.bottom + (rowsDown - 1) * spacing;
+      canvas.drawRect(
+        Rect.fromPoints(
+          Offset(0, top),
+          Offset(size.width, lerpDouble(size.height, top, 1 - reveal)!),
         ),
+        Paint()..color = TheDeets.color,
       );
     }
-    return Positioned.fill(
-      child: Opacity(
-        opacity: controller.value,
-        child: const ColoredBox(color: GrateColors.lightCyan),
-      ),
-    );
+  }
+}
+
+class _ProjectFunderline extends Funderline {
+  const _ProjectFunderline(super.rect);
+
+  @override
+  RenderFunder createRenderObject(BuildContext _) => _RenderProjectFunderline(rect);
+}
+
+class _RenderProjectFunderline extends RenderFunder {
+  _RenderProjectFunderline(super.start);
+
+  @override
+  Route get route => Route.projects;
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final ToggleAnimation(:status, value: t) = controller;
+    final Rect rect;
+    final Color color;
+
+    if (status.isForwardOrCompleted) {
+      final x = Curves.easeOutQuart.transform(math.min(t * 2.5, 1));
+      final y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
+
+      final Rect(:left, :width) = Rect.lerp(start, fullScreen, x)!;
+      final Rect(:top, :height) = Rect.lerp(start, fullScreen, y)!;
+
+      rect = Rect.fromLTWH(left, top, width, height);
+      color = Color.lerp(FunLink.color, const Color(0xff80ffff), t)!;
+    } else {
+      rect = fullScreen;
+      color = GrateColors.lightCyan.withValues(alpha: t);
+    }
+
+    context.canvas.drawRect(rect, Paint()..color = color);
   }
 }

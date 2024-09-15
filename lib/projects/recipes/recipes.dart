@@ -251,15 +251,13 @@ class SpringDrop extends LeafRenderObjectWidget {
   static const duration = Seconds(4);
 
   @override
-  RenderObject createRenderObject(BuildContext context) {
-    return _RenderSpringDrop(Navigator.of(context));
-  }
+  RenderObject createRenderObject(BuildContext context) => _RenderSpringDrop();
 }
 
 class _RenderSpringDrop extends RenderBox {
-  _RenderSpringDrop(TickerProvider vsync) {
+  _RenderSpringDrop() {
     animation = ValueAnimation(
-      vsync: vsync,
+      vsync: App.vsync,
       initialValue: 0,
       duration: SpringDrop.duration,
       curve: Curves.easeOutCubic,
