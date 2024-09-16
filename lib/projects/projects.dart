@@ -6,8 +6,8 @@ export 'hueman/hueman_card.dart';
 export 'this_site/this_site_card.dart';
 export 'recipes/recipe_card.dart';
 
-class Projects extends StatefulWidget {
-  const Projects({super.key});
+class Projects extends TopBar {
+  const Projects({super.key}) : super(body: grid);
 
   static const grid = Column(children: [
     Spacer(),
@@ -32,16 +32,6 @@ class Projects extends StatefulWidget {
     ),
     Spacer(),
   ]);
-
-  @override
-  State<Projects> createState() => _ProjectsState();
-}
-
-class _ProjectsState extends State<Projects> {
-  @override
-  Widget build(BuildContext context) {
-    return const TopBar(body: Projects.grid);
-  }
 }
 
 class _Expanded extends Expanded {
@@ -67,8 +57,6 @@ class _ProjectButton extends StatefulWidget {
   const _ProjectButton(this.child);
 
   final Widget child;
-
-  Future<void> get pause => Future.delayed(const Seconds(0.0125));
 
   @override
   State<_ProjectButton> createState() => _ProjectButtonState();
@@ -147,20 +135,16 @@ class _ProjectButtonState extends State<_ProjectButton> {
 class ProjectCardTemplate extends PhysicalShape {
   const ProjectCardTemplate({
     super.key,
-    super.elevation = defaultElevation,
+    super.elevation = 5.0,
     required super.color,
     super.shadowColor = Colors.black45,
     super.clipBehavior = Clip.antiAlias,
     Widget super.child = const SizedBox.expand(),
-  }) : super(
-          clipper: const ShapeBorderClipper(shape: shape),
-        );
+  }) : super(clipper: const ShapeBorderClipper(shape: shape));
 
   static const shape = ContinuousRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(16.0)),
   );
-
-  static const defaultElevation = 5.0;
 
   @override
   RenderPhysicalShape createRenderObject(BuildContext context) {

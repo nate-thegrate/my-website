@@ -2,22 +2,8 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class Refactoring extends InheritedWidget {
-  const Refactoring({required this.refactor, required super.child})
-      : super(key: const GlobalObjectKey(Refactoring));
-
-  final bool refactor;
-
-  static bool of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<Refactoring>()!.refactor;
-  }
-
-  @override
-  bool updateShouldNotify(Refactoring oldWidget) => refactor != oldWidget.refactor;
-}
-
-class Stats extends StatefulWidget {
-  const Stats({super.key});
+class Stats extends TopBar {
+  const Stats({super.key}) : super(body: const TheDeets());
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
     return NoTransitionPage(
@@ -30,17 +16,20 @@ class Stats extends StatefulWidget {
 
   static const insets = 14.0;
   static const maxWidth = 720.0;
-
-  @override
-  State<Stats> createState() => _StatsState();
 }
 
-class _StatsState extends State<Stats> {
-  // Refactor once TopBar is functional
-  @override
-  Widget build(BuildContext context) {
-    return const TopBar(body: TheDeets());
+class Refactoring extends InheritedWidget {
+  const Refactoring({required this.refactor, required super.child})
+      : super(key: const GlobalObjectKey(Refactoring));
+
+  final bool refactor;
+
+  static bool of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<Refactoring>()!.refactor;
   }
+
+  @override
+  bool updateShouldNotify(Refactoring oldWidget) => refactor != oldWidget.refactor;
 }
 
 class TheDeets extends StatefulWidget {
@@ -56,8 +45,8 @@ class TheDeets extends StatefulWidget {
 class _TheDeetsState extends State<TheDeets> {
   bool onlyRefactorPRs = false;
   bool floatingFooter = true;
-  final controller = ScrollController();
   double targetExtent = double.infinity;
+  final controller = ScrollController();
 
   @override
   void initState() {
@@ -122,6 +111,7 @@ class _TheDeetsState extends State<TheDeets> {
         ),
       ),
     ];
+
     return ColoredBox(
       color: TheDeets.color,
       child: Stack(

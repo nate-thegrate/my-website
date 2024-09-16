@@ -14,7 +14,7 @@ class TopBar extends StatefulWidget {
   State<TopBar> createState() => _TopBarState();
 }
 
-class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
+class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
   late final gapAnimation = ValueAnimation(
     vsync: this,
     initialValue: 0.0,
@@ -42,7 +42,7 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  final floaterKey = _Floater._newKey;
+  final floaterKey = Floater._newKey;
 
   @override
   Widget build(BuildContext context) {
@@ -94,38 +94,40 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
     );
 
     final gapHeight = gapAnimation.value;
+    final appBar = PreferredSize(
+      preferredSize: Size.fromHeight(barHeight + gapHeight),
+      child: MouseRegion(
+        onEnter: openGap,
+        onExit: closeGap,
+        child: Column(
+          children: [
+            ColoredBox(
+              color: GrateColors.lightCyan,
+              child: SizedBox(
+                height: barHeight,
+                child: Stack(
+                  children: [
+                    Floater(key: floaterKey),
+                    bar,
+                  ],
+                ),
+              ),
+            ),
+            if (gapHeight > 0)
+              SizedBox(
+                width: double.infinity,
+                height: gapHeight,
+                child: const ColoredBox(color: Colors.black, child: VoidGap()),
+              ),
+          ],
+        ),
+      ),
+    );
+
     return Stache(
       child: TheVoid.consume(
         child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(barHeight + gapHeight),
-            child: MouseRegion(
-              onEnter: openGap,
-              onExit: closeGap,
-              child: Column(
-                children: [
-                  ColoredBox(
-                    color: GrateColors.lightCyan,
-                    child: SizedBox(
-                      height: barHeight,
-                      child: Stack(
-                        children: [
-                          _Floater(key: floaterKey),
-                          bar,
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (gapHeight > 0)
-                    SizedBox(
-                      width: double.infinity,
-                      height: gapHeight,
-                      child: const ColoredBox(color: Colors.black, child: _Sinker()),
-                    ),
-                ],
-              ),
-            ),
-          ),
+          appBar: appBar,
           body: widget.body,
         ),
       ),
@@ -133,34 +135,37 @@ class _TopBarState extends State<TopBar> with TickerProviderStateMixin {
   }
 }
 
-class _Floater extends StatefulWidget {
-  const _Floater({super.key});
+class Floater extends StatefulWidget {
+  const Floater({super.key});
 
   static GlobalKey<_FloaterState> get _newKey {
-    if (_key.currentContext != null) {
-      return _key = GlobalKey<_FloaterState>();
-    }
+    if (_key.currentContext != null) _key = GlobalKey<_FloaterState>();
     return _key;
   }
 
   static GlobalKey<_FloaterState> _key = GlobalKey<_FloaterState>();
-  static _FloaterState get state => _key.currentState!;
-  static ValueListenable<int> get focused => state.focused;
+  static _FloaterState get _state => _key.currentState!;
+
+  static ValueListenable<int> get focused => _state.focused;
+  static double position = 0;
 
   @override
-  _FloaterState createState() => _FloaterState();
+  State<Floater> createState() => _FloaterState();
 }
 
-class _FloaterState extends State<_Floater> {
+class _FloaterState extends State<Floater> {
   final int initial = switch (Route.current) {
     Route.stats => 1,
     Route.projects => 2,
     _ => 0,
   };
 
+  late final ValueNotifier<int> focused = ValueNotifier(initial);
   bool goingBack = false;
-  static double position = 0;
-  late final ValueNotifier<int> focused = ValueNotifier(initial)..addListener(rebuild);
+  void goBack() {
+    goingBack = true;
+    App.overlay.insert(NoMoreCSS.entry);
+  }
 
   @override
   void dispose() {
@@ -168,25 +173,18 @@ class _FloaterState extends State<_Floater> {
     super.dispose();
   }
 
-  void goto(Route route) async {
-    final animation = context.findAncestorStateOfType<_TopBarState>()!.gapAnimation;
-    try {
-      await animation.animateTo(0).orCancel;
-    } on TickerCanceled {
-      return;
-    }
-    if (mounted) {
-      Route.go(route);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    const box = FractionallySizedBox(
+      widthFactor: 1 / TopBar.sections,
+      child: ColoredBox(color: Colors.white54, child: SizedBox.expand()),
+    );
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onHover: (event) {
-        position = event.position.dx / App.screenSize.width;
-        int x = (position * TopBar.sections).floor();
+        Floater.position = event.position.dx / App.screenSize.width;
+        int x = (Floater.position * TopBar.sections).floor();
         if (x == TopBar.sections) x -= 1;
         focused.value = x;
       },
@@ -197,19 +195,16 @@ class _FloaterState extends State<_Floater> {
         onTapInside: (event) => switch (focused.value) {
           1 => Route.go(Route.stats),
           2 => Route.go(Route.projects),
-          _ => () {
-              goingBack = true;
-              App.overlay.insert(NoMoreCSS.entry);
-            }(),
+          _ => goBack(),
         },
         child: SizedBox.expand(
-          child: AnimatedAlign(
-            duration: Durations.short3,
-            curve: Curves.ease,
-            alignment: Alignment(focused.value * 2 / (TopBar.sections - 1) - 1, 0),
-            child: const FractionallySizedBox(
-              widthFactor: 1 / TopBar.sections,
-              child: ColoredBox(color: Colors.white54, child: SizedBox.expand()),
+          child: ValueListenableBuilder(
+            valueListenable: focused,
+            builder: (context, index, child) => AnimatedAlign(
+              duration: Durations.short3,
+              curve: Curves.ease,
+              alignment: Alignment(index * 2 / (TopBar.sections - 1) - 1, 0),
+              child: box,
             ),
           ),
         ),
@@ -218,25 +213,25 @@ class _FloaterState extends State<_Floater> {
   }
 }
 
-class _Sinker extends LeafRenderObjectWidget {
-  const _Sinker();
+class VoidGap extends LeafRenderObjectWidget {
+  const VoidGap({super.key});
 
   @override
-  _RenderSink createRenderObject(BuildContext context) => _RenderSink();
+  RenderBox createRenderObject(BuildContext context) => _VoidGap();
 }
 
-class _SinkAnimation extends ValueAnimation<double> {
-  _SinkAnimation()
+class _VoidGapAnimation extends ValueAnimation<double> {
+  _VoidGapAnimation()
       : super(
           vsync: App.vsync,
-          initialValue: _FloaterState.position,
+          initialValue: Floater.position,
           duration: Duration.zero,
           lerp: lerpDouble,
         );
 }
 
-class _RenderSink extends RenderBox {
-  _RenderSink() {
+class _VoidGap extends RenderBox {
+  _VoidGap() {
     focused.addListener(updateColor);
     updateColor();
     ticker.start();
@@ -249,11 +244,11 @@ class _RenderSink extends RenderBox {
 
   late final ticker = App.vsync.createTicker(_tick);
   late Color color;
-  ValueListenable<int> focused = _Floater.focused;
+  ValueListenable<int> focused = Floater.focused;
   int frame = 0;
-  double lastPosition = _FloaterState.position;
+  double lastPosition = Floater.position;
   final animations = [
-    for (int i = 0; i < 8; i++) _SinkAnimation(),
+    for (int i = 0; i < 8; i++) _VoidGapAnimation(),
   ];
 
   @override
@@ -269,16 +264,18 @@ class _RenderSink extends RenderBox {
   }
 
   void _tick(Duration elapsed) {
-    frame = ++frame % 60;
-    final newFocused = _Floater.focused;
+    frame = (frame + 1) % 60;
+    if (frame == 0) {
+      animations.removeLast().dispose();
+      animations.insert(0, _VoidGapAnimation());
+    }
+
+    final newFocused = Floater.focused;
     if (newFocused != focused) {
       focused.removeListener(updateColor);
       focused = newFocused..addListener(updateColor);
     }
-    if (frame == 0) {
-      animations.removeLast().dispose();
-      animations.insert(0, _SinkAnimation());
-    }
+
     markNeedsPaint();
   }
 
@@ -287,7 +284,7 @@ class _RenderSink extends RenderBox {
     final canvas = context.canvas;
     final fullBox = offset & size;
 
-    final position = _FloaterState.position;
+    final position = Floater.position;
     for (final (index, animation) in animations.indexed.toList().reversed) {
       final t = (frame + 1) / (120 * 4) + index / 8;
       final color = Color.lerp(this.color, Colors.black, t)!;

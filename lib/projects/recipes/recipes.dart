@@ -16,74 +16,60 @@ class Recipes extends SizedBox {
           child: SizedBox(
             width: 400,
             height: 500,
-            child: _Recipes(),
+            child: Stack(
+              key: Key('s'),
+              alignment: Alignment.bottomCenter,
+              children: [
+                Align(
+                  alignment: Alignment(0, -0.6),
+                  child: DefaultTextStyle(
+                    style: TextStyle(
+                      inherit: false,
+                      color: Color(0xffb0b0b0),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 72,
+                    ),
+                    child: _ComingSoon(),
+                  ),
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 8),
+                    AnimatedText(0, 'delicious'),
+                    AnimatedText(1, 'affordable'),
+                    AnimatedText(2, 'whole grain'),
+                    AnimatedText(3, 'sugar-free'),
+                    AnimatedText(4, 'plant-based'),
+                    Expanded(
+                      child: _FadeInButtons(),
+                    ),
+                    DefaultTextStyle(
+                      style: RecipeStyle(size: 60),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 10),
+                          AnimatedText(8.6, 'r'),
+                          AnimatedText(8.8, 'e'),
+                          AnimatedText(9.0, 'c'),
+                          AnimatedText(9.2, 'i'),
+                          AnimatedText(9.4, 'p'),
+                          AnimatedText(9.6, 'e'),
+                          AnimatedText(9.8, 's'),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                ),
+                SpringDrop(),
+              ],
+            ),
           ),
         ),
       ),
     ),
   );
-}
-
-class _Recipes extends StatefulWidget {
-  const _Recipes();
-
-  @override
-  State<_Recipes> createState() => _RecipesState();
-}
-
-class _RecipesState extends State<_Recipes> {
-  @override
-  Widget build(BuildContext context) {
-    return const Stack(
-      key: Key('s'),
-      alignment: Alignment.bottomCenter,
-      children: [
-        Align(
-          alignment: Alignment(0, -0.6),
-          child: DefaultTextStyle(
-            style: TextStyle(
-              inherit: false,
-              color: Color(0xffb0b0b0),
-              fontWeight: FontWeight.bold,
-              fontSize: 72,
-            ),
-            child: _ComingSoon(),
-          ),
-        ),
-        Column(
-          children: [
-            SizedBox(height: 8),
-            AnimatedText(0, 'delicious'),
-            AnimatedText(1, 'affordable'),
-            AnimatedText(2, 'whole grain'),
-            AnimatedText(3, 'sugar-free'),
-            AnimatedText(4, 'plant-based'),
-            Expanded(
-              child: _FadeInButtons(),
-            ),
-            DefaultTextStyle(
-              style: RecipeStyle(size: 60),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(width: 10),
-                  AnimatedText(8.6, 'r'),
-                  AnimatedText(8.8, 'e'),
-                  AnimatedText(9.0, 'c'),
-                  AnimatedText(9.2, 'i'),
-                  AnimatedText(9.4, 'p'),
-                  AnimatedText(9.6, 'e'),
-                  AnimatedText(9.8, 's'),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-          ],
-        ),
-        SpringDrop(),
-      ],
-    );
-  }
 }
 
 class RecipeStyle extends TextStyle {
