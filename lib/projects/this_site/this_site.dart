@@ -277,7 +277,6 @@ class TheSource extends RenderBox {
   late final Ticker _ticker;
 
   // cycle
-  static const microPerSec = Duration.microsecondsPerSecond;
   static const seconds = 1.25;
   static const microseconds = (seconds * microPerSec) ~/ 1;
   static final micros = pow(microseconds, 1.5) as double;

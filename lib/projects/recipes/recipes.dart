@@ -256,18 +256,18 @@ class SpringDrop extends LeafRenderObjectWidget {
 
 class _RenderSpringDrop extends RenderBox {
   _RenderSpringDrop() {
-    animation = ValueAnimation(
-      vsync: App.vsync,
-      initialValue: 0,
-      duration: SpringDrop.duration,
-      curve: Curves.easeOutCubic,
-      lerp: lerpDouble,
-    )
+    animation
       ..addListener(markNeedsPaint)
       ..value = 431;
   }
 
-  late final ValueAnimation<double> animation;
+  final ValueAnimation<double> animation = ValueAnimation(
+    vsync: App.vsync,
+    initialValue: 0,
+    duration: SpringDrop.duration,
+    curve: Curves.easeOutCubic,
+    lerp: lerpDouble,
+  );
 
   @override
   void performLayout() => size = constraints.biggest;

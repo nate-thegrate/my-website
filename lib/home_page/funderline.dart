@@ -38,11 +38,7 @@ final projectsEntry = OverlayEntry(builder: (_) => Funderline.fromRoute(Route.pr
 
 abstract class RenderFunder extends RenderBox {
   RenderFunder(this.start) {
-    controller = ToggleAnimation(
-      vsync: App.vsync,
-      duration: const Seconds(1.75),
-      reverseDuration: const Seconds(0.75),
-    )
+    controller
       ..addListener(markNeedsPaint)
       ..addStatusListener(statusUpdate)
       ..forward();
@@ -50,7 +46,12 @@ abstract class RenderFunder extends RenderBox {
 
   Route get route;
 
-  late final ToggleAnimation controller;
+  final ToggleAnimation controller = ToggleAnimation(
+    vsync: App.vsync,
+    duration: const Seconds(1.75),
+    reverseDuration: const Seconds(0.75),
+  );
+
   final Rect start;
   late Rect fullScreen;
 
@@ -113,7 +114,7 @@ class _RenderStatsFunderline extends RenderFunder {
     super.performLayout();
     maxWidth = math.min(size.width - 2 * Stats.insets, Stats.maxWidth);
     final baseline = start.topLeft.dy;
-    rowsDown = (size.height - baseline) ~/ spacing;
+    rowsDown = (size.height - baseline + 8) ~/ spacing;
     targetRect = Rect.fromCenter(
       center: Offset(fullScreen.center.dx, start.center.dy),
       width: maxWidth,
@@ -148,7 +149,7 @@ class _RenderStatsFunderline extends RenderFunder {
       } else {
         for (int i = -2; i < rowsDown; i++) {
           canvas.drawRect(
-            rect.translate(0, y * i * spacing - 0.5),
+            rect.translate(0, y * (i * spacing - 8.5)),
             Paint()..color = color,
           );
         }
@@ -156,11 +157,11 @@ class _RenderStatsFunderline extends RenderFunder {
     } else {
       final reveal = Curves.easeInOutSine.transform(t);
       canvas.drawRect(
-        Offset.zero & Size(size.width, (targetRect.top - 2 * spacing) * reveal),
+        Offset.zero & Size(size.width, (targetRect.top - 2 * spacing - 8) * reveal),
         Paint()..color = TheDeets.color,
       );
       for (int i = -2; i < rowsDown; i++) {
-        final rect = targetRect.translate(0, i * spacing);
+        final rect = targetRect.translate(0, i * spacing - 8);
         canvas.drawRect(
           Rect.fromLTWH(0, rect.top - spacing + 1, size.width, (spacing - 2) * reveal),
           Paint()..color = TheDeets.color,

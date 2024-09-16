@@ -24,6 +24,7 @@ export 'stats/pr_data/pr_data.dart';
 export 'projects/projects.dart';
 export 'projects/recipes/recipes.dart';
 export 'projects/this_site/this_site.dart';
+export 'top_bar/top_bar.dart';
 
 /// This class stores the colors which, objectively speaking,
 /// are better than any others.
@@ -62,6 +63,7 @@ extension type WidgetStates._(SetNotifier<WidgetState> _states)
 }
 
 const root2 = 1.4142135623730951;
+const microPerSec = Duration.microsecondsPerSecond;
 
 class Seconds extends Duration {
   const Seconds(double seconds)
