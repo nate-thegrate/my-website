@@ -5,66 +5,61 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 class Recipes extends SizedBox {
   const Recipes({super.key}) : super.expand(child: recipes);
 
-  static const drop = AssetImage('assets/images/spring_drop.png');
-
   static const recipes = ColoredBox(
     color: RecipeCard.background,
     child: DefaultTextStyle(
       style: RecipeStyle(size: 36),
-      child: SizedBox.expand(
-        child: FittedBox(
-          child: SizedBox(
-            width: 400,
-            height: 500,
-            child: Stack(
-              key: Key('s'),
-              alignment: Alignment.bottomCenter,
-              children: [
-                Align(
-                  alignment: Alignment(0, -0.6),
-                  child: DefaultTextStyle(
-                    style: TextStyle(
-                      inherit: false,
-                      color: Color(0xffb0b0b0),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 72,
-                    ),
-                    child: _ComingSoon(),
+      child: FittedBox(
+        child: SizedBox(
+          width: 400,
+          height: 500,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Align(
+                alignment: Alignment(0, -0.6),
+                child: DefaultTextStyle(
+                  style: TextStyle(
+                    inherit: false,
+                    color: Color(0xffb0b0b0),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 72,
                   ),
+                  child: _ComingSoon(),
                 ),
-                Column(
-                  children: [
-                    SizedBox(height: 8),
-                    AnimatedText(0, 'delicious'),
-                    AnimatedText(1, 'affordable'),
-                    AnimatedText(2, 'whole grain'),
-                    AnimatedText(3, 'sugar-free'),
-                    AnimatedText(4, 'plant-based'),
-                    Expanded(
-                      child: _FadeInButtons(),
+              ),
+              Column(
+                children: [
+                  SizedBox(height: 8),
+                  AnimatedText(0, 'delicious'),
+                  AnimatedText(1, 'affordable'),
+                  AnimatedText(2, 'whole grain'),
+                  AnimatedText(3, 'sugar-free'),
+                  AnimatedText(4, 'plant-based'),
+                  Expanded(
+                    child: _FadeInButtons(),
+                  ),
+                  DefaultTextStyle(
+                    style: RecipeStyle(size: 60),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(width: 10),
+                        AnimatedText(8.6, 'r'),
+                        AnimatedText(8.8, 'e'),
+                        AnimatedText(9.0, 'c'),
+                        AnimatedText(9.2, 'i'),
+                        AnimatedText(9.4, 'p'),
+                        AnimatedText(9.6, 'e'),
+                        AnimatedText(9.8, 's'),
+                      ],
                     ),
-                    DefaultTextStyle(
-                      style: RecipeStyle(size: 60),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(width: 10),
-                          AnimatedText(8.6, 'r'),
-                          AnimatedText(8.8, 'e'),
-                          AnimatedText(9.0, 'c'),
-                          AnimatedText(9.2, 'i'),
-                          AnimatedText(9.4, 'p'),
-                          AnimatedText(9.6, 'e'),
-                          AnimatedText(9.8, 's'),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                  ],
-                ),
-                SpringDrop(),
-              ],
-            ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+              SpringDrop(),
+            ],
           ),
         ),
       ),
@@ -81,29 +76,15 @@ class RecipeStyle extends TextStyle {
         );
 }
 
-class _FadeInButtons extends StatefulWidget {
+class _FadeInButtons extends HookWidget {
   const _FadeInButtons();
 
-  @override
-  State<_FadeInButtons> createState() => _FadeInButtonsState();
-}
-
-class _FadeInButtonsState extends State<_FadeInButtons> {
   static void view() => launchUrlString('https://recipes.nate-thegrate.com/');
   static void back() => Route.go(Route.projects);
 
-  bool ignoring = true;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Seconds(6), () {
-      if (mounted) setState(() => ignoring = false);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ignoring = !useDelayedActivation(6);
     const row = Row(
       children: [
         Expanded(
@@ -158,29 +139,16 @@ class _FadeInButtonsState extends State<_FadeInButtons> {
   }
 }
 
-class AnimatedText extends StatefulWidget {
+class AnimatedText extends HookWidget {
   const AnimatedText(this.delay, this.text, {super.key});
 
   final String text;
   final double delay;
 
   @override
-  State<AnimatedText> createState() => _AnimatedTextState();
-}
-
-class _AnimatedTextState extends State<AnimatedText> {
-  bool activated = false;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Seconds(widget.delay / 3), () {
-      if (mounted) setState(() => activated = true);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final activated = useDelayedActivation(delay / 3);
+
     const duration = Seconds(0.8);
     return AnimatedSlide(
       offset: activated ? Offset.zero : const Offset(0, -0.25),
@@ -190,32 +158,19 @@ class _AnimatedTextState extends State<AnimatedText> {
         opacity: activated ? 1 : 0,
         duration: duration,
         curve: Curves.easeInOutSine,
-        child: Text(widget.text),
+        child: Text(text),
       ),
     );
   }
 }
 
-class _ComingSoon extends StatefulWidget {
+class _ComingSoon extends HookWidget {
   const _ComingSoon();
 
   @override
-  State<_ComingSoon> createState() => _ComingSoonState();
-}
-
-class _ComingSoonState extends State<_ComingSoon> {
-  bool visible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Seconds(5), () {
-      if (mounted) setState(() => visible = true);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final visible = useDelayedActivation(5);
+
     return Transform.rotate(
       angle: -0.5,
       child: AnimatedOpacity(
