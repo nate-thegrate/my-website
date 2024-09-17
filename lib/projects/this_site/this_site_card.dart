@@ -68,7 +68,7 @@ class _ThisSiteCardState extends State<_ThisSiteCard> with SingleTickerProviderS
         onTapInside: (event) async {
           TheVoid.approach();
           states.add(WidgetState.selected);
-          await Future.delayed(const Seconds(5 / 3));
+          await Future.delayed(const Seconds(2.35));
           TheVoid.transcend();
         },
         behavior: HitTestBehavior.opaque,

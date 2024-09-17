@@ -30,7 +30,7 @@ class _FadeToWhite extends AnimatedValue<Color> {
       : super(
           Colors.white,
           initialValue: const Color(0x00ffffff),
-          duration: const Seconds(0.5),
+          duration: Durations.short3,
           lerp: Color.lerp,
           onEnd: _end,
         );
@@ -99,7 +99,7 @@ class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
   _ConsumedByTheVoid(BuildContext context, {super.child})
       : super(
           curve: const Dilation(),
-          _box(context).getTransformTo(_box()),
+          _box(context).getTransformTo(_box()).scaled(1.001, 1.001, 1.0),
           duration: const Seconds(2.5),
           initialValue: Matrix4.identity(),
           lerp: _lerp,
