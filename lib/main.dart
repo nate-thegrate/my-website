@@ -40,6 +40,9 @@ enum Route {
   }
 
   static void go(Route route, {Map<String, String>? params, Object? extra}) {
+    if (route == Route.home) {
+      HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
+    }
     if (params == null) {
       return App.router.go(route.target, extra: extra);
     }

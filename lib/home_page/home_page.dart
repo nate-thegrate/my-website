@@ -100,8 +100,6 @@ class HomePageElement extends SingleChildRenderObjectElement {
     }
   }
 
-  Timer? timer;
-
   /// A generous amount of fricks.
   static const initialFricks = 7;
 
@@ -110,10 +108,6 @@ class HomePageElement extends SingleChildRenderObjectElement {
   set fricksToGive(int frickCount) {
     if (frickCount == initialFricks) {
       _fricksToGive = initialFricks;
-      timer?.cancel();
-      timer = Timer(const Seconds(10), () {
-        fricksToGive = 0;
-      });
     }
     if (frickCount == _fricksToGive) return;
     _fricksToGive = frickCount;
@@ -157,7 +151,7 @@ class _FunLinkState extends State<FunLink> {
   void hover(PointerEvent event) async {
     final text = switch (widget.route) {
       Route.stats => 'read: "bragging about LOC reduction"',
-      Route.projects => 'A few things I made.',
+      Route.projects => 'a few things I made.',
       _ => throw Error(),
     };
 
