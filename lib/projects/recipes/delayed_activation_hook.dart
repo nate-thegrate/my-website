@@ -5,6 +5,8 @@ class Seconds extends Duration {
       : super(microseconds: (seconds * Duration.microsecondsPerSecond) ~/ 1);
 }
 
+const microPerSec = Duration.microsecondsPerSecond;
+
 bool useDelayedActivation(double seconds) => use(_DelayedActivationHook(seconds));
 
 class _DelayedActivationHook extends Hook<bool> {

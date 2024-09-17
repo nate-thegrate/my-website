@@ -34,19 +34,16 @@ enum Route {
     }
   }
 
-  @Deprecated('probably not necessary')
-  factory Route.of(BuildContext context) {
-    final uri = GoRouter.of(context).routeInformationProvider.value.uri;
-    return Route.fromUri(uri);
-  }
-
   static Route get current {
-    final uri = App._router.routerDelegate.currentConfiguration.uri;
+    final uri = App.router.routerDelegate.currentConfiguration.uri;
     return Route.fromUri(uri);
   }
 
   static void go(Route route, {Map<String, String>? params, Object? extra}) {
-    App.context.go(route, params: params, extra: extra);
+    if (params == null) {
+      return App.router.go(route.target, extra: extra);
+    }
+    App.router.goNamed(route.name, pathParameters: params, extra: extra);
   }
 
   String get target {
@@ -70,14 +67,14 @@ enum Route {
 class App extends StatelessWidget {
   const App({super.key});
 
-  static GlobalKey<NavigatorState> get _navigatorKey => _router.routerDelegate.navigatorKey;
+  static GlobalKey<NavigatorState> get _navigatorKey => router.routerDelegate.navigatorKey;
   static BuildContext get context => _navigatorKey.currentContext!;
   static NavigatorState get vsync => _navigatorKey.currentState!;
   static OverlayState get overlay => vsync.overlay!;
 
   static Size get screenSize => WidgetsBinding.instance.renderViews.first.size;
 
-  static final GoRouter _router = GoRouter(
+  static final GoRouter router = GoRouter(
     routes: <RouteBase>[
       GoRoute(
         path: '/',
@@ -162,7 +159,7 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       theme: theme,
       debugShowCheckedModeBanner: false,
-      routerConfig: _router,
+      routerConfig: router,
     );
   }
 }

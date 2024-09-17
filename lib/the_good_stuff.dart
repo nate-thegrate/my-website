@@ -1,8 +1,5 @@
 import 'package:collection_notifiers/collection_notifiers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:go_router/go_router.dart';
-import 'package:nate_thegrate/projects/projects.dart';
 import 'package:provider/provider.dart';
 
 import 'main.dart';
@@ -26,15 +23,6 @@ abstract final class GrateColors {
   static const tolls = Color(0xfff7b943);
 }
 
-extension ContextRoute on BuildContext {
-  void go(Route route, {Map<String, String>? params, Object? extra}) {
-    if (params == null) {
-      return GoRouter.of(this).go(route.target, extra: extra);
-    }
-    GoRouter.of(this).goNamed(route.name, pathParameters: params, extra: extra);
-  }
-}
-
 extension Rebuild on State {
   // ignore: invalid_use_of_protected_member, screw that
   void rebuild() => setState(() {});
@@ -54,11 +42,3 @@ extension type WidgetStates._(SetNotifier<WidgetState> _states)
         : context.watch<WidgetStates>();
   }
 }
-
-const root2 = 1.4142135623730951;
-const microPerSec = Duration.microsecondsPerSecond;
-
-final isMobile = switch (defaultTargetPlatform) {
-  TargetPlatform.android || TargetPlatform.fuchsia || TargetPlatform.iOS => true,
-  TargetPlatform.linux || TargetPlatform.macOS || TargetPlatform.windows => false,
-};
