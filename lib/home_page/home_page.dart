@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'funderline.dart';
 
 class HomePage extends ColoredBox {
-  const HomePage({super.key}) : super(color: Colors.white, child: _child);
+  const HomePage() : super(key: HomePageElement.key, color: Colors.white, child: _child);
 
   static const _child = DefaultTextStyle(
     style: TextStyle(
@@ -44,9 +46,97 @@ class HomePage extends ColoredBox {
       ),
     ),
   );
+
+  @override
+  HomePageElement createElement() => HomePageElement(this);
 }
 
-class FunLink extends StatelessWidget {
+class HomePageElement extends SingleChildRenderObjectElement {
+  HomePageElement(HomePage super.widget);
+
+  static const key = GlobalObjectKey(HomePage);
+  static HomePageElement get instance => key.currentContext! as HomePageElement;
+
+  void show([String? message]) async {
+    if (--fricksIGive > 0) {
+      if (message != null) {
+        text.value = message;
+      }
+      if (opacity.isDismissed) {
+        final currentText = text.value;
+        await Future.delayed(Durations.short2);
+        if (text.value != currentText) return;
+      }
+    }
+
+    if (!text.value.contains('é')) {
+      opacity.forward();
+    }
+  }
+
+  void hide([_]) async {
+    if (fricksIGive == 0) return;
+
+    final currentText = text.value;
+    await Future.delayed(Durations.short2);
+    if (text.value == currentText && fricksIGive > 0) {
+      opacity.reverse();
+    }
+  }
+
+  /// A generous amount of fricks.
+  static const initialFricks = 7;
+
+  int get fricksIGive => _fricksIGive;
+  int _fricksIGive = initialFricks;
+  set fricksIGive(int frickCount) {
+    if (frickCount == _fricksIGive) return;
+    _fricksIGive = frickCount;
+    if (frickCount <= 0 && !text.value.contains('é')) {
+      text.value = 'um... you gonna click on something?';
+    }
+  }
+
+  final text = ValueNotifier<String>('');
+
+  final opacity = ToggleAnimation(
+    vsync: App.vsync,
+    duration: Durations.short1,
+    reverseDuration: Durations.long1,
+  );
+
+  late final preview = OverlayEntry(
+    builder: (context) => Positioned(
+      bottom: 0,
+      left: 0,
+      child: FadeTransition(
+        opacity: opacity,
+        child: _FunPreview.box,
+      ),
+    ),
+  );
+
+  @override
+  void mount(Element? parent, Object? newSlot) {
+    super.mount(parent, newSlot);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      App.overlay.insert(preview);
+    });
+    Future.delayed(const Seconds(10), () {
+      fricksIGive = 0;
+    });
+  }
+
+  @override
+  void unmount() {
+    opacity.dispose();
+    text.dispose();
+    preview.remove();
+    super.unmount();
+  }
+}
+
+class FunLink extends StatefulWidget {
   const FunLink.contributions({super.key}) : route = Route.stats;
   const FunLink.projects({super.key}) : route = Route.projects;
 
@@ -54,10 +144,29 @@ class FunLink extends StatelessWidget {
 
   static const color = Color(0xff0000ee);
 
+  @override
+  State<FunLink> createState() => _FunLinkState();
+}
+
+class _FunLinkState extends State<FunLink> {
+  final preview = HomePageElement.instance;
+
   void onTap(PointerDownEvent event) {
+    preview.hide();
     if (event.buttons != kSecondaryMouseButton) {
-      Funderline.show(route);
+      Funderline.show(widget.route);
     }
+  }
+
+  Timer? timer;
+  void hover(PointerEvent event) async {
+    final text = switch (widget.route) {
+      Route.stats => 'read: "bragging about LOC reduction"',
+      Route.projects => 'A few things I made.',
+      _ => throw Error(),
+    };
+
+    preview.show(text);
   }
 
   @override
@@ -73,11 +182,11 @@ class FunLink extends StatelessWidget {
             right: 0,
             child: SizedBox(
               height: 1.5,
-              child: ColoredBox(key: route.key, color: color),
+              child: ColoredBox(key: widget.route.key, color: FunLink.color),
             ),
           ),
           Text(
-            '$route',
+            '${widget.route}',
             style: TextStyle(
               foreground: Paint()
                 ..style = PaintingStyle.stroke
@@ -86,12 +195,14 @@ class FunLink extends StatelessWidget {
             ),
           ),
           Text(
-            '$route',
-            style: const TextStyle(color: color),
+            '${widget.route}',
+            style: const TextStyle(color: FunLink.color),
           ),
           Positioned.fill(
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
+              onEnter: hover,
+              onExit: preview.hide,
               child: TapRegion(
                 behavior: HitTestBehavior.opaque,
                 onTapInside: onTap,
@@ -102,5 +213,48 @@ class FunLink extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _FunPreview extends HookWidget {
+  const _FunPreview();
+
+  static void touch([PointerEvent? _]) {
+    final HomePageElement(:text, :opacity) = HomePageElement.instance;
+
+    if (text.value.contains('...')) {
+      text.value = 'touché.';
+      Future.delayed(const Seconds(2.5), opacity.reverse);
+    }
+  }
+
+  static const box = TapRegion(
+    onTapInside: touch,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(width: 0.5, color: Colors.black12),
+          right: BorderSide(width: 0.5, color: Colors.black12),
+        ),
+        borderRadius: BorderRadius.only(topRight: Radius.circular(4)),
+        color: Color(0xffe6f0ff),
+      ),
+      child: DefaultTextStyle(
+        style: TextStyle(inherit: false, color: Colors.black87),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          child: _FunPreview(),
+        ),
+      ),
+    ),
+  );
+
+  static String useFunPreview() {
+    return useValueListenable(useMemoized(() => HomePageElement.instance.text));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(useFunPreview());
   }
 }
