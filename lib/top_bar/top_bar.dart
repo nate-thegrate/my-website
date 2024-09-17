@@ -42,7 +42,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  final floaterKey = Floater._newKey;
+  final indicative = Indicative._newKey;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +107,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                 height: barHeight,
                 child: Stack(
                   children: [
-                    Floater(key: floaterKey),
+                    Indicative(key: indicative),
                     bar,
                   ],
                 ),
@@ -117,7 +117,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
               SizedBox(
                 width: double.infinity,
                 height: gapHeight,
-                child: const ColoredBox(color: Colors.black, child: VoidGap()),
+                child: const ColoredBox(color: Colors.black, child: _VoidGap()),
               ),
           ],
         ),
@@ -135,25 +135,25 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
   }
 }
 
-class Floater extends StatefulWidget {
-  const Floater({super.key});
+class Indicative extends StatefulWidget {
+  const Indicative({super.key});
 
-  static GlobalKey<_FloaterState> get _newKey {
-    if (_key.currentContext != null) _key = GlobalKey<_FloaterState>();
+  static GlobalKey<_IndicativeState> get _newKey {
+    if (_key.currentContext != null) _key = GlobalKey<_IndicativeState>();
     return _key;
   }
 
-  static GlobalKey<_FloaterState> _key = GlobalKey<_FloaterState>();
-  static _FloaterState get _state => _key.currentState!;
+  static GlobalKey<_IndicativeState> _key = GlobalKey<_IndicativeState>();
+  static _IndicativeState get _state => _key.currentState!;
 
   static ValueListenable<int> get focused => _state.focused;
   static double position = 0;
 
   @override
-  State<Floater> createState() => _FloaterState();
+  State<Indicative> createState() => _IndicativeState();
 }
 
-class _FloaterState extends State<Floater> {
+class _IndicativeState extends State<Indicative> {
   final int initial = switch (Route.current) {
     Route.stats => 1,
     Route.projects => 2,
@@ -184,8 +184,8 @@ class _FloaterState extends State<Floater> {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onHover: (event) {
-        Floater.position = event.position.dx / App.screenSize.width;
-        int x = (Floater.position * TopBar.sections).floor();
+        Indicative.position = event.position.dx / App.screenSize.width;
+        int x = (Indicative.position * TopBar.sections).floor();
         if (x == TopBar.sections) x -= 1;
         focused.value = x;
       },
@@ -214,25 +214,25 @@ class _FloaterState extends State<Floater> {
   }
 }
 
-class VoidGap extends LeafRenderObjectWidget {
-  const VoidGap({super.key});
+class _VoidGap extends LeafRenderObjectWidget {
+  const _VoidGap();
 
   @override
-  RenderBox createRenderObject(BuildContext context) => _VoidGap();
+  VoidGap createRenderObject(BuildContext context) => VoidGap();
 }
 
 class _VoidGapAnimation extends ValueAnimation<double> {
   _VoidGapAnimation()
       : super(
           vsync: App.vsync,
-          initialValue: Floater.position,
+          initialValue: Indicative.position,
           duration: Duration.zero,
           lerp: lerpDouble,
         );
 }
 
-class _VoidGap extends RenderBox {
-  _VoidGap() {
+class VoidGap extends RenderBox {
+  VoidGap() {
     focused.addListener(updateColor);
     updateColor();
     ticker.start();
@@ -245,33 +245,36 @@ class _VoidGap extends RenderBox {
 
   late final ticker = App.vsync.createTicker(_tick);
   late Color color;
-  ValueListenable<int> focused = Floater.focused;
+  ValueListenable<int> focused = Indicative.focused;
   int frame = 0;
-  double lastPosition = Floater.position;
+  double lastPosition = Indicative.position;
+  static const rectCount = 12;
+  static const cycleFrames = 33;
   final animations = [
-    for (int i = 0; i < 8; i++) _VoidGapAnimation(),
+    for (int i = 0; i < rectCount; i++) _VoidGapAnimation(),
   ];
 
   @override
-  void performLayout() {
-    size = constraints.biggest;
-  }
+  void performLayout() => size = constraints.biggest;
 
   @override
   void dispose() {
     ticker.dispose();
     focused.removeListener(updateColor);
+    for (final animation in animations) {
+      animation.dispose();
+    }
     super.dispose();
   }
 
   void _tick(Duration elapsed) {
-    frame = (frame + 1) % 60;
+    frame = (frame + 1) % cycleFrames;
     if (frame == 0) {
       animations.removeLast().dispose();
       animations.insert(0, _VoidGapAnimation());
     }
 
-    final newFocused = Floater.focused;
+    final newFocused = Indicative.focused;
     if (newFocused != focused) {
       focused.removeListener(updateColor);
       focused = newFocused..addListener(updateColor);
@@ -285,9 +288,9 @@ class _VoidGap extends RenderBox {
     final canvas = context.canvas;
     final fullBox = offset & size;
 
-    final position = Floater.position;
+    final position = Indicative.position;
     for (final (index, animation) in animations.indexed.toList().reversed) {
-      final t = (frame + 1) / (120 * 4) + index / 8;
+      final t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
       final color = Color.lerp(this.color, Colors.black, t)!;
       animation.duration = Seconds(t / 2);
 
