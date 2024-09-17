@@ -3,19 +3,30 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class TopBar extends StatefulWidget {
-  const TopBar({super.key, this.body});
+class TopBar extends StatelessWidget {
+  const TopBar({super.key, required this.body});
 
-  final Widget? body;
+  final Widget body;
 
   static const sections = 3;
 
   @override
-  State<TopBar> createState() => _TopBarState();
+  Widget build(BuildContext context) {
+    return Stache(child: TheVoid.consume(child: _TopBar(body: body)));
+  }
 }
 
-class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
-  late final gapAnimation = ValueAnimation(
+class _TopBar extends StatefulWidget {
+  const _TopBar({this.body});
+
+  final Widget? body;
+
+  @override
+  State<_TopBar> createState() => _TopBarState();
+}
+
+class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
+  late final _gapAnimation = ValueAnimation(
     vsync: this,
     initialValue: 0.0,
     duration: Duration.zero,
@@ -25,20 +36,20 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
   Timer? timer;
 
   void openGap([_]) {
-    timer = Timer(const Seconds(1), () {
+    timer = Timer(Durations.extralong4, () {
       if (!mounted) return;
-      gapAnimation.animateTo(12, duration: Durations.long2, curve: Curves.easeInOutSine);
+      _gapAnimation.animateTo(12, duration: Durations.long2, curve: Curves.easeInOutSine);
     });
   }
 
   void closeGap([_]) {
     timer?.cancel();
-    gapAnimation.animateTo(0, duration: Durations.short2, curve: Curves.ease);
+    _gapAnimation.animateTo(0, duration: Durations.short2, curve: Curves.ease);
   }
 
   @override
   void dispose() {
-    gapAnimation.dispose();
+    _gapAnimation.dispose();
     super.dispose();
   }
 
@@ -93,7 +104,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
       ),
     );
 
-    final gapHeight = gapAnimation.value;
+    final gapHeight = _gapAnimation.value;
     final appBar = PreferredSize(
       preferredSize: Size.fromHeight(barHeight + gapHeight),
       child: MouseRegion(
@@ -124,26 +135,21 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
       ),
     );
 
-    return Stache(
-      child: TheVoid.consume(
-        child: Scaffold(
-          appBar: appBar,
-          body: widget.body,
-        ),
-      ),
-    );
+    return Scaffold(appBar: appBar, body: widget.body);
   }
 }
+
+typedef _IndiKey = GlobalKey<_IndicativeState>;
 
 class Indicative extends StatefulWidget {
   const Indicative({super.key});
 
-  static GlobalKey<_IndicativeState> get _newKey {
-    if (_key.currentContext != null) _key = GlobalKey<_IndicativeState>();
+  static _IndiKey get _newKey {
+    if (_key.currentContext != null) _key = _IndiKey();
     return _key;
   }
 
-  static GlobalKey<_IndicativeState> _key = GlobalKey<_IndicativeState>();
+  static _IndiKey _key = _IndiKey();
   static _IndicativeState get _state => _key.currentState!;
 
   static ValueListenable<int> get focused => _state.focused;
@@ -160,7 +166,7 @@ class _IndicativeState extends State<Indicative> {
     _ => 0,
   };
 
-  late final ValueNotifier<int> focused = ValueNotifier(initial);
+  late final focused = ValueNotifier(initial);
   bool goingBack = false;
   void goBack() {
     goingBack = true;

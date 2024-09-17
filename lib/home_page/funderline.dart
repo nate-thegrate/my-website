@@ -107,7 +107,7 @@ class _RenderStatsFunderline extends RenderFunder {
   @override
   Route get route => Route.stats;
 
-  static const spacing = TheDeets.itemExtent;
+  static const spacing = Stats.itemExtent;
 
   @override
   void performLayout() {
@@ -121,6 +121,8 @@ class _RenderStatsFunderline extends RenderFunder {
       height: 2,
     );
   }
+
+  static final bgFill = Paint()..color = Stats.background;
 
   @override
   void paint(PaintingContext context, Offset offset) {
@@ -142,7 +144,7 @@ class _RenderStatsFunderline extends RenderFunder {
       canvas.drawRect(start, Paint()..color = Colors.white);
       canvas.drawRect(
         fullScreen,
-        Paint()..color = TheDeets.color.withValues(alpha: alpha),
+        Paint()..color = Stats.background.withValues(alpha: alpha),
       );
       if (y == 0) {
         canvas.drawRect(rect, Paint()..color = color);
@@ -158,13 +160,13 @@ class _RenderStatsFunderline extends RenderFunder {
       final reveal = Curves.easeInOutSine.transform(t);
       canvas.drawRect(
         Offset.zero & Size(size.width, (targetRect.top - 2 * spacing - 8) * reveal),
-        Paint()..color = TheDeets.color,
+        bgFill,
       );
       for (int i = -2; i < rowsDown; i++) {
         final rect = targetRect.translate(0, i * spacing - 8);
         canvas.drawRect(
           Rect.fromLTWH(0, rect.top - spacing + 1, size.width, (spacing - 2) * reveal),
-          Paint()..color = TheDeets.color,
+          bgFill,
         );
         canvas.drawRect(
           Rect.fromCenter(center: rect.center, width: rect.width, height: rect.height * reveal),
@@ -172,13 +174,11 @@ class _RenderStatsFunderline extends RenderFunder {
         );
       }
       final top = targetRect.bottom + (rowsDown - 1) * spacing;
-      canvas.drawRect(
-        Rect.fromPoints(
-          Offset(0, top),
-          Offset(size.width, lerpDouble(size.height, top, 1 - reveal)!),
-        ),
-        Paint()..color = TheDeets.color,
+      final rect = Rect.fromPoints(
+        Offset(0, top),
+        Offset(size.width, lerpDouble(size.height, top, 1 - reveal)!),
       );
+      canvas.drawRect(rect, bgFill);
     }
   }
 }

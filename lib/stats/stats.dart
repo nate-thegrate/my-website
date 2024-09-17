@@ -5,7 +5,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 export 'pr_data/pr_data.dart';
 
 class Stats extends TopBar {
-  const Stats({super.key}) : super(body: const TheDeets());
+  const Stats({super.key}) : super(body: const _Stats());
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
     return NoTransitionPage(
@@ -16,8 +16,10 @@ class Stats extends TopBar {
     );
   }
 
+  static const background = Color(0xfff3f8f8);
   static const insets = 14.0;
   static const maxWidth = 720.0;
+  static const itemExtent = 36.0;
 }
 
 class Refactoring extends InheritedWidget {
@@ -34,18 +36,14 @@ class Refactoring extends InheritedWidget {
   bool updateShouldNotify(Refactoring oldWidget) => refactor != oldWidget.refactor;
 }
 
-class TheDeets extends StatefulWidget {
-  const TheDeets({super.key});
-
-  static const color = Color(0xfff3f8f8);
-  static const itemExtent = 36.0;
+class _Stats extends StatefulWidget {
+  const _Stats();
 
   @override
-  State<TheDeets> createState() => _TheDeetsState();
+  State<_Stats> createState() => _StatsState();
 }
 
-class _TheDeetsState extends State<TheDeets> {
-  bool onlyRefactorPRs = false;
+class _StatsState extends State<_Stats> {
   bool floatingFooter = true;
   double targetExtent = double.infinity;
   final controller = ScrollController();
@@ -63,7 +61,7 @@ class _TheDeetsState extends State<TheDeets> {
 
   @override
   Widget build(BuildContext context) {
-    onlyRefactorPRs = Refactoring.of(context);
+    final onlyRefactorPRs = Refactoring.of(context);
     final padding = EdgeInsets.symmetric(
       horizontal: math.max(
         Stats.insets,
@@ -78,7 +76,7 @@ class _TheDeetsState extends State<TheDeets> {
             delegate: _TableHeader(),
           ),
           SliverFixedExtentList.list(
-            itemExtent: TheDeets.itemExtent,
+            itemExtent: Stats.itemExtent,
             children: onlyRefactorPRs ? refactorPRs : flutterPRs,
           ),
         ],
@@ -115,7 +113,7 @@ class _TheDeetsState extends State<TheDeets> {
     ];
 
     return ColoredBox(
-      color: TheDeets.color,
+      color: Stats.background,
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [

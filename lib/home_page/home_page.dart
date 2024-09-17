@@ -71,7 +71,8 @@ class HomePageElement extends SingleChildRenderObjectElement {
   }
 
   static const key = GlobalObjectKey(HomePage);
-  static HomePageElement get instance => key.currentContext! as HomePageElement;
+  static HomePageElement? _instance;
+  static HomePageElement get instance => _instance ??= key.currentContext! as HomePageElement;
 
   void show([String? message]) async {
     if (--fricksToGive > 0) {
@@ -125,7 +126,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
   );
 }
 
-class FunLink extends StatefulWidget {
+class FunLink extends StatelessWidget {
   const FunLink.contributions({super.key}) : route = Route.stats;
   const FunLink.projects({super.key}) : route = Route.projects;
 
@@ -133,30 +134,7 @@ class FunLink extends StatefulWidget {
 
   static const color = Color(0xff0000ee);
 
-  @override
-  State<FunLink> createState() => _FunLinkState();
-}
-
-class _FunLinkState extends State<FunLink> {
-  final preview = HomePageElement.instance;
-
-  void onTap(PointerDownEvent event) {
-    preview.hide();
-    if (event.buttons != kSecondaryMouseButton) {
-      Funderline.show(widget.route);
-    }
-  }
-
-  Timer? timer;
-  void hover(PointerEvent event) async {
-    final text = switch (widget.route) {
-      Route.stats => 'read: "bragging about LOC reduction"',
-      Route.projects => 'a few things I made.',
-      _ => throw Error(),
-    };
-
-    preview.show(text);
-  }
+  static HomePageElement get preview => HomePageElement.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -171,11 +149,11 @@ class _FunLinkState extends State<FunLink> {
             right: 0,
             child: SizedBox(
               height: 1.5,
-              child: ColoredBox(key: widget.route.key, color: FunLink.color),
+              child: ColoredBox(key: route.key, color: FunLink.color),
             ),
           ),
           Text(
-            '${widget.route}',
+            '$route',
             style: TextStyle(
               foreground: Paint()
                 ..style = PaintingStyle.stroke
@@ -184,17 +162,30 @@ class _FunLinkState extends State<FunLink> {
             ),
           ),
           Text(
-            '${widget.route}',
+            '$route',
             style: const TextStyle(color: FunLink.color),
           ),
           Positioned.fill(
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
-              onEnter: hover,
+              onEnter: (event) async {
+                final text = switch (route) {
+                  Route.stats => 'read: "bragging about LOC reduction"',
+                  Route.projects => 'just some things I made :)',
+                  _ => throw Error(),
+                };
+
+                preview.show(text);
+              },
               onExit: preview.hide,
               child: TapRegion(
                 behavior: HitTestBehavior.opaque,
-                onTapInside: onTap,
+                onTapInside: (event) {
+                  preview.hide();
+                  if (event.buttons != kSecondaryMouseButton) {
+                    Funderline.show(route);
+                  }
+                },
                 child: const SizedBox.shrink(),
               ),
             ),
