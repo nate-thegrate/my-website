@@ -165,6 +165,7 @@ class _FloaterState extends State<Floater> {
   void goBack() {
     goingBack = true;
     App.overlay.insert(NoMoreCSS.entry);
+    HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
   }
 
   @override

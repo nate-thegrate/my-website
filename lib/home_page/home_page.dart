@@ -52,13 +52,29 @@ class HomePage extends ColoredBox {
 }
 
 class HomePageElement extends SingleChildRenderObjectElement {
-  HomePageElement(HomePage super.widget);
+  HomePageElement(HomePage super.widget) {
+    final entry = OverlayEntry(
+      builder: (context) => Positioned(
+        bottom: 0,
+        left: 0,
+        child: FadeTransition(
+          opacity: opacity,
+          child: _FunPreview.box,
+        ),
+      ),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      App.overlay.insert(entry);
+    });
+    fricksToGive = initialFricks;
+  }
 
   static const key = GlobalObjectKey(HomePage);
   static HomePageElement get instance => key.currentContext! as HomePageElement;
 
   void show([String? message]) async {
-    if (--fricksIGive > 0) {
+    if (--fricksToGive > 0) {
       if (message != null) {
         text.value = message;
       }
@@ -75,23 +91,32 @@ class HomePageElement extends SingleChildRenderObjectElement {
   }
 
   void hide([_]) async {
-    if (fricksIGive == 0) return;
+    if (fricksToGive == 0) return;
 
     final currentText = text.value;
     await Future.delayed(Durations.short2);
-    if (text.value == currentText && fricksIGive > 0) {
+    if (text.value == currentText && fricksToGive > 0) {
       opacity.reverse();
     }
   }
 
+  Timer? timer;
+
   /// A generous amount of fricks.
   static const initialFricks = 7;
 
-  int get fricksIGive => _fricksIGive;
-  int _fricksIGive = initialFricks;
-  set fricksIGive(int frickCount) {
-    if (frickCount == _fricksIGive) return;
-    _fricksIGive = frickCount;
+  int get fricksToGive => _fricksToGive;
+  int _fricksToGive = initialFricks;
+  set fricksToGive(int frickCount) {
+    if (frickCount == initialFricks) {
+      _fricksToGive = initialFricks;
+      timer?.cancel();
+      timer = Timer(const Seconds(10), () {
+        fricksToGive = 0;
+      });
+    }
+    if (frickCount == _fricksToGive) return;
+    _fricksToGive = frickCount;
     if (frickCount <= 0 && !text.value.contains('é')) {
       text.value = 'um... you gonna click on something?';
     }
@@ -104,36 +129,6 @@ class HomePageElement extends SingleChildRenderObjectElement {
     duration: Durations.short1,
     reverseDuration: Durations.long1,
   );
-
-  late final preview = OverlayEntry(
-    builder: (context) => Positioned(
-      bottom: 0,
-      left: 0,
-      child: FadeTransition(
-        opacity: opacity,
-        child: _FunPreview.box,
-      ),
-    ),
-  );
-
-  @override
-  void mount(Element? parent, Object? newSlot) {
-    super.mount(parent, newSlot);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      App.overlay.insert(preview);
-    });
-    Future.delayed(const Seconds(10), () {
-      fricksIGive = 0;
-    });
-  }
-
-  @override
-  void unmount() {
-    opacity.dispose();
-    text.dispose();
-    preview.remove();
-    super.unmount();
-  }
 }
 
 class FunLink extends StatefulWidget {
