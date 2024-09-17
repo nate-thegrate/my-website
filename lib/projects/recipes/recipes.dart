@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
+export 'delayed_activation_hook.dart';
+
 class Recipes extends SizedBox {
   const Recipes({super.key}) : super.expand(child: recipes);
 

@@ -4,7 +4,9 @@ export 'flutter_apis/flutter_apis_card.dart';
 export 'flutter_apis/flutter_apis.dart';
 export 'hueman/hueman_card.dart';
 export 'this_site/this_site_card.dart';
+export 'this_site/this_site.dart';
 export 'recipes/recipe_card.dart';
+export 'recipes/recipes.dart';
 
 class Projects extends TopBar {
   const Projects({super.key}) : super(body: grid);

@@ -18,14 +18,6 @@ export 'package:flutter_hooks/flutter_hooks.dart';
 export 'package:url_launcher/url_launcher_string.dart';
 
 export 'main.dart';
-export 'home_page/home_page.dart';
-export 'stats/stats.dart';
-export 'stats/pr_data/pr_data.dart';
-export 'projects/projects.dart';
-export 'projects/recipes/recipes.dart';
-export 'projects/recipes/delayed_activation_hook.dart';
-export 'projects/this_site/this_site.dart';
-export 'top_bar/top_bar.dart';
 
 /// This class stores the colors which, objectively speaking,
 /// are better than any others.

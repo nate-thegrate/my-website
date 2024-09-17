@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
+export 'pr_data/pr_data.dart';
+
 class Stats extends TopBar {
   const Stats({super.key}) : super(body: const TheDeets());
 

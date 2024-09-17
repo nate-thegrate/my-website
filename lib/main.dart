@@ -1,5 +1,10 @@
 import 'the_good_stuff.dart';
 
+export 'home_page/home_page.dart';
+export 'stats/stats.dart';
+export 'projects/projects.dart';
+export 'top_bar/top_bar.dart';
+
 void main() => runApp(const App());
 
 enum Route {
