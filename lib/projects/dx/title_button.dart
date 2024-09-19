@@ -1,6 +1,168 @@
+import 'dart:ui';
 import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
+
+class TitleButton extends StatefulWidget {
+  const TitleButton(
+    this.route, {
+    super.key,
+    this.border = Rekt.defaultBorder,
+    required this.child,
+  });
+
+  final Route route;
+
+  final OutlinedBorder border;
+
+  final Widget child;
+
+  static const style = TextStyle(
+    inherit: false,
+    color: Colors.black87,
+    fontFamily: 'roboto mono',
+    fontSize: 22,
+    fontVariations: [FontVariation.weight(550)],
+  );
+
+  @override
+  State<TitleButton> createState() => _TitleButtonState();
+}
+
+class _TitleButtonState extends State<TitleButton> with SingleTickerProviderStateMixin {
+  late final depth = ValueAnimation(
+    vsync: this,
+    initialValue: 0.0,
+    duration: Durations.medium1,
+    curve: Curves.ease,
+    lerp: lerpDouble,
+  );
+
+  @override
+  void dispose() {
+    depth.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final border = widget.border;
+    final Widget box = RouteBox(
+      route: widget.route,
+      child: SizedBox(
+        width: 500,
+        child: FittedBox(
+          child: SizedBox(
+            width: 200,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: DepthTransition(depth: depth, child: widget.child),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return MouseRegion(
+      onEnter: (event) => depth.value = 1.0,
+      onExit: (event) => depth.value = 0.0,
+      child: ClipPath(
+        clipper: ShapeBorderClipper(shape: border),
+        child: RektTransition(
+          depth: depth,
+          border: border,
+          child: SplashBox(
+            child: InkWell(
+              onTap: () {
+                if (Route.current case Route.animation || Route.mapping) {
+                  return Route.go(widget.route);
+                }
+                Rekt.getRekt(context);
+              },
+              overlayColor: const WidgetStateColor.fromMap({
+                WidgetState.pressed: Color(0x24000000),
+                WidgetState.hovered: Color(0x14000000),
+                WidgetState.any: Colors.black12,
+              }),
+              child: box,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RouteBox extends SingleChildRenderObjectWidget {
+  const RouteBox({super.key, required this.route, super.child});
+
+  final Route route;
+
+  Color _color(BuildContext context) {
+    return Route.of(context) == route ? Colors.black12 : Colors.transparent;
+  }
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return RenderColoredBox(color: _color(context));
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderColoredBox renderObject) {
+    renderObject.color = _color(context);
+  }
+}
+
+class DepthTransition extends SingleChildRenderObjectWidget with RenderListenable {
+  const DepthTransition({super.key, required this.depth, super.child});
+
+  final ValueListenable<double> depth;
+
+  @override
+  Listenable get listenable => depth;
+
+  static Matrix4 _transformed(ValueListenable<double> depth) {
+    return Matrix4.translationValues(0, depth.value * 2, 0);
+  }
+
+  @override
+  RenderTransform createRenderObject(BuildContext context) {
+    final renderTransform = RenderTransform(
+      transform: _transformed(depth),
+      filterQuality: FilterQuality.none,
+    );
+
+    return renderTransform;
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderTransform renderObject) {
+    renderObject.transform = _transformed(depth);
+  }
+}
+
+class RektTransition extends SingleChildRenderObjectWidget with RenderListenable {
+  const RektTransition({super.key, required this.depth, this.border, super.child});
+
+  final ValueListenable<double> depth;
+  final OutlinedBorder? border;
+
+  @override
+  Listenable get listenable => depth;
+
+  @override
+  RenderDecoratedBox createRenderObject(BuildContext context) {
+    return RenderDecoratedBox(
+      decoration: Rekt(depth: depth.value, border: border ?? Rekt.defaultBorder),
+      configuration: createLocalImageConfiguration(context),
+    );
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderDecoratedBox renderObject) {
+    renderObject.decoration = Rekt(depth: depth.value, border: border ?? Rekt.defaultBorder);
+  }
+}
 
 double _lerpDouble(double a, double b, double t) => a * (1 - t) + b * t;
 
@@ -41,9 +203,9 @@ final class Rekt extends Decoration {
   static void getRekt(BuildContext context) {
     final box = context.findRenderObject()! as RenderBox;
     final rect = box.localToGlobal(Offset.zero) & box.size;
-    final ApiButton apiButton = switch (context) {
-      Element(widget: final ApiButton apiButton) => apiButton,
-      _ => context.findAncestorWidgetOfExactType<ApiButton>()!,
+    final TitleButton apiButton = switch (context) {
+      Element(widget: final TitleButton apiButton) => apiButton,
+      _ => context.findAncestorWidgetOfExactType<TitleButton>()!,
     };
     final route = apiButton.route;
     animation.forward();
@@ -53,7 +215,7 @@ final class Rekt extends Decoration {
           child: FadeTransition(
             opacity: animation,
             child: DecoratedBox(
-              decoration: BigApiButtons.decoration,
+              decoration: BigApiButtons.background,
               child: _RektTransition(rect, route),
             ),
           ),

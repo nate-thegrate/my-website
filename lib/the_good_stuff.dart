@@ -30,6 +30,10 @@ typedef Bloc = ChangeNotifier;
 typedef Cubit<T> = ValueNotifier<T>;
 typedef BlocProvider<T extends Bloc?> = ChangeNotifierProvider<T>;
 
+extension ToggleCubit on Cubit<bool> {
+  void toggle() => value = !value;
+}
+
 extension type WidgetStates._(SetNotifier<WidgetState> _states)
     implements SetNotifier<WidgetState> {
   WidgetStates([_]) : _states = SetNotifier<WidgetState>();
