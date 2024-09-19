@@ -43,13 +43,9 @@ flutter:
         - asset: assets/fonts/gaegu.ttf
         - asset: assets/fonts/gaegu_bold.ttf
           weight: 700
-        - asset: assets/fonts/gaegu_light.ttf
-          weight: 300
     - family: roboto mono
       fonts:
         - asset: assets/fonts/roboto_mono.ttf
-        - asset: assets/fonts/roboto_mono_italic.ttf
-          style: italic
     - family: annie use your telescope
       fonts:
         - asset: assets/fonts/annie_use_your_telescope.ttf
