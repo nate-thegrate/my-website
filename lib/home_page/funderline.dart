@@ -213,7 +213,7 @@ class _RenderProjectFunderline extends RenderFunder {
       color = Color.lerp(FunLink.color, const Color(0xff80ffff), t)!;
     } else {
       rect = fullScreen;
-      color = GrateColors.lightCyan.withValues(alpha: t);
+      color = TopBar.background.withValues(alpha: t);
     }
 
     context.canvas.drawRect(rect, Paint()..color = color);

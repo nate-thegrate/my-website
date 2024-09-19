@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
@@ -50,8 +50,12 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
 
         FlutterApisCard.launching = false;
         prepareToLaunch = false;
-        states?.remove(WidgetState.selected);
-        launchAnimation.animateTo(0, from: 0.01);
+        states?.removeAll(const {
+          WidgetState.selected,
+          WidgetState.hovered,
+          WidgetState.pressed,
+        });
+        launchAnimation.value = 0;
       }
     }
   }
@@ -61,7 +65,9 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
     super.initState();
     (widthAnimation, depthAnimation, launchAnimation);
     states?.addListener(_updateAnimations);
-    Future.microtask(() => precacheImage(FlutterApis.bgImage, context));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => precacheImage(ApiButtons.bgImage, context),
+    );
   }
 
   @override
@@ -96,36 +102,19 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
     final elevation = prepareToLaunch
         ? bottom
         : lerpDouble(top, bottom, Curves.ease.transform(depthAnimation.value))!;
-    final altitude = max(elevation, 0.0);
-    final shadowSize = max(-elevation, 0.0);
-    final visibleLetters = (width * 10).round();
+    final altitude = math.max(elevation, 0.0);
+    final shadowSize = math.max(-elevation, 0.0);
 
-    final text = TextSpan(children: [
-      const TextSpan(text: '{ d'),
-      TextSpan(text: 'eveloper e'.substring(0, visibleLetters)),
-      const TextSpan(text: 'x'),
-      TextSpan(text: 'perience'.substring(0, min(visibleLetters, 8))),
-      const TextSpan(text: ' }'),
-    ]);
-
-    final column = Column(
+    const column = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const DarkFlutterLogo(height: 150),
-        const SizedBox(height: 64),
-        DecoratedBox(
-          decoration: const BoxDecoration(),
+        DarkFlutterLogo(height: 150),
+        SizedBox(height: 64),
+        FittedBox(
+          fit: BoxFit.fitWidth,
           child: Padding(
-            padding: EdgeInsets.zero,
-            child: Text.rich(
-              text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'roboto mono',
-                fontSize: 22,
-                fontVariations: [FontVariation.weight(550)],
-              ),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: SizedBox(width: 325, child: _DX()),
           ),
         ),
       ],
@@ -156,7 +145,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
                     height: height,
                     child: Transform.translate(
                       offset: Offset(0, -elevation / 5),
-                      child: Center(child: column),
+                      child: const Center(child: column),
                     ),
                   ),
                 ),
@@ -164,6 +153,39 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DX extends HookWidget {
+  const _DX();
+
+  static TextSpan useThatCurvedAnimation(BuildContext context) {
+    final animation = useMemoized(
+      () => context.findAncestorStateOfType<_FlutterApisCardState>()!.widthCurved,
+    );
+    final visibleLetters = (useValueListenable(animation) * 10).round();
+    return TextSpan(children: [
+      const TextSpan(text: '{ d'),
+      TextSpan(text: 'eveloper e'.substring(0, visibleLetters)),
+      const TextSpan(text: 'x'),
+      TextSpan(text: 'perience'.substring(0, math.min(visibleLetters, 8))),
+      const TextSpan(text: ' }'),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      useThatCurvedAnimation(context),
+      textAlign: TextAlign.center,
+      maxLines: 1,
+      overflow: TextOverflow.visible,
+      style: const TextStyle(
+        fontFamily: 'roboto mono',
+        fontSize: 22,
+        fontVariations: [FontVariation.weight(550)],
       ),
     );
   }
@@ -188,7 +210,7 @@ class _RenderFlutterLogo extends RenderBox {
   @override
   void performLayout() {
     final maxSize = constraints.biggest;
-    scale = min(maxSize.width, maxSize.height) / 100;
+    scale = math.min(maxSize.width, maxSize.height) / 100;
 
     size = maxSize;
   }
@@ -221,6 +243,11 @@ class _RenderFlutterLogo extends RenderBox {
 class CardDecoration extends Decoration {
   const CardDecoration(this.shadowSize);
   final double shadowSize;
+
+  @override
+  Path getClipPath(Rect rect, TextDirection textDirection) {
+    return Path()..addRect(rect);
+  }
 
   @override
   BoxPainter createBoxPainter([VoidCallback? onChanged]) {
@@ -266,6 +293,6 @@ class FlutterApisTransition extends AnimatedSlide {
 
   static const stack = Stack(
     fit: StackFit.expand,
-    children: [FlutterApis(), FlutterApisTransition()],
+    children: [ApiButtons(), FlutterApisTransition()],
   );
 }

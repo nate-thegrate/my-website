@@ -277,7 +277,7 @@ class _RefactorButton extends StatelessWidget {
         WidgetState.selected: Color(0xff80ffff),
       }),
       foregroundColor: WidgetStatePropertyAll(Colors.black),
-      overlayColor: WidgetStateProperty.fromMap({
+      overlayColor: WidgetStateMapper({
         WidgetState.pressed: Color(0x4000c0c0),
         WidgetState.hovered: Color(0x2000ffff),
         WidgetState.any: Color(0x2000c0c0),

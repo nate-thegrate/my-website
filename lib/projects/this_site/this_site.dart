@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
@@ -20,31 +20,48 @@ sealed class TheVoid extends Widget {
 
   static void approach() => _ApproachTheVoid.instance.approach();
 
-  static void transcend() => App.overlay.insert(_FadeToWhite.entry);
+  static void transcend() => App.overlay.insert(RenderFadeToWhite.entry);
 
   static bool of(BuildContext context) => !context.watch<_ApproachTheVoid>().approaching;
 }
 
-class _FadeToWhite extends AnimatedValue<Color> {
-  const _FadeToWhite()
-      : super(
-          Colors.white,
-          initialValue: const Color(0x00ffffff),
-          duration: Durations.short3,
-          lerp: Color.lerp,
-          onEnd: _end,
-        );
+class BetterFadeToWhite extends LeafRenderObjectWidget {
+  const BetterFadeToWhite({super.key});
 
-  static final entry = OverlayEntry(builder: (context) => const _FadeToWhite());
-  static void _end() async {
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderFadeToWhite();
+}
+
+class RenderFadeToWhite extends RenderBox {
+  RenderFadeToWhite() {
+    animation.addListener(markNeedsPaint);
+    animate();
+  }
+
+  void animate() async {
+    try {
+      await animation.animateTo(Colors.white).orCancel;
+    } on TickerCanceled {
+      // probs won't happen
+    }
     await Future.delayed(const Seconds(0.5));
     Route.go(Route.thisSite);
     entry.remove();
   }
 
+  static final entry = OverlayEntry(builder: (context) => const BetterFadeToWhite());
+
+  final animation = ValueAnimation(
+    vsync: App.vsync,
+    initialValue: const Color(0x00ffffff),
+    duration: Durations.short3,
+    curve: Curves.easeInOutSine,
+    lerp: Color.lerp,
+  );
+
   @override
-  Widget build(BuildContext context, Color value) {
-    return Positioned.fill(child: ColoredBox(color: value));
+  void paint(PaintingContext context, Offset offset) {
+    context.canvas.drawRect(offset & size, Paint()..color = animation.value);
   }
 }
 
@@ -92,7 +109,7 @@ class Dilation extends Curve {
   static const aInverse = 1 / a;
 
   @override
-  double transformInternal(double t) => (pow(a, t - 1) - aInverse) / (1 - aInverse);
+  double transformInternal(double t) => (math.pow(a, t - 1) - aInverse) / (1 - aInverse);
 }
 
 class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
@@ -139,27 +156,21 @@ class TheVoidProvides extends State<ThisSite> with TickerProviderStateMixin {
 
   static const _vessel = Stack(
     alignment: Alignment.center,
-    children: [_Passage(), _InnerSource()],
+    children: [
+      _Passage(),
+      FractionallySizedBox.scaled(
+        scale: TheSource.minScaleFactor,
+        child: _InnerSource(),
+      ),
+    ],
   );
 
   @override
   Widget build(BuildContext context) => _vessel;
 }
 
-class _InnerSource extends StatelessWidget {
+class _InnerSource extends HookWidget {
   const _InnerSource();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.fromSize(
-      size: MediaQuery.sizeOf(context) * TheSource.minScaleFactor,
-      child: const _Deeper(),
-    );
-  }
-}
-
-class _Deeper extends HookWidget {
-  const _Deeper();
 
   static const fromLight = FromLight(0.8);
 
@@ -279,7 +290,7 @@ class TheSource extends RenderBox {
   // cycle
   static const seconds = 1.25;
   static const microseconds = (seconds * microPerSec) ~/ 1;
-  static final micros = pow(microseconds, 1.5) as double;
+  static final micros = math.pow(microseconds, 1.5) as double;
 
   // appear
   static const transitionSeconds = 10.0;
@@ -303,15 +314,16 @@ class TheSource extends RenderBox {
     if (activated case final tStart?) {
       final remainingMs = endMs - totalElapsed;
       if (remainingMs <= 0) return apotheosis();
-      t = (2 * (tStart - totalElapsed) / sqrt(sqrt(remainingMs) * micros) + tActivated) % 1;
+      final stretched = math.sqrt(math.sqrt(remainingMs) * micros);
+      t = (2 * (tStart - totalElapsed) / stretched + tActivated) % 1;
       transition = Curves.easeOutExpo.transform(
-        min(remainingMs / endTransitionMicroseconds * 1.5, 1),
+        math.min(remainingMs / endTransitionMicroseconds * 1.5, 1),
       );
     } else {
       t = (totalElapsed % microseconds) / microseconds;
       if (transition < 1) {
         transition = Curves.easeOutSine.transform(
-          min(totalElapsed / transitionMicroseconds, 1),
+          math.min(totalElapsed / transitionMicroseconds, 1),
         );
         if (transition == 1) {
           journey.value = Journey.sourceOfWisdom;
@@ -330,9 +342,6 @@ class TheSource extends RenderBox {
     Route.go(Route.home);
   }
 
-  @override
-  void performLayout() => size = constraints.biggest;
-
   static const rectCount = 12;
   static const baseLightness = 0.5;
   static const lightnessFactor = (1 - baseLightness) / rectCount;
@@ -348,13 +357,14 @@ class TheSource extends RenderBox {
     canvas.drawRect(rect, Paint()..color = const FromLight(baseLightness));
     final minScale = 1 - transition + transition * minScaleFactor;
     for (int i = 1; i <= rectCount; i++) {
-      final scale = min(
-        lerpDouble(inverseScaleFactor, 1, transition)! * (2 / 3 + 1 / (i + t + 2)),
+      final multiplier = i + t - 1;
+      final scale = math.min(
+        lerpDouble(inverseScaleFactor, 1, transition)! * (2 / 3 + 1 / (multiplier + 3)),
         1.0,
       );
       canvas.drawRect(
         SourceRect(rect, scale: scale),
-        Paint()..color = FromLight(baseLightness + lightnessFactor * (i + t - 1)),
+        Paint()..color = FromLight(baseLightness + lightnessFactor * multiplier),
       );
     }
     canvas.drawRect(

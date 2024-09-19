@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -9,6 +10,31 @@ class TopBar extends StatelessWidget {
   final Widget body;
 
   static const sections = 3;
+  static const background = Color(0xff80ffff);
+
+  static Route get focused => _focused.value;
+  static final _focused = ValueNotifier(Route.home);
+  static set focused(Route newValue) {
+    _focused.value = newValue;
+  }
+
+  static double get position => _position;
+  static double _position = 0.0;
+  static set position(double newValue) {
+    if (newValue == position) return;
+
+    _position = newValue;
+    final index = math.min((_position * sections).floor(), sections - 1);
+    focused = Route.values[index];
+  }
+
+  static void update(PointerHoverEvent event) {
+    position = event.position.dx / App.screenSize.width;
+  }
+
+  static void reset(PointerExitEvent event) {
+    TopBar.focused = Route.destination ?? Route.current;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +70,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
 
   void closeGap([_]) {
     timer?.cancel();
-    _gapAnimation.animateTo(0, duration: Durations.short2, curve: Curves.ease);
+    _gapAnimation.animateTo(0, duration: Blank.duration, curve: Curves.ease);
   }
 
   @override
@@ -53,52 +79,69 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  final indicative = Indicative._newKey;
-
   @override
   Widget build(BuildContext context) {
     const barHeight = 48.0;
-    const bar = DefaultTextStyle(
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: Colors.black,
-        letterSpacing: 0.25,
-      ),
-      child: IgnorePointer(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    const bar = ColoredBox(
+      color: TopBar.background,
+      child: SizedBox(
+        height: barHeight,
+        child: Stack(
           children: [
-            Expanded(
-              child: Center(
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onHover: TopBar.update,
+              onExit: TopBar.reset,
+              child: TapRegion(
+                onTapInside: Route.travel,
+                child: SizedBox.expand(child: _Indicator()),
+              ),
+            ),
+            DefaultTextStyle(
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+                letterSpacing: 0.25,
+              ),
+              child: IgnorePointer(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 14, 8, 12),
-                      child: Image(image: AssetImage('assets/images/tolls.png')),
-                    ),
-                    Text.rich(
-                      maxLines: 1,
-                      overflow: TextOverflow.clip,
-                      TextSpan(children: [
-                        TextSpan(
-                          text: 'N',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
+                    Expanded(
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(0, 14, 8, 12),
+                              child: Image(image: AssetImage('assets/images/tolls.png')),
+                            ),
+                            Text.rich(
+                              maxLines: 1,
+                              overflow: TextOverflow.clip,
+                              TextSpan(children: [
+                                TextSpan(
+                                  text: 'N',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                TextSpan(text: 'ATE THE GRATE'),
+                              ]),
+                            ),
+                            SizedBox(width: 2),
+                          ],
                         ),
-                        TextSpan(text: 'ATE THE GRATE'),
-                      ]),
+                      ),
                     ),
-                    SizedBox(width: 2),
+                    _RouteButton(Route.stats),
+                    _RouteButton(Route.projects),
                   ],
                 ),
               ),
             ),
-            _RouteButton(Route.stats),
-            _RouteButton(Route.projects),
           ],
         ),
       ),
@@ -112,18 +155,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
         onExit: closeGap,
         child: Column(
           children: [
-            ColoredBox(
-              color: GrateColors.lightCyan,
-              child: SizedBox(
-                height: barHeight,
-                child: Stack(
-                  children: [
-                    Indicative(key: indicative),
-                    bar,
-                  ],
-                ),
-              ),
-            ),
+            bar,
             if (gapHeight > 0)
               SizedBox(
                 width: double.infinity,
@@ -139,46 +171,8 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
   }
 }
 
-typedef _IndiKey = GlobalKey<_IndicativeState>;
-
-class Indicative extends StatefulWidget {
-  const Indicative({super.key});
-
-  static _IndiKey get _newKey {
-    if (_key.currentContext != null) _key = _IndiKey();
-    return _key;
-  }
-
-  static _IndiKey _key = _IndiKey();
-  static _IndicativeState get _state => _key.currentState!;
-
-  static ValueListenable<int> get focused => _state.focused;
-  static double position = 0;
-
-  @override
-  State<Indicative> createState() => _IndicativeState();
-}
-
-class _IndicativeState extends State<Indicative> {
-  final int initial = switch (Route.current) {
-    Route.stats => 1,
-    Route.projects => 2,
-    _ => 0,
-  };
-
-  late final focused = ValueNotifier(initial);
-  bool goingBack = false;
-  void goBack() {
-    goingBack = true;
-    App.overlay.insert(NoMoreCSS.entry);
-    HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
-  }
-
-  @override
-  void dispose() {
-    focused.dispose();
-    super.dispose();
-  }
+class _Indicator extends StatelessWidget {
+  const _Indicator();
 
   @override
   Widget build(BuildContext context) {
@@ -187,34 +181,13 @@ class _IndicativeState extends State<Indicative> {
       child: ColoredBox(color: Colors.white54, child: SizedBox.expand()),
     );
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onHover: (event) {
-        Indicative.position = event.position.dx / App.screenSize.width;
-        int x = (Indicative.position * TopBar.sections).floor();
-        if (x == TopBar.sections) x -= 1;
-        focused.value = x;
-      },
-      onExit: (_) {
-        focused.value = goingBack ? 0 : initial;
-      },
-      child: TapRegion(
-        onTapInside: (event) => switch (focused.value) {
-          1 => Route.go(Route.stats),
-          2 => Route.go(Route.projects),
-          _ => goBack(),
-        },
-        child: SizedBox.expand(
-          child: ValueListenableBuilder(
-            valueListenable: focused,
-            builder: (context, index, child) => AnimatedAlign(
-              duration: Durations.short3,
-              curve: Curves.ease,
-              alignment: Alignment(index * 2 / (TopBar.sections - 1) - 1, 0),
-              child: box,
-            ),
-          ),
-        ),
+    return ValueListenableBuilder(
+      valueListenable: TopBar._focused,
+      builder: (context, route, child) => AnimatedAlign(
+        duration: Durations.short3,
+        curve: Curves.ease,
+        alignment: Alignment(route.index * 2 / (TopBar.sections - 1) - 1, 0),
+        child: box,
       ),
     );
   }
@@ -227,46 +200,41 @@ class _VoidGap extends LeafRenderObjectWidget {
   VoidGap createRenderObject(BuildContext context) => VoidGap();
 }
 
-class _VoidGapAnimation extends ValueAnimation<double> {
-  _VoidGapAnimation()
-      : super(
-          vsync: App.vsync,
-          initialValue: Indicative.position,
-          duration: Duration.zero,
-          lerp: lerpDouble,
-        );
-}
-
 class VoidGap extends RenderBox {
   VoidGap() {
-    focused.addListener(updateColor);
+    TopBar._focused.addListener(updateColor);
     updateColor();
     ticker.start();
   }
 
+  static ValueAnimation<double> animation() => ValueAnimation<double>(
+        vsync: App.vsync,
+        initialValue: TopBar.position,
+        duration: Duration.zero,
+        lerp: lerpDouble,
+      );
+
   void updateColor() {
-    final index = focused.value;
-    color = index == 0 ? GrateColors.tolls : const Color(0xff00ffff);
+    color = switch (TopBar.focused) {
+      Route.home => const Color(0xfff7b943),
+      _ => const Color(0xff00ffff),
+    };
   }
 
   late final ticker = App.vsync.createTicker(_tick);
   late Color color;
-  ValueListenable<int> focused = Indicative.focused;
   int frame = 0;
-  double lastPosition = Indicative.position;
+  double lastPosition = TopBar.position;
   static const rectCount = 12;
   static const cycleFrames = 33;
   final animations = [
-    for (int i = 0; i < rectCount; i++) _VoidGapAnimation(),
+    for (int i = 0; i < rectCount; i++) animation(),
   ];
-
-  @override
-  void performLayout() => size = constraints.biggest;
 
   @override
   void dispose() {
     ticker.dispose();
-    focused.removeListener(updateColor);
+    TopBar._focused.removeListener(updateColor);
     for (final animation in animations) {
       animation.dispose();
     }
@@ -277,15 +245,8 @@ class VoidGap extends RenderBox {
     frame = (frame + 1) % cycleFrames;
     if (frame == 0) {
       animations.removeLast().dispose();
-      animations.insert(0, _VoidGapAnimation());
+      animations.insert(0, animation());
     }
-
-    final newFocused = Indicative.focused;
-    if (newFocused != focused) {
-      focused.removeListener(updateColor);
-      focused = newFocused..addListener(updateColor);
-    }
-
     markNeedsPaint();
   }
 
@@ -294,7 +255,7 @@ class VoidGap extends RenderBox {
     final canvas = context.canvas;
     final fullBox = offset & size;
 
-    final position = Indicative.position;
+    final position = TopBar.position;
     for (final (index, animation) in animations.indexed.toList().reversed) {
       final t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
       final color = Color.lerp(this.color, Colors.black, t)!;
@@ -340,24 +301,21 @@ class NoMoreCSS extends LeafRenderObjectWidget {
   static final entry = OverlayEntry(builder: (_) => const NoMoreCSS());
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderNoMoreCSS();
+  RenderObject createRenderObject(BuildContext context) => RenderNoMoreCSS();
 }
 
-class _RenderNoMoreCSS extends RenderBox {
-  _RenderNoMoreCSS() {
-    ticker.start();
+class RenderNoMoreCSS extends RenderBox {
+  RenderNoMoreCSS() {
+    ticker = App.vsync.createTicker(_tick)..start();
   }
 
-  late final ticker = App.vsync.createTicker(_tick);
+  late final Ticker ticker;
   Color color = Colors.transparent;
   Color? white;
 
   static const fadeInMicros = 2 * microPerSec;
-  static const fadeOutMicros = 1 * microPerSec;
+  static const fadeOutMicros = 0.5 * microPerSec;
   bool fadingIn = true;
-
-  @override
-  void performLayout() => size = constraints.biggest;
 
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
@@ -379,7 +337,7 @@ class _RenderNoMoreCSS extends RenderBox {
     } else {
       final t = (elapsed.inMicroseconds - fadeInMicros) / fadeOutMicros;
       if (t >= 1) {
-        ticker.stop();
+        ticker.dispose();
         return NoMoreCSS.entry.remove();
       }
       final alpha = Curves.easeInOutSine.transform(1 - t);
@@ -399,4 +357,26 @@ class _RenderNoMoreCSS extends RenderBox {
     }
     canvas.drawRect(rect, Paint()..color = color);
   }
+}
+
+class _BlankBox extends LeafRenderObjectWidget {
+  const _BlankBox();
+
+  @override
+  RenderBox createRenderObject(BuildContext context) => Blank();
+}
+
+class Blank extends RenderBox {
+  Blank();
+  static const duration = Durations.short2;
+  static final entry = OverlayEntry(builder: (context) => const _BlankBox());
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    result.add(BoxHitTestEntry(this, position));
+    return true;
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {}
 }

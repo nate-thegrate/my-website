@@ -181,8 +181,9 @@ class FunLink extends StatelessWidget {
               child: TapRegion(
                 behavior: HitTestBehavior.opaque,
                 onTapInside: (event) {
-                  preview.hide();
+                  preview.opacity.value = 0;
                   if (event.buttons != kSecondaryMouseButton) {
+                    TopBar.focused = route;
                     Funderline.show(route);
                   }
                 },

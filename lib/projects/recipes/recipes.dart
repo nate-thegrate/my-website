@@ -97,7 +97,7 @@ class _FadeInButtons extends HookWidget {
                 padding: WidgetStatePropertyAll(EdgeInsets.only(left: 8)),
                 foregroundColor: WidgetStatePropertyAll(Colors.black),
                 overlayColor: WidgetStatePropertyAll(Colors.white54),
-                side: WidgetStateProperty.fromMap({
+                side: WidgetStateMapper({
                   WidgetState.hovered: BorderSide(width: 2),
                   WidgetState.any: BorderSide.none,
                 }),
@@ -117,7 +117,7 @@ class _FadeInButtons extends HookWidget {
               ),
             ),
             side: WidgetStatePropertyAll(BorderSide(width: 2)),
-            overlayColor: WidgetStateProperty.fromMap({
+            overlayColor: WidgetStateMapper({
               WidgetState.pressed: Color(0xff80ffc0),
               WidgetState.any: Color(0x80a0ffd0),
             }),

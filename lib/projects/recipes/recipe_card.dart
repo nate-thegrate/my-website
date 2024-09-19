@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -74,7 +74,7 @@ class _RecipeCardState extends State<RecipeCard> {
                 return Transform.translate(
                   offset: Offset(t * width, (2 * t * t - t) * height * 4),
                   child: Transform.rotate(
-                    angle: pow(t, 1.5) * 5,
+                    angle: math.pow(t, 1.5) * 5,
                     child: const StacheStash(),
                   ),
                 );
@@ -107,7 +107,7 @@ class JiggleStache extends ToggleAnimation {
     return isForwardOrCompleted ? transform(value) : 1 - transform(1 - value);
   }
 
-  static double _topTransform(double t) => Curves.ease.transform(min(t * 2, 1));
+  static double _topTransform(double t) => Curves.ease.transform(math.min(t * 2, 1));
   static double _bottomTransform(double t) => t * t * t * (16 * t * t - 35 * t + 20);
 
   double get top => _evaluate(_topTransform);
@@ -244,9 +244,6 @@ class RenderStache extends RenderBox {
     ..close();
 
   static final brown = Paint()..color = Stache.color;
-
-  @override
-  void performLayout() => size = constraints.biggest;
 
   @override
   void paint(PaintingContext context, Offset offset) {

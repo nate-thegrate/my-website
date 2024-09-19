@@ -20,23 +20,23 @@ class WidgetStateButton extends StatelessWidget {
     const spring2 = Color(0xff60ffb0);
     const spring3 = Color(0x4000ff80);
 
-    final elevation = WidgetStateProperty.fromMap({
+    final elevation = WidgetStateMapper({
       WidgetState.hovered & ~WidgetState.pressed: 3.0,
       WidgetState.any: 0.0,
     });
 
     const button = FilledButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.fromMap({
+        backgroundColor: WidgetStateMapper({
           WidgetState.pressed: black,
           WidgetState.hovered: spring2,
           WidgetState.any: spring,
         }),
-        foregroundColor: WidgetStateProperty.fromMap({
+        foregroundColor: WidgetStateMapper({
           WidgetState.pressed: pink,
           WidgetState.any: black,
         }),
-        overlayColor: WidgetStateProperty.fromMap({
+        overlayColor: WidgetStateMapper({
           WidgetState.pressed: pink2,
           WidgetState.hovered: clear,
           WidgetState.any: spring3,
@@ -161,30 +161,30 @@ extension type VsCode._(TextSpan _textSpan) implements TextSpan {
     return switch (word) {
       'final' || 'const' => _blueKeyword,
       'return' || 'if' => _purpleKeyword,
-      'fromMap' || 'resolveWith' || 'build' || '_switch' || 'contains' => _function,
+      'resolveWith' || 'build' || '_switch' || 'contains' => _function,
       'pressed' || 'hovered' => _enum,
       _ => _variable,
     };
   }
 
   static const _concise = '''\
-final elevation = WidgetStateProperty.fromMap({
+final elevation = WidgetStateMapper({
   WidgetState.hovered & ~WidgetState.pressed: 3.0,
   WidgetState.any: 0.0,
 });
 
 const button = FilledButton(
   style: ButtonStyle(
-    backgroundColor: WidgetStateProperty.fromMap({
+    backgroundColor: WidgetStateMapper({
       WidgetState.pressed: black,
       WidgetState.hovered: spring2,
       WidgetState.any:     spring,
     }),
-    foregroundColor: WidgetStateProperty.fromMap({
+    foregroundColor: WidgetStateMapper({
       WidgetState.pressed: pink,
       WidgetState.any:     black,
     }),
-    overlayColor: WidgetStateProperty.fromMap({
+    overlayColor: WidgetStateMapper({
       WidgetState.pressed: pink2,
       WidgetState.hovered: clear,
       WidgetState.any:     spring3,

@@ -1,65 +1,94 @@
-import 'package:nate_thegrate/projects/flutter_apis/api_button.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-export 'widget_state_mapping/widget_state_mapping.dart';
-export 'package:nate_thegrate/projects/flutter_apis/rekt.dart';
+export 'api_buttons.dart';
+export 'flutter_apis_card.dart';
+export 'animated_render_object_widget.dart';
 
 class FlutterApis extends StatelessWidget {
-  const FlutterApis({super.key, this.child = _child});
-
-  static const _child = Row(
-    children: [
-      ApiButton(Route.mapping),
-      ApiButton(Route.animation),
-    ],
-  );
-
-  final Widget child;
-
-  static const bgImage = AssetImage('assets/images/gradient.png');
-  static const decoration = BoxDecoration(
-    color: Color(0xff28ffff),
-    image: DecorationImage(
-      alignment: Alignment.topLeft,
-      fit: BoxFit.fill,
-      image: bgImage,
-      filterQuality: FilterQuality.none,
-    ),
-  );
+  const FlutterApis({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: GetRekt.new,
-      child: DecoratedBox(
-        decoration: decoration,
-        child: SizedBox.expand(child: child),
-      ),
+    const border = BeveledRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     );
-  }
-}
-
-class ApiAppBar extends StatelessWidget {
-  const ApiAppBar({super.key});
-
-  static void _back() {
-    FlutterApisCard.launching = false;
-    Route.go(Route.projects);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(
-      width: double.infinity,
-      height: kToolbarHeight,
-      child: Row(
-        children: [
-          BackButton(onPressed: _back),
-          ApiButton.appBar(Route.mapping),
-          ApiButton.appBar(Route.animation),
-          // Expanded(child: Center(child: Text('Mapping'))),
-          // Expanded(child: Center(child: Text('Animation'))),
-        ],
+    return const RouteProvider(
+      child: SizedBox.expand(
+        child: DecoratedBox(
+          decoration: ApiButtons.decoration,
+          child: DefaultTextStyle(
+            style: ApiButton.style,
+            textAlign: TextAlign.center,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: kToolbarHeight,
+                  child: Row(
+                    children: [
+                      SizedBox(width: 8),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 40,
+                          child: ApiButton(
+                            Route.projects,
+                            border: CircleBorder(),
+                            child: SizedBox.square(
+                              dimension: 200,
+                              child: Icon(Icons.arrow_back, size: 125),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 9,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: ApiButton(
+                            Route.mapping,
+                            border: BeveledRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                            ),
+                            child: Text('Mapping'),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 9,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: ApiButton(
+                            Route.animation,
+                            border: BeveledRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                            ),
+                            child: Text('Animation'),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ClipPath(
+                    clipper: ShapeBorderClipper(shape: border),
+                    child: SizedBox.expand(
+                      child: DecoratedBox(
+                        decoration: Rekt(depth: 1.0, border: border),
+                        position: DecorationPosition.foreground,
+                        child: ColoredBox(
+                          color: Color(0xff303030),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
