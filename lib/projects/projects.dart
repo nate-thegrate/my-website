@@ -2,10 +2,10 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'dx/dx.dart';
 export 'hueman/hueman_card.dart';
-export 'this_site/this_site_card.dart';
-export 'this_site/this_site.dart';
 export 'recipes/recipe_card.dart';
 export 'recipes/recipes.dart';
+export 'this_site/this_site.dart';
+export 'this_site/this_site_card.dart';
 
 class Projects extends TopBar {
   const Projects({super.key}) : super(body: grid);

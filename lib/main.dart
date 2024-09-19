@@ -1,8 +1,8 @@
 import 'the_good_stuff.dart';
 
 export 'home_page/home_page.dart';
-export 'stats/stats.dart';
 export 'projects/projects.dart';
+export 'stats/stats.dart';
 export 'top_bar/top_bar.dart';
 
 part 'route.dart';

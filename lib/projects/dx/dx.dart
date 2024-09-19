@@ -1,9 +1,9 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'demo_button.dart';
+export 'dx_card.dart';
 export 'title_button.dart';
 export 'vs_code.dart';
-export 'dx_card.dart';
 
 class BigApiButtons extends DecoratedBox {
   const BigApiButtons({super.key}) : super(decoration: background, child: _child);
