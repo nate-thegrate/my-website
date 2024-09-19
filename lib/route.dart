@@ -12,8 +12,10 @@ enum Route {
   thisSite;
 
   factory Route.fromUri(Uri uri) {
-    final [..._, penultimate, last] = uri.pathSegments;
-    final name = last.contains('true') || last.contains('false') ? penultimate : last;
+    final segments = uri.pathSegments;
+    final name = segments.last.contains('true') || segments.last.contains('false')
+        ? segments[segments.length - 2]
+        : segments.last;
 
     try {
       return values.byName(name);
