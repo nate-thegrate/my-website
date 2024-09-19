@@ -113,10 +113,10 @@ class _RektTransition extends LeafRenderObjectWidget {
   final Route route;
 
   @override
-  RenderBox createRenderObject(BuildContext context) => _RenderRekt(rect, route);
+  RenderBig createRenderObject(BuildContext context) => _RenderRekt(rect, route);
 }
 
-class _RenderRekt extends RenderBox {
+class _RenderRekt extends RenderBig {
   _RenderRekt(this.rect, this.route) {
     ticker = App.vsync.createTicker(_tick)..start();
   }

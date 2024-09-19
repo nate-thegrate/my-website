@@ -202,7 +202,7 @@ class _FlutterLogo extends LeafRenderObjectWidget {
   const _FlutterLogo();
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderFlutterLogo();
+  RenderBox createRenderObject(BuildContext context) => _RenderFlutterLogo();
 }
 
 class _RenderFlutterLogo extends RenderBox {

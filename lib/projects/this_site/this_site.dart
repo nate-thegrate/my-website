@@ -29,10 +29,10 @@ class BetterFadeToWhite extends LeafRenderObjectWidget {
   const BetterFadeToWhite({super.key});
 
   @override
-  RenderObject createRenderObject(BuildContext context) => RenderFadeToWhite();
+  RenderBig createRenderObject(BuildContext context) => RenderFadeToWhite();
 }
 
-class RenderFadeToWhite extends RenderBox {
+class RenderFadeToWhite extends RenderBig {
   RenderFadeToWhite() {
     animation.addListener(markNeedsPaint);
     animate();
@@ -267,7 +267,7 @@ class _Passage extends LeafRenderObjectWidget {
   TheSource createRenderObject(BuildContext context) => TheSource();
 }
 
-class TheSource extends RenderBox {
+class TheSource extends RenderBig {
   TheSource() {
     final theVoidProvides = TheVoid.provide();
     journey = theVoidProvides.journey;

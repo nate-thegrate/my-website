@@ -1,14 +1,13 @@
 import 'package:collection_notifiers/collection_notifiers.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:flutter/rendering.dart' as render;
 import 'package:provider/provider.dart';
 
 import 'main.dart';
 
-export 'package:flutter/material.dart' hide Route, RenderBox;
+export 'package:flutter/material.dart' hide Route;
 export 'package:flutter/gestures.dart';
 export 'package:flutter/foundation.dart';
-export 'package:flutter/rendering.dart' hide RenderBox;
+export 'package:flutter/rendering.dart';
 export 'package:flutter/scheduler.dart';
 export 'package:go_router/go_router.dart' hide GoRouterHelper;
 export 'package:provider/provider.dart' hide ChangeNotifierProvider, Dispose;
@@ -22,7 +21,7 @@ extension Rebuild on State {
   void rebuild() => setState(() {});
 }
 
-class RenderBox extends render.RenderBox {
+class RenderBig extends RenderBox {
   @override
   void performLayout() => size = constraints.biggest;
 }

@@ -194,10 +194,10 @@ class SpringDrop extends LeafRenderObjectWidget {
   static const duration = Seconds(4);
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderSpringDrop();
+  RenderBig createRenderObject(BuildContext context) => _RenderSpringDrop();
 }
 
-class _RenderSpringDrop extends RenderBox {
+class _RenderSpringDrop extends RenderBig {
   _RenderSpringDrop() {
     animation
       ..addListener(markNeedsPaint)

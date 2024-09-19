@@ -164,7 +164,7 @@ class Stache extends BlocProvider<_Stached> {
   static bool of(BuildContext context) => context.watch<_Stached>().value;
 }
 
-class RenderStache extends RenderBox {
+class RenderStache extends RenderBig {
   RenderStache(this.jiggle, this.states) {
     jiggle.addListener(markNeedsPaint);
     states?.addListener(_updateAnimation);

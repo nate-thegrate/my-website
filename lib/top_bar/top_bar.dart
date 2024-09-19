@@ -200,7 +200,7 @@ class _VoidGap extends LeafRenderObjectWidget {
   VoidGap createRenderObject(BuildContext context) => VoidGap();
 }
 
-class VoidGap extends RenderBox {
+class VoidGap extends RenderBig {
   VoidGap() {
     TopBar._focused.addListener(updateColor);
     updateColor();
@@ -301,10 +301,10 @@ class NoMoreCSS extends LeafRenderObjectWidget {
   static final entry = OverlayEntry(builder: (_) => const NoMoreCSS());
 
   @override
-  RenderObject createRenderObject(BuildContext context) => RenderNoMoreCSS();
+  RenderBig createRenderObject(BuildContext context) => RenderNoMoreCSS();
 }
 
-class RenderNoMoreCSS extends RenderBox {
+class RenderNoMoreCSS extends RenderBig {
   RenderNoMoreCSS() {
     ticker = App.vsync.createTicker(_tick)..start();
   }
@@ -363,10 +363,10 @@ class _BlankBox extends LeafRenderObjectWidget {
   const _BlankBox();
 
   @override
-  RenderBox createRenderObject(BuildContext context) => Blank();
+  RenderBig createRenderObject(BuildContext context) => Blank();
 }
 
-class Blank extends RenderBox {
+class Blank extends RenderBig {
   Blank();
   static const duration = Durations.short2;
   static final entry = OverlayEntry(builder: (context) => const _BlankBox());
