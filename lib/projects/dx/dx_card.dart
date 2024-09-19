@@ -3,15 +3,41 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class FlutterApisCard extends StatefulWidget {
+class FlutterApisCard extends HookWidget {
   const FlutterApisCard({super.key});
-  static bool launching = false;
+
+  static final launching = Cubit(false);
+
+  static bool of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_ApiLaunchProvider>()!.launch;
+  }
 
   @override
-  State<FlutterApisCard> createState() => _FlutterApisCardState();
+  Widget build(BuildContext context) {
+    return _ApiLaunchProvider(
+      launch: RecursionCount.of(context) == 0 && useValueListenable(launching),
+      child: const _FlutterApisCard(),
+    );
+  }
 }
 
-class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderStateMixin {
+class _ApiLaunchProvider extends InheritedWidget {
+  const _ApiLaunchProvider({required this.launch, required super.child});
+
+  final bool launch;
+
+  @override
+  bool updateShouldNotify(_ApiLaunchProvider oldWidget) => launch != oldWidget.launch;
+}
+
+class _FlutterApisCard extends StatefulWidget {
+  const _FlutterApisCard();
+
+  @override
+  State<_FlutterApisCard> createState() => _FlutterApisCardState();
+}
+
+class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderStateMixin {
   late final widthAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
   late final depthAnimation = ToggleAnimation(vsync: this, duration: Durations.short1);
   late final launchAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
@@ -40,7 +66,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
         } on TickerCanceled {
           return;
         }
-        FlutterApisCard.launching = true;
+        FlutterApisCard.launching.value = true;
 
         await Future.delayed(Durations.medium1);
         if (!mounted) return;
@@ -53,7 +79,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
         Route.go(Route.flutterApis, extra: const Projects());
         await Future.delayed(const Seconds(1));
 
-        FlutterApisCard.launching = false;
+        FlutterApisCard.launching.value = false;
         prepareToLaunch = false;
         launchAnimation.value = 0;
       }
@@ -81,7 +107,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    if (FlutterApisCard.launching) {
+    if (FlutterApisCard.of(context)) {
       return const SizedBox.shrink();
     }
     return Stached(
@@ -284,9 +310,9 @@ class CardPainter extends BoxPainter {
 class FlutterApisTransition extends AnimatedSlide {
   const FlutterApisTransition({super.key})
       : super(
-          offset: const Offset(0, 1),
+          offset: const Offset(0, 1.2),
           initialOffset: Offset.zero,
-          duration: Durations.medium1,
+          duration: Durations.medium3,
           curve: Curves.easeIn,
           child: const Projects(),
         );

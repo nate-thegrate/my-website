@@ -283,7 +283,7 @@ class RenderStache extends RenderBig {
 class _FadeToGreen extends AnimatedValue<Color> {
   const _FadeToGreen()
       : super(
-          RecipeCard.background,
+          value: RecipeCard.background,
           initialValue: RecipeCard.transparentBackground,
           duration: _duration,
           lerp: Color.lerp,

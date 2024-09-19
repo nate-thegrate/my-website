@@ -1,7 +1,12 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-export 'widget_state_mapping/widget_state_mapping.dart';
-export 'package:nate_thegrate/projects/flutter_apis/rekt.dart';
+export 'src/animated_values/animated_values.dart';
+export 'src/widget_state_mapping/widget_state_mapping.dart';
+export 'src/animated_render_object_widget.dart';
+export 'src/api_button.dart';
+export 'dx_card.dart';
+export 'src/flutter_apis.dart';
+export 'src/rekt.dart';
 
 class BigApiButtons extends StatelessWidget {
   const BigApiButtons({super.key});

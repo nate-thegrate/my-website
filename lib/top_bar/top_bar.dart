@@ -340,7 +340,7 @@ class RenderNoMoreCSS extends RenderBig {
         ticker.dispose();
         return NoMoreCSS.entry.remove();
       }
-      final alpha = Curves.easeInOutSine.transform(1 - t);
+      final alpha = 1 - Curves.easeOutCubic.transform(t);
       color = Colors.black.withValues(alpha: alpha);
       white = Colors.white.withValues(alpha: alpha);
     }
@@ -368,6 +368,7 @@ class _BlankBox extends LeafRenderObjectWidget {
 
 class Blank extends RenderBig {
   Blank();
+
   static const duration = Durations.short2;
   static final entry = OverlayEntry(builder: (context) => const _BlankBox());
 

@@ -1,6 +1,6 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-export 'flutter_apis/flutter_apis.dart';
+export 'dx/dx.dart';
 export 'hueman/hueman_card.dart';
 export 'this_site/this_site_card.dart';
 export 'this_site/this_site.dart';
@@ -48,8 +48,7 @@ class ProjectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (RecursionCount.of(context).value > 0) return child;
-
+    if (RecursionCount.of(context) > 0) return child;
     return _ProjectButton(child);
   }
 }

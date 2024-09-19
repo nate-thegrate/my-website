@@ -5,7 +5,7 @@ class ThisSiteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (RecursionCount.of(context).value > 0) return const _CardRecursion();
+    if (RecursionCount.of(context) > 0) return const _CardRecursion();
 
     return const Stached(direction: AxisDirection.right, child: _ThisSiteCard());
   }
@@ -84,9 +84,9 @@ class _ThisSiteCardState extends State<_ThisSiteCard> with SingleTickerProviderS
 class RecursionCount extends KeyedSubtree {
   const RecursionCount({required ValueKey<int> super.key, required super.child});
 
-  static ValueKey<int> of(BuildContext context) {
+  static int of(BuildContext context) {
     final key = context.findAncestorWidgetOfExactType<RecursionCount>()?.key as ValueKey<int>?;
-    return ValueKey<int>(key != null ? key.value + 1 : 0);
+    return key != null ? key.value + 1 : 0;
   }
 }
 
@@ -96,7 +96,7 @@ class _CardRecursion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final recursions = RecursionCount.of(context);
-    if (recursions.value > 6) {
+    if (recursions > 6) {
       if (context.findAncestorWidgetOfExactType<FlutterApisTransition>() != null) {
         return const SizedBox.shrink();
       }
@@ -119,7 +119,7 @@ class _CardRecursion extends StatelessWidget {
             fit: BoxFit.cover,
             child: SizedBox.fromSize(
               size: MediaQuery.sizeOf(context),
-              child: RecursionCount(key: recursions, child: Projects.grid),
+              child: RecursionCount(key: ValueKey(recursions), child: Projects.grid),
             ),
           ),
         ),

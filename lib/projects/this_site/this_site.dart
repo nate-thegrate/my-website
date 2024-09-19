@@ -116,8 +116,8 @@ class Dilation extends Curve {
 class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
   _ConsumedByTheVoid(BuildContext context, {super.child})
       : super(
+          value: _box(context).getTransformTo(_box()).scaled(1.001, 1.001, 1.0),
           curve: const Dilation(),
-          _box(context).getTransformTo(_box()).scaled(1.001, 1.001, 1.0),
           duration: const Seconds(2.5),
           initialValue: Matrix4.identity(),
           lerp: _lerp,
@@ -207,7 +207,7 @@ class _InnerSource extends HookWidget {
       ),
       child: const AnimatedOpacity(
         opacity: 1.0,
-        initialValue: 0.0,
+        initialOpacity: 0.0,
         duration: Seconds(TheSource.transitionSeconds / 2),
         child: FittedBox(
           child: SizedBox(
