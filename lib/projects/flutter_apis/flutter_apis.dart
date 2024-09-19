@@ -1,6 +1,7 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-export 'api_buttons.dart';
+export 'api_button.dart';
+export 'big_api_buttons.dart';
 export 'flutter_apis_card.dart';
 export 'animated_render_object_widget.dart';
 
@@ -15,7 +16,7 @@ class FlutterApis extends StatelessWidget {
     return const RouteProvider(
       child: SizedBox.expand(
         child: DecoratedBox(
-          decoration: ApiButtons.decoration,
+          decoration: BigApiButtons.decoration,
           child: DefaultTextStyle(
             style: ApiButton.style,
             textAlign: TextAlign.center,

@@ -20,36 +20,37 @@ sealed class TheVoid extends Widget {
 
   static void approach() => _ApproachTheVoid.instance.approach();
 
-  static void transcend() => App.overlay.insert(RenderFadeToWhite.entry);
+  static void transcend() => App.overlay.insert(_FadeToWhite.entry);
 
   static bool of(BuildContext context) => !context.watch<_ApproachTheVoid>().approaching;
 }
 
-class BetterFadeToWhite extends LeafRenderObjectWidget {
-  const BetterFadeToWhite({super.key});
+class _FadeToWhite extends LeafRenderObjectWidget {
+  const _FadeToWhite();
+
+  static final entry = OverlayEntry(builder: (context) => const _FadeToWhite());
 
   @override
-  RenderBig createRenderObject(BuildContext context) => RenderFadeToWhite();
+  _RenderFadeToWhite createRenderObject(BuildContext context) => _RenderFadeToWhite();
 }
 
-class RenderFadeToWhite extends RenderBig {
-  RenderFadeToWhite() {
-    animation.addListener(markNeedsPaint);
+class _RenderFadeToWhite extends RenderBig {
+  _RenderFadeToWhite() {
     animate();
   }
 
   void animate() async {
+    animation.addListener(markNeedsPaint);
     try {
       await animation.animateTo(Colors.white).orCancel;
     } on TickerCanceled {
       // probs won't happen
     }
     await Future.delayed(const Seconds(0.5));
+    animation.dispose();
     Route.go(Route.thisSite);
-    entry.remove();
+    _FadeToWhite.entry.remove();
   }
-
-  static final entry = OverlayEntry(builder: (context) => const BetterFadeToWhite());
 
   final animation = ValueAnimation(
     vsync: App.vsync,
@@ -146,7 +147,7 @@ class TheVoidProvides extends State<ThisSite> with TickerProviderStateMixin {
 
   TheVoidProvides.createState();
 
-  final journey = ValueNotifier(Journey.whiteVoid);
+  final journey = Cubit(Journey.whiteVoid);
 
   @override
   void dispose() {
@@ -281,11 +282,11 @@ class TheSource extends RenderBig {
     }
 
     journey.addListener(theVoid);
-    _ticker = theVoidProvides.createTicker(_tick)..start();
+    ticker = theVoidProvides.createTicker(_tick)..start();
   }
 
-  late final ValueNotifier<Journey> journey;
-  late final Ticker _ticker;
+  late final Cubit<Journey> journey;
+  late final Ticker ticker;
 
   // cycle
   static const seconds = 1.25;
@@ -334,7 +335,7 @@ class TheSource extends RenderBig {
   }
 
   void apotheosis() async {
-    _ticker.dispose();
+    ticker.dispose();
     await Future.delayed(Durations.short4);
     launchUrlString('https://github.com/nate-thegrate/my-website');
     await Future.delayed(Durations.long4);

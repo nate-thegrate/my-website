@@ -117,7 +117,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
     }
   }
 
-  final text = ValueNotifier<String>('');
+  final text = Cubit('');
 
   final opacity = ToggleAnimation(
     vsync: App.vsync,

@@ -53,7 +53,7 @@ final class Rekt extends Decoration {
           child: FadeTransition(
             opacity: animation,
             child: DecoratedBox(
-              decoration: ApiButtons.decoration,
+              decoration: BigApiButtons.decoration,
               child: _RektTransition(rect, route),
             ),
           ),

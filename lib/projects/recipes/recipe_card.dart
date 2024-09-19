@@ -26,7 +26,7 @@ class _RecipeCardState extends State<RecipeCard> {
     if (states == null || !states.contains(WidgetState.selected)) return;
 
     selected = true;
-    final stash = context.read<_Stached>();
+    final stash = Stache._stache;
     await Future.delayed(Durations.medium1);
 
     stash.value = true;
@@ -152,16 +152,30 @@ class Stached extends StatelessWidget {
   }
 }
 
-extension type _Stached._(Cubit<bool> cubit) implements Cubit<bool> {
-  _Stached([_]) : cubit = Cubit<bool>(false);
+class _Stache extends InheritedWidget {
+  const _Stache({required this.value, required super.child});
+  final bool value;
+
+  @override
+  bool updateShouldNotify(_Stache oldWidget) => oldWidget.value != value;
 }
 
-class Stache extends BlocProvider<_Stached> {
-  Stache({super.key, super.child}) : super(create: _Stached.new);
+class Stache extends HookWidget {
+  const Stache({super.key, required this.child});
+
+  final Widget child;
+  static final _stache = Cubit(false);
 
   static const color = Color(0xff403020);
 
-  static bool of(BuildContext context) => context.watch<_Stached>().value;
+  static bool of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_Stache>()!.value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _Stache(value: useValueListenable(_stache), child: child);
+  }
 }
 
 class RenderStache extends RenderBig {

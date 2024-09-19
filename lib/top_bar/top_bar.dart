@@ -13,7 +13,7 @@ class TopBar extends StatelessWidget {
   static const background = Color(0xff80ffff);
 
   static Route get focused => _focused.value;
-  static final _focused = ValueNotifier(Route.home);
+  static final _focused = Cubit(Route.home);
   static set focused(Route newValue) {
     _focused.value = newValue;
   }

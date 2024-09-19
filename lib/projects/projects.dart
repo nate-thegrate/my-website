@@ -64,9 +64,6 @@ class _ProjectButton extends StatefulWidget {
 }
 
 class _ProjectButtonState extends State<_ProjectButton> {
-  /// The [BlocProvider] will [dispose] of it automatically!
-  final states = WidgetStates();
-
   final _controller = OverlayPortalController();
   void _show() {
     if (!_controller.isShowing) setState(_controller.show);
@@ -74,6 +71,14 @@ class _ProjectButtonState extends State<_ProjectButton> {
 
   void _hide() {
     if (_controller.isShowing) setState(_controller.hide);
+  }
+
+  final states = WidgetStates();
+
+  @override
+  void dispose() {
+    states.dispose();
+    super.dispose();
   }
 
   void hover(_) async {
@@ -104,9 +109,9 @@ class _ProjectButtonState extends State<_ProjectButton> {
 
   @override
   Widget build(BuildContext context) {
-    final card = BlocProvider(
+    final card = BlocProvider.value(
       key: GlobalObjectKey(states),
-      create: (_) => states,
+      value: states,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: hover,

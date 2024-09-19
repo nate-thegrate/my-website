@@ -59,7 +59,8 @@ abstract class RenderFunder extends RenderBox {
     switch (status) {
       case AnimationStatus.completed:
         Route.go(route);
-        Future.delayed(const Duration(milliseconds: 90), controller.reverse);
+        HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
+        Future.delayed(Durations.short2, controller.reverse);
       case AnimationStatus.dismissed:
         (route == Route.stats ? statsEntry : projectsEntry).remove();
       case AnimationStatus.forward:

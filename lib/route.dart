@@ -24,19 +24,19 @@ enum Route {
     }
   }
 
-  static Route? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_RouteProvider>()?.route;
+  factory Route.of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_RouteProvider>()?.route ?? current;
   }
 
-  static Route get current {
-    final uri = _goRouter.routerDelegate.currentConfiguration.uri;
-    return Route.fromUri(uri);
-  }
+  static Route get current => _current.value;
+  static final _current = Cubit(home);
 
   static void go(Route route, {Map<String, String>? params, Object? extra}) {
+    _current.value = route;
     if (route == Route.home) {
       HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
     }
+
     if (params == null) {
       return _goRouter.go(route.uri, extra: extra);
     }
@@ -83,15 +83,14 @@ enum Route {
   String toString() => name;
 }
 
-class RouteProvider extends StatelessWidget {
+class RouteProvider extends HookWidget {
   const RouteProvider({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final uri = GoRouter.of(context).routerDelegate.currentConfiguration.uri;
-    return _RouteProvider(route: Route.fromUri(uri), child: child);
+    return _RouteProvider(route: useValueListenable(Route._current), child: child);
   }
 }
 
@@ -128,9 +127,9 @@ final _goRouter = GoRouter(
               path: Route.flutterApis.name,
               pageBuilder: (context, state) {
                 if (state.extra != null) {
-                  return const NoTransitionPage(child: FlutterApisTransition.stack);
+                  return const NoTransitionPage(child: BigApiButtons.stack);
                 }
-                return const NoTransitionPage(child: ApiButtons());
+                return const NoTransitionPage(child: BigApiButtons());
               },
               routes: [
                 GoRoute(

@@ -13,7 +13,7 @@ class WidgetStateMapping extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ApiButtons(
+    return const BigApiButtons(
         // child: BlocProvider(
         //   create: ToggleMapping.new,
         //   child: const Column(

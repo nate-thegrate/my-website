@@ -45,16 +45,16 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
         await Future.delayed(Durations.medium1);
         if (!mounted) return;
 
-        Route.go(Route.flutterApis, extra: const Projects());
-        await Future.delayed(const Seconds(1));
-
-        FlutterApisCard.launching = false;
-        prepareToLaunch = false;
         states?.removeAll(const {
           WidgetState.selected,
           WidgetState.hovered,
           WidgetState.pressed,
         });
+        Route.go(Route.flutterApis, extra: const Projects());
+        await Future.delayed(const Seconds(1));
+
+        FlutterApisCard.launching = false;
+        prepareToLaunch = false;
         launchAnimation.value = 0;
       }
     }
@@ -66,7 +66,7 @@ class _FlutterApisCardState extends State<FlutterApisCard> with TickerProviderSt
     (widthAnimation, depthAnimation, launchAnimation);
     states?.addListener(_updateAnimations);
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => precacheImage(ApiButtons.bgImage, context),
+      (_) => precacheImage(BigApiButtons.bgImage, context),
     );
   }
 
@@ -290,9 +290,4 @@ class FlutterApisTransition extends AnimatedSlide {
           curve: Curves.easeIn,
           child: const Projects(),
         );
-
-  static const stack = Stack(
-    fit: StackFit.expand,
-    children: [ApiButtons(), FlutterApisTransition()],
-  );
 }
