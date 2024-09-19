@@ -193,6 +193,8 @@ class Streeeetch extends LeafRenderObjectWidget {
 }
 
 class _Streeeetch extends RenderBig {
+  static final yellowFill = Paint()..color = const Color(0xfff0ff30);
+
   @override
   void paint(PaintingContext context, Offset offset) {
     final Size(width: w, height: h) = size;
@@ -200,24 +202,23 @@ class _Streeeetch extends RenderBig {
     final r = h / 4;
     final radius = Radius.circular(r);
     final squeeze = r / 4;
-    final s = squeeze;
-    final firmness = h * 0.5;
-    final f = firmness;
+    final firmness = h / 2;
 
     final path = Path()
       ..moveTo(0, r)
       ..arcToPoint(Offset(r, 0), radius: radius)
-      ..cubicTo(f, 0, f, s, w / 2, s)
-      ..cubicTo(w - f, s, w - f, 0, w - r, 0)
+      ..cubicTo(firmness, 0, firmness, squeeze, w / 2, squeeze)
+      ..cubicTo(w - firmness, squeeze, w - firmness, 0, w - r, 0)
       ..arcToPoint(Offset(w, r), radius: radius)
       ..lineTo(w, h - r)
       ..arcToPoint(Offset(w - r, h), radius: radius)
-      ..cubicTo(w - f, h, w - f, h - s, w / 2, h - s)
-      ..cubicTo(f, h - s, f, h, r, h)
+      ..cubicTo(w - firmness, h, w - firmness, h - squeeze, w / 2, h - squeeze)
+      ..cubicTo(firmness, h - squeeze, firmness, h, r, h)
       ..lineTo(r, h)
       ..arcToPoint(Offset(0, h - r), radius: radius)
       ..lineTo(0, r)
       ..close();
-    context.canvas.drawPath(path.shift(offset), Paint()..color = const Color(0xfff0ff30));
+
+    context.canvas.drawPath(path.shift(offset), yellowFill);
   }
 }

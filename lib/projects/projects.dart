@@ -17,7 +17,7 @@ class Projects extends TopBar {
         Spacer(),
         _Expanded(ProjectButton(HuemanCard())),
         Spacer(),
-        _Expanded(ProjectButton(FlutterApisCard())),
+        _Expanded(ProjectButton(DXCard())),
         Spacer(),
       ]),
     ),

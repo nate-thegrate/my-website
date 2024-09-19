@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class FlutterApisCard extends HookWidget {
-  const FlutterApisCard({super.key});
+class DXCard extends HookWidget {
+  const DXCard({super.key});
 
   static final launching = Cubit(false);
 
@@ -66,7 +66,7 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
         } on TickerCanceled {
           return;
         }
-        FlutterApisCard.launching.value = true;
+        DXCard.launching.value = true;
 
         await Future.delayed(Durations.medium1);
         if (!mounted) return;
@@ -76,10 +76,10 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
           WidgetState.hovered,
           WidgetState.pressed,
         });
-        Route.go(Route.flutterApis, extra: const Projects());
+        Route.go(Route.dx, extra: const Projects());
         await Future.delayed(const Seconds(1));
 
-        FlutterApisCard.launching.value = false;
+        DXCard.launching.value = false;
         prepareToLaunch = false;
         launchAnimation.value = 0;
       }
@@ -92,7 +92,7 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
     (widthAnimation, depthAnimation, launchAnimation);
     states?.addListener(_updateAnimations);
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => precacheImage(BigApiButtons.bgImage, context),
+      (_) => precacheImage(DX.bgImage, context),
     );
   }
 
@@ -107,7 +107,7 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
 
   @override
   Widget build(BuildContext context) {
-    if (FlutterApisCard.of(context)) {
+    if (DXCard.of(context)) {
       return const SizedBox.shrink();
     }
     return Stached(

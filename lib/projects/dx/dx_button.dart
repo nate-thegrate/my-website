@@ -3,8 +3,8 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class TitleButton extends StatefulWidget {
-  const TitleButton(
+class DXButton extends StatefulWidget {
+  const DXButton(
     this.route, {
     super.key,
     this.border = Rekt.defaultBorder,
@@ -26,10 +26,10 @@ class TitleButton extends StatefulWidget {
   );
 
   @override
-  State<TitleButton> createState() => _TitleButtonState();
+  State<DXButton> createState() => _DXButtonState();
 }
 
-class _TitleButtonState extends State<TitleButton> with SingleTickerProviderStateMixin {
+class _DXButtonState extends State<DXButton> with SingleTickerProviderStateMixin {
   late final depth = ValueAnimation(
     vsync: this,
     initialValue: 0.0,
@@ -47,24 +47,9 @@ class _TitleButtonState extends State<TitleButton> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final border = widget.border;
-    final Widget box = RouteBox(
-      route: widget.route,
-      child: SizedBox(
-        width: 500,
-        child: FittedBox(
-          child: SizedBox(
-            width: 200,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: DepthTransition(depth: depth, child: widget.child),
-            ),
-          ),
-        ),
-      ),
-    );
 
     return MouseRegion(
-      onEnter: (event) => depth.value = 1.0,
+      onEnter: (event) => depth.value = 0.98,
       onExit: (event) => depth.value = 0.0,
       child: ClipPath(
         clipper: ShapeBorderClipper(shape: border),
@@ -84,7 +69,24 @@ class _TitleButtonState extends State<TitleButton> with SingleTickerProviderStat
                 WidgetState.hovered: Color(0x14000000),
                 WidgetState.any: Colors.black12,
               }),
-              child: box,
+              child: RouteHighlight(
+                route: widget.route,
+                child: SizedBox(
+                  width: 500,
+                  child: FittedBox(
+                    child: SizedBox(
+                      width: 200,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: DepthTransition(
+                          depth: depth,
+                          child: widget.child,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -93,8 +95,8 @@ class _TitleButtonState extends State<TitleButton> with SingleTickerProviderStat
   }
 }
 
-class RouteBox extends SingleChildRenderObjectWidget {
-  const RouteBox({super.key, required this.route, super.child});
+class RouteHighlight extends SingleChildRenderObjectWidget {
+  const RouteHighlight({super.key, required this.route, super.child});
 
   final Route route;
 
@@ -203,9 +205,9 @@ final class Rekt extends Decoration {
   static void getRekt(BuildContext context) {
     final box = context.findRenderObject()! as RenderBox;
     final rect = box.localToGlobal(Offset.zero) & box.size;
-    final TitleButton apiButton = switch (context) {
-      Element(widget: final TitleButton apiButton) => apiButton,
-      _ => context.findAncestorWidgetOfExactType<TitleButton>()!,
+    final DXButton apiButton = switch (context) {
+      Element(widget: final DXButton apiButton) => apiButton,
+      _ => context.findAncestorWidgetOfExactType<DXButton>()!,
     };
     final route = apiButton.route;
     animation.forward();
@@ -215,7 +217,7 @@ final class Rekt extends Decoration {
           child: FadeTransition(
             opacity: animation,
             child: DecoratedBox(
-              decoration: BigApiButtons.background,
+              decoration: DX.background,
               child: _RektTransition(rect, route),
             ),
           ),

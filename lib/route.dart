@@ -3,11 +3,12 @@ part of 'main.dart';
 enum Route {
   home,
   stats,
+  refactorStats,
   projects,
   mapping,
   animation,
   hueman,
-  flutterApis,
+  dx,
   recipes,
   thisSite;
 
@@ -48,9 +49,9 @@ enum Route {
 
     final parent = switch (this) {
       home => throw Error(),
-      stats || projects => '',
-      hueman || flutterApis || recipes || thisSite => projects.uri,
-      mapping || animation => flutterApis.uri,
+      stats || refactorStats || projects => '',
+      hueman || dx || recipes || thisSite => projects.uri,
+      mapping || animation => dx.uri,
     };
     return '$parent/$name';
   }
@@ -115,6 +116,10 @@ final _goRouter = GoRouter(
           redirect: (context, state) => '/stats/refactor=false',
         ),
         GoRoute(
+          path: Route.refactorStats.name,
+          redirect: (context, state) => '/stats/refactor=true',
+        ),
+        GoRoute(
           name: Route.stats.name,
           path: 'stats/:refactor',
           pageBuilder: Stats.pageBuilder,
@@ -124,24 +129,24 @@ final _goRouter = GoRouter(
           pageBuilder: (context, state) => const NoTransitionPage(child: Projects()),
           routes: <RouteBase>[
             GoRoute(
-              path: Route.flutterApis.name,
+              path: Route.dx.name,
               pageBuilder: (context, state) {
                 if (state.extra != null) {
-                  return const NoTransitionPage(child: BigApiButtons.stack);
+                  return const NoTransitionPage(child: DX.stack);
                 }
-                return const NoTransitionPage(child: BigApiButtons());
+                return const NoTransitionPage(child: DX());
               },
               routes: [
                 GoRoute(
                   path: Route.mapping.name,
                   pageBuilder: (context, state) {
-                    return const NoTransitionPage(child: FlutterApis());
+                    return const NoTransitionPage(child: DemoScreen());
                   },
                 ),
                 GoRoute(
                   path: Route.animation.name,
                   pageBuilder: (context, state) {
-                    return const NoTransitionPage(child: FlutterApis());
+                    return const NoTransitionPage(child: DemoScreen());
                   },
                 ),
               ],

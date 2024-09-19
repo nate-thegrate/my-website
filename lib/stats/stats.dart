@@ -8,9 +8,11 @@ class Stats extends TopBar {
   const Stats({super.key}) : super(body: const _Stats());
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
+    final param = state.pathParameters['refactor'];
+
     return NoTransitionPage(
       child: Refactoring(
-        refactor: state.pathParameters['refactor'] == 'true',
+        refactor: param != null && param.endsWith('true'),
         child: const Stats(),
       ),
     );
@@ -263,7 +265,7 @@ class _RefactorButton extends StatelessWidget {
       side: WidgetStatePropertyAll(
         BorderSide(width: 2, color: Color(0xff80a0a0)),
       ),
-      backgroundColor: WidgetStateProperty<Color?>.fromMap({
+      backgroundColor: WidgetStateMapper<Color?>({
         WidgetState.selected: Color(0xffc0e0e0),
       }),
       foregroundColor: WidgetStatePropertyAll(Color(0xff406060)),
@@ -273,7 +275,7 @@ class _RefactorButton extends StatelessWidget {
       side: WidgetStatePropertyAll(
         BorderSide(width: 2, color: Color(0xff80ffff)),
       ),
-      backgroundColor: WidgetStateProperty<Color?>.fromMap({
+      backgroundColor: WidgetStateMapper<Color?>({
         WidgetState.selected: Color(0xff80ffff),
       }),
       foregroundColor: WidgetStatePropertyAll(Colors.black),
@@ -293,10 +295,7 @@ class _RefactorButton extends StatelessWidget {
       ],
       selected: {onlyRefactorPRs},
       onSelectionChanged: (selected) {
-        Route.go(
-          Route.stats,
-          params: selected.single ? {'refactor': 'true'} : null,
-        );
+        Route.go(selected.single ? Route.refactorStats : Route.stats);
       },
       showSelectedIcon: false,
     );
