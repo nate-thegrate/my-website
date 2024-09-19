@@ -3,8 +3,8 @@ part of 'main.dart';
 enum Route {
   home,
   stats,
-  refactorStats,
   projects,
+  refactorStats,
   mapping,
   animation,
   hueman,
@@ -14,9 +14,10 @@ enum Route {
 
   factory Route.fromUri(Uri uri) {
     final segments = uri.pathSegments;
-    final name = segments.last.contains('true') || segments.last.contains('false')
-        ? segments[segments.length - 2]
-        : segments.last;
+    final name = switch (segments.last) {
+      final s when !s.contains('true') && !s.contains('false') => s,
+      _ => segments[segments.length - 2],
+    };
 
     try {
       return values.byName(name);
