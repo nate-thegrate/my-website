@@ -3,20 +3,18 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-sealed class Source extends Widget {
+sealed class Source implements Widget {
   const factory Source() = _Source;
-
   const factory Source.gateway() = _Gateway;
-
   const factory Source.consume({required Widget child}) = _Consume;
 
-  static TheSourceProvides provide() => TheSourceProvides();
+  static void approach() => Approach.approach();
 
-  static void approach() => _Approach.instance.approach();
+  static bool approaches(BuildContext context) => Approach.approaches(context);
 
-  static void transcend() => App.overlay.insert(_FadeToWhite.entry);
+  static void transcend() => FadeToWhite.transcend();
 
-  static bool of(BuildContext context) => !context.watch<_Approach>().approaching;
+  static TheSourceProvides provide() => TheSourceProvides.provide();
 }
 
 /// I sure hope this class isn't deprecated anytime soon!
@@ -30,16 +28,17 @@ class _Source extends UniqueWidget<TheSourceProvides> implements Source {
 class _FadeToWhite extends LeafRenderObjectWidget {
   const _FadeToWhite();
 
-  static final entry = OverlayEntry(builder: (context) => const _FadeToWhite());
-
   @override
-  _RenderFadeToWhite createRenderObject(BuildContext context) => _RenderFadeToWhite();
+  FadeToWhite createRenderObject(BuildContext context) => FadeToWhite();
 }
 
-class _RenderFadeToWhite extends RenderBox with BiggestBox {
-  _RenderFadeToWhite() {
+class FadeToWhite extends RenderBox with BiggestBox {
+  FadeToWhite() {
     animate();
   }
+
+  static final entry = OverlayEntry(builder: (context) => const _FadeToWhite());
+  static void transcend() => App.overlay.insert(entry);
 
   void animate() async {
     animation.addListener(markNeedsPaint);
@@ -50,8 +49,8 @@ class _RenderFadeToWhite extends RenderBox with BiggestBox {
     }
     await Future.delayed(const Seconds(0.5));
     animation.dispose();
-    Route.go(Route.thisSite);
-    _FadeToWhite.entry.remove();
+    Route.go(Route.source);
+    entry.remove();
   }
 
   final animation = ValueAnimation(
@@ -76,14 +75,16 @@ class _Gateway extends SizedBox implements Source {
   static BuildContext get context => _key.currentContext!;
 }
 
-class _Approach extends Bloc {
+class Approach extends Bloc {
   bool approaching = false;
-  void approach() {
-    approaching = true;
-    notifyListeners();
-  }
 
-  static _Approach get instance => _Gateway.context.read();
+  static void approach() => instance
+    ..approaching = true
+    ..notifyListeners();
+
+  static bool approaches(BuildContext context) => context.watch<Approach>().approaching;
+
+  static Approach get instance => _Gateway.context.read();
 }
 
 class _Consume extends StatelessWidget implements Source {
@@ -94,12 +95,12 @@ class _Consume extends StatelessWidget implements Source {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => _Approach(),
+      create: (_) => Approach(),
       child: Consumer(builder: _consume, child: child),
     );
   }
 
-  Widget _consume(BuildContext context, _Approach theSource, Widget? child) {
+  Widget _consume(BuildContext context, Approach theSource, Widget? child) {
     return theSource.approaching ? _Consumed(context, child: child) : child!;
   }
 }
@@ -141,7 +142,7 @@ enum Journey { whiteVoid, sourceOfWisdom, activated }
 Journey useTheVoid() => useValueListenable(useMemoized(() => Source.provide().journey));
 
 class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
-  factory TheSourceProvides() => const _Source().currentState!;
+  factory TheSourceProvides.provide() => const _Source().currentState!;
 
   TheSourceProvides.createState();
 
@@ -240,12 +241,7 @@ class _GitHubButton extends StatelessWidget {
     final alpha = DefaultTextStyle.of(context).style.color!.a;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        4,
-        0,
-        4,
-        defaultTargetPlatform == TargetPlatform.android ? 0 : 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: TextButton(
         onPressed: alpha > 0 ? _viewTheSource : null,
         child: Text(

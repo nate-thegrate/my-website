@@ -50,39 +50,44 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
 
   late final listenables = Listenable.merge({widthAnimation, depthAnimation, launchAnimation});
   late final states = context.read<WidgetStates?>();
-  bool _contains(WidgetState state) => states?.contains(state) ?? false;
 
   bool prepareToLaunch = false;
 
   void _updateAnimations() async {
-    widthAnimation.animateTo(_contains(WidgetState.hovered) ? 1.0 : 0.0);
-    depthAnimation.animateTo(_contains(WidgetState.pressed) ? 1.0 : 0.0);
+    final states = this.states;
+    if (states == null) return;
 
-    if (_contains(WidgetState.selected) != prepareToLaunch) {
+    widthAnimation.toggle(
+      forward: (WidgetState.hovered | WidgetState.pressed).isSatisfiedBy(states),
+    );
+    depthAnimation.toggle(
+      forward: states.contains(WidgetState.pressed),
+    );
+
+    if (states.contains(WidgetState.selected) != prepareToLaunch) {
       setState(() => prepareToLaunch = !prepareToLaunch);
-      if (launchAnimation.isDismissed) {
-        try {
-          await launchAnimation.animateTo(1.0).orCancel;
-        } on TickerCanceled {
-          return;
-        }
-        DxCard.launching.value = true;
-
-        await Future.delayed(Durations.medium1);
-        if (!mounted) return;
-
-        states?.removeAll(const {
-          WidgetState.selected,
-          WidgetState.hovered,
-          WidgetState.pressed,
-        });
-        Route.go(Route.dx, extra: const Projects());
-        await Future.delayed(const Seconds(1));
-
-        DxCard.launching.value = false;
-        prepareToLaunch = false;
-        launchAnimation.value = 0;
+      if (!launchAnimation.isDismissed) return;
+      try {
+        await launchAnimation.animateTo(1.0).orCancel;
+      } on TickerCanceled {
+        return;
       }
+      DxCard.launching.value = true;
+
+      await Future.delayed(Durations.medium1);
+      if (!mounted) return;
+
+      states.removeAll(const {
+        WidgetState.selected,
+        WidgetState.hovered,
+        WidgetState.pressed,
+      });
+      Route.go(Route.dx, extra: const Projects());
+      await Future.delayed(const Seconds(1));
+
+      DxCard.launching.value = false;
+      prepareToLaunch = false;
+      launchAnimation.value = 0;
     }
   }
 
@@ -91,9 +96,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     super.initState();
     (widthAnimation, depthAnimation, launchAnimation);
     states?.addListener(_updateAnimations);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => precacheImage(DX.bgImage, context),
-    );
+    postFrameCallback(() => precacheImage(DX.bgImage, context));
   }
 
   @override

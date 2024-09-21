@@ -46,6 +46,10 @@ ValueListenable<T> useAnimationFrom<S extends State, T>(ValueListenable<T> Funct
   return useMemoized(() => s(context.findAncestorStateOfType<S>()!));
 }
 
+void postFrameCallback(VoidCallback callback) {
+  WidgetsBinding.instance.addPostFrameCallback((_) => callback());
+}
+
 typedef _States = SetNotifier<WidgetState>;
 extension type WidgetStates._(_States _states) implements _States {
   WidgetStates([_]) : _states = _States();

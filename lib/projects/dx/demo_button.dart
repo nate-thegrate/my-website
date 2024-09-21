@@ -10,17 +10,7 @@ class DemoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Route.of(context) == Route.mapping) {
-      return const Mapping();
-    }
-    return const SizedBox(
-      width: double.infinity,
-      height: 100,
-      child: FractionallySizedBox(
-        widthFactor: 1 / 3,
-        child: _PressToStretch(),
-      ),
-    );
+    return Route.of(context) == Route.mapping ? const Mapping() : const PressToStretch();
   }
 }
 
@@ -76,7 +66,7 @@ class Mapping extends StatelessWidget {
           ),
         ),
       ),
-      child: const SizedBox(height: 100, child: Center(child: button)),
+      child: const RepaintBoundary(child: SizedBox(height: 100, child: Center(child: button))),
     );
   }
 }
@@ -95,6 +85,18 @@ class AnimatedStretch extends AnimatedValue<double> {
   Widget build(BuildContext context, double value) {
     return Transform.scale(scaleX: value, scaleY: 1 / value, child: child);
   }
+}
+
+extension type const PressToStretch._(Widget _) implements Widget {
+  const PressToStretch()
+      : _ = const SizedBox(
+          width: double.infinity,
+          height: 100,
+          child: FractionallySizedBox(
+            widthFactor: 1 / 3,
+            child: _PressToStretch(),
+          ),
+        );
 }
 
 class _PressToStretch extends StatefulWidget {

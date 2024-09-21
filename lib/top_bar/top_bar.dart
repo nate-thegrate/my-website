@@ -41,16 +41,14 @@ class TopBar extends StatelessWidget {
     focused = Route.destination ?? Route.current;
   }
 
+  static const _stuff = Stache(child: Source.consume(child: _TopBar()));
+
   @override
-  Widget build(BuildContext context) {
-    return Stache(child: Source.consume(child: _TopBar(body: body)));
-  }
+  Widget build(BuildContext context) => _stuff;
 }
 
 class _TopBar extends StatefulWidget {
-  const _TopBar({this.body});
-
-  final Widget? body;
+  const _TopBar();
 
   @override
   State<_TopBar> createState() => _TopBarState();
@@ -155,27 +153,31 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
       child: MouseRegion(
         onEnter: openGap,
         onExit: closeGap,
-        child: Column(
-          children: [
-            SizedBox(height: barHeight + gapHeight, child: bar),
-            if (gapHeight > 0)
-              SizedBox(
-                width: double.infinity,
-                height: gapHeight,
-                child: const Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ColoredBox(color: Color(0xff202020), child: _VoidGap()),
-                    BlurBox(),
-                  ],
+        child: RepaintBoundary(
+          child: Column(
+            children: [
+              SizedBox(height: barHeight + gapHeight, child: bar),
+              if (gapHeight > 0)
+                SizedBox(
+                  width: double.infinity,
+                  height: gapHeight,
+                  child: const Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ColoredBox(color: Color(0xff202020), child: _VoidGap()),
+                      BlurBox(),
+                    ],
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
 
-    return Scaffold(appBar: appBar, body: widget.body);
+    final body = context.findAncestorWidgetOfExactType<TopBar>()!.body;
+
+    return Scaffold(appBar: appBar, body: body);
   }
 }
 

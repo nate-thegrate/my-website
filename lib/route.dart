@@ -10,7 +10,7 @@ enum Route {
   hueman,
   dx,
   recipes,
-  thisSite;
+  source;
 
   factory Route.fromUri(Uri uri) {
     final segments = uri.pathSegments;
@@ -32,6 +32,9 @@ enum Route {
 
   static Route get current => _current.value;
   static final _current = Cubit(home);
+  static set current(Route newValue) {
+    _current.value = newValue;
+  }
 
   static void go(Route route, {Map<String, String>? params, Object? extra}) {
     _current.value = route == refactorStats ? stats : route;
@@ -51,7 +54,7 @@ enum Route {
     final parent = switch (this) {
       home => throw Error(),
       stats || refactorStats || projects => '',
-      hueman || dx || recipes || thisSite => projects.uri,
+      hueman || dx || recipes || source => projects.uri,
       mapping || animation => dx.uri,
     };
     return '$parent/$name';
@@ -60,6 +63,8 @@ enum Route {
   static Route? destination;
   static void travel([_]) async {
     destination = TopBar.focused;
+    if (destination == current) return;
+
     switch (destination) {
       case home:
         App.overlay.insert(NoMoreCSS.entry);
@@ -133,7 +138,7 @@ final _goRouter = GoRouter(
             ),
             _GoRoute.redirect(Route.hueman, Route.projects.uri),
             _GoRoute(Route.recipes, const _Page(Recipes())),
-            _GoRoute(Route.thisSite, const _Page(Source())),
+            _GoRoute(Route.source, const _Page(Source())),
           ],
         ),
       ],

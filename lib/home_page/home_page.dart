@@ -64,9 +64,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
       ),
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      App.overlay.insert(entry);
-    });
+    postFrameCallback(() => App.overlay.insert(entry));
     fricksToGive = initialFricks;
   }
 

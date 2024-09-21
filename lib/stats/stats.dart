@@ -59,6 +59,8 @@ class _StatsState extends State<_Stats> {
         setState(() => floatingFooter = shouldFloat);
       }
     });
+    Future.delayed(Durations.long2, () => Route.current = TopBar.focused = Route.stats);
+    postFrameCallback(() => HomePageElement.instance.opacity.value = 0.0);
   }
 
   @override

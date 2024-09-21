@@ -49,6 +49,8 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
       colorAnimation.value =
           active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.lightGray;
     });
+    Future.delayed(Durations.long2, () => Route.current = TopBar.focused = Route.projects);
+    postFrameCallback(() => HomePageElement.instance.opacity.value = 0.0);
   }
 
   @override
@@ -104,12 +106,12 @@ class _CardRecursion extends StatelessWidget {
     }
 
     return ToggleBuilder(
-      Source.of(context),
+      Source.approaches(context),
       duration: Durations.medium1,
       builder: (context, t, child) {
         return ProjectCardTemplate(
           color: ColorAnimation.of(context),
-          elevation: t * 5,
+          elevation: (1 - t) * 5,
           child: child!,
         );
       },
