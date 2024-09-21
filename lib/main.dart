@@ -20,6 +20,7 @@ class App extends StatelessWidget {
   static Size get screenSize => WidgetsBinding.instance.renderViews.first.size;
 
   static final _theme = ThemeData(
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     scaffoldBackgroundColor: Colors.white,
     colorScheme: ColorScheme.fromSeed(
       seedColor: TopBar.background,

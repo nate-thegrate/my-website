@@ -187,42 +187,46 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     const diffs = [
-      Diffs('+', style: TextStyle(color: RightColumn.green)),
-      Diffs('–', style: TextStyle(color: RightColumn.red)),
-      Diffs('Δ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      Diffs('+', color: RightColumn.green),
+      Diffs('–', color: RightColumn.red),
+      Diffs('Δ', color: Colors.black),
     ];
-
-    final header = Row(
-      key: const GlobalObjectKey('header'),
-      children: [
-        Expanded(
+    final dateBox = ColoredBox(
+      color: shrinkOffset == 0 ? Colors.white54 : Colors.transparent,
+      child: DefaultTextStyle(
+        style: TextStyle(
+          color: RightColumn.dateColor(darker: shrinkOffset > 0),
+          fontWeight: FontWeight.w600,
+        ),
+        child: const SizedBox(
+          width: RightColumn.dateWidth,
           child: Center(
-            child: Text(
-              refactoring
-                  ? 'Refactoring (lines added/removed)'
-                  : 'Flutter framework contributions',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: Text('date'),
           ),
         ),
-        if (refactoring)
-          ...diffs
-        else
-          ColoredBox(
-            color: shrinkOffset == 0 ? Colors.white54 : Colors.transparent,
-            child: const SizedBox(
-              width: RightColumn.dateWidth,
-              child: Center(
-                child: Text(
-                  'date',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
+      ),
+    );
+
+    final header = DefaultTextStyle(
+      style: const TextStyle(fontWeight: FontWeight.w600),
+      child: Row(
+        key: const GlobalObjectKey('header'),
+        children: [
+          Expanded(
+            child: Center(
+              child: Text(
+                refactoring
+                    ? 'Refactoring (lines added/removed)'
+                    : 'Flutter framework contributions',
+                style: const TextStyle(color: Colors.black87),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
-      ],
+          if (refactoring) ...diffs else dateBox,
+        ],
+      ),
     );
 
     if (shrinkOffset == 0) {

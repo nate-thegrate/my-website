@@ -237,14 +237,14 @@ class _GitHubButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final alpha = DefaultTextStyle.of(context).style.color!.a;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
       child: TextButton(
         onPressed: alpha > 0 ? _viewTheSource : null,
         child: Text(
           'GitHub',
           style: TextStyle(
             fontSize: 32,
-            height: 0,
+            height: 1,
             color: const Color(0xff70a8ff).withValues(alpha: alpha),
           ),
         ),

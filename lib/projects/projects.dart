@@ -106,8 +106,11 @@ class _ProjectButtonState extends State<_ProjectButton> {
     if (states.contains(WidgetState.hovered)) {
       states.add(WidgetState.selected);
     }
-    states.remove(WidgetState.pressed);
-
+    if (defaultTargetPlatform case TargetPlatform.iOS || TargetPlatform.android) {
+      states.removeAll(const {WidgetState.hovered, WidgetState.pressed});
+    } else {
+      states.remove(WidgetState.pressed);
+    }
     await Future.delayed(const Seconds(2));
     if (mounted) _hide();
   }

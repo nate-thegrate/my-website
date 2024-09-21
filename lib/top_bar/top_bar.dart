@@ -16,6 +16,10 @@ class TopBar extends StatelessWidget {
   static final _focused = Cubit(Route.home);
   static set focused(Route newValue) {
     _focused.value = newValue;
+    if (defaultTargetPlatform case TargetPlatform.android || TargetPlatform.iOS) {
+      Route.destination = newValue;
+      Route.travel();
+    }
   }
 
   static double get position => _position;

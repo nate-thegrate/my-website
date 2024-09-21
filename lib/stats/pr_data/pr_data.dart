@@ -147,6 +147,10 @@ class RightColumn extends StatelessWidget {
   static const dateWidth = 115.0;
   static const diffWidth = 150.0;
 
+  static Color dateColor({required bool darker}) {
+    return darker ? Colors.black87 : const Color(0xff606060);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Refactoring.of(context)) {
@@ -155,9 +159,9 @@ class RightColumn extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Row(children: [
-          Diffs('+$additions', style: const TextStyle(color: green)),
-          Diffs('-$deletions', style: const TextStyle(color: red)),
-          Diffs('$delta', style: const TextStyle(fontWeight: FontWeight.w600)),
+          Diffs('+$additions', color: green),
+          Diffs('-$deletions', color: red),
+          Diffs('$delta', color: Colors.black),
         ]),
       );
     }
@@ -167,7 +171,7 @@ class RightColumn extends StatelessWidget {
       height: double.infinity,
       child: DefaultTextStyle(
         style: TextStyle(
-          color: Focus.of(context).hasFocus ? Colors.black87 : const Color(0xff606060),
+          color: dateColor(darker: Focus.of(context).hasFocus),
           fontSize: 14,
           fontFamily: 'roboto mono',
           fontVariations: const [FontVariation.weight(650)],
@@ -178,13 +182,24 @@ class RightColumn extends StatelessWidget {
   }
 }
 
-class Diffs extends Text {
-  const Diffs(super.data, {super.key, super.style});
+class Diffs extends StatelessWidget {
+  const Diffs(this.text, {super.key, required this.color});
+
+  final String text;
+  final Color color;
+
   @override
   Widget build(BuildContext context) {
+    final isHeader = context.findAncestorWidgetOfExactType<SliverPersistentHeader>() != null;
+    final style = TextStyle(
+      fontSize: isHeader ? 18 : 14,
+      fontWeight: FontWeight.w600,
+      color: color,
+    );
+
     return SizedBox(
       width: RightColumn.diffWidth / 3,
-      child: Center(child: super.build(context)),
+      child: Center(child: Text(text, style: style)),
     );
   }
 }
