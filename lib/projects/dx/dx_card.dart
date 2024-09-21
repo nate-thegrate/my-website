@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class DXCard extends HookWidget {
-  const DXCard({super.key});
+class DxCard extends HookWidget {
+  const DxCard({super.key});
 
   static final launching = Cubit(false);
 
@@ -16,7 +16,7 @@ class DXCard extends HookWidget {
   Widget build(BuildContext context) {
     return _ApiLaunchProvider(
       launch: RecursionCount.of(context) == 0 && useValueListenable(launching),
-      child: const _FlutterApisCard(),
+      child: const _DxCard(),
     );
   }
 }
@@ -30,14 +30,14 @@ class _ApiLaunchProvider extends InheritedWidget {
   bool updateShouldNotify(_ApiLaunchProvider oldWidget) => launch != oldWidget.launch;
 }
 
-class _FlutterApisCard extends StatefulWidget {
-  const _FlutterApisCard();
+class _DxCard extends StatefulWidget {
+  const _DxCard();
 
   @override
-  State<_FlutterApisCard> createState() => _FlutterApisCardState();
+  State<_DxCard> createState() => _DxCardState();
 }
 
-class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderStateMixin {
+class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   late final widthAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
   late final depthAnimation = ToggleAnimation(vsync: this, duration: Durations.short1);
   late final launchAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
@@ -66,7 +66,7 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
         } on TickerCanceled {
           return;
         }
-        DXCard.launching.value = true;
+        DxCard.launching.value = true;
 
         await Future.delayed(Durations.medium1);
         if (!mounted) return;
@@ -79,7 +79,7 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
         Route.go(Route.dx, extra: const Projects());
         await Future.delayed(const Seconds(1));
 
-        DXCard.launching.value = false;
+        DxCard.launching.value = false;
         prepareToLaunch = false;
         launchAnimation.value = 0;
       }
@@ -107,7 +107,7 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
 
   @override
   Widget build(BuildContext context) {
-    if (DXCard.of(context)) {
+    if (DxCard.of(context)) {
       return const SizedBox.shrink();
     }
     return Stached(
@@ -134,13 +134,17 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
     const column = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        DarkFlutterLogo(height: 150),
-        SizedBox(height: 64),
+        FittedBox(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 36),
+            child: DarkFlutterLogo(height: 150),
+          ),
+        ),
         FittedBox(
           fit: BoxFit.fitWidth,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: SizedBox(width: 325, child: _DX()),
+            child: SizedBox(width: 325, child: _DxText()),
           ),
         ),
       ],
@@ -184,27 +188,25 @@ class _FlutterApisCardState extends State<_FlutterApisCard> with TickerProviderS
   }
 }
 
-class _DX extends HookWidget {
-  const _DX();
+class _DxText extends HookWidget {
+  const _DxText();
 
-  static TextSpan useThatCurvedAnimation(BuildContext context) {
-    final animation = useMemoized(
-      () => context.findAncestorStateOfType<_FlutterApisCardState>()!.widthCurved,
+  @override
+  Widget build(BuildContext context) {
+    final value = useValueListenable(
+      useAnimationFrom<_DxCardState, double>((s) => s.widthCurved),
     );
-    final visibleLetters = (useValueListenable(animation) * 10).round();
-    return TextSpan(children: [
+    final visibleLetters = (value * 10).round();
+    final textSpan = TextSpan(children: [
       const TextSpan(text: '{ d'),
       TextSpan(text: 'eveloper e'.substring(0, visibleLetters)),
       const TextSpan(text: 'x'),
       TextSpan(text: 'perience'.substring(0, math.min(visibleLetters, 8))),
       const TextSpan(text: ' }'),
     ]);
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Text.rich(
-      useThatCurvedAnimation(context),
+      textSpan,
       textAlign: TextAlign.center,
       maxLines: 1,
       overflow: TextOverflow.visible,

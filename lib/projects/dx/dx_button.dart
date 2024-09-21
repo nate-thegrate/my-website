@@ -203,7 +203,7 @@ final class Rekt extends Decoration {
         duration: Durations.short3,
       );
   static void getRekt(BuildContext context) {
-    final box = context.findRenderObject()! as RenderBox;
+    final box = context.renderBox;
     final rect = box.localToGlobal(Offset.zero) & box.size;
     final DXButton apiButton = switch (context) {
       Element(widget: final DXButton apiButton) => apiButton,
@@ -277,10 +277,10 @@ class _RektTransition extends LeafRenderObjectWidget {
   final Route route;
 
   @override
-  RenderBig createRenderObject(BuildContext context) => _RenderRekt(rect, route);
+  RenderBox createRenderObject(BuildContext context) => _RenderRekt(rect, route);
 }
 
-class _RenderRekt extends RenderBig {
+class _RenderRekt extends RenderBox with BiggestBox {
   _RenderRekt(this.rect, this.route) {
     ticker = App.vsync.createTicker(_tick)..start();
   }

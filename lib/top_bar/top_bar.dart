@@ -22,18 +22,19 @@ class TopBar extends StatelessWidget {
   static double _position = 0.0;
   static set position(double newValue) {
     if (newValue == position) return;
-
     _position = newValue;
-    final index = math.min((_position * sections).floor(), sections - 1);
+    newValue -= TollsBox.getWidth();
+
+    final index = newValue < 0 ? 0 : (newValue * sections / App.screenSize.width).ceil();
     focused = Route.values[index];
   }
 
   static void update(PointerHoverEvent event) {
-    position = event.position.dx / App.screenSize.width;
+    position = event.position.dx;
   }
 
   static void reset(PointerExitEvent event) {
-    TopBar.focused = Route.destination ?? Route.current;
+    focused = Route.destination ?? Route.current;
   }
 
   @override
@@ -64,7 +65,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
   void openGap([_]) {
     timer = Timer(Durations.extralong4, () {
       if (!mounted) return;
-      _gapAnimation.animateTo(12, duration: Durations.long2, curve: Curves.easeInOutSine);
+      _gapAnimation.animateTo(18, duration: Durations.long2, curve: Curves.easeInOutSine);
     });
   }
 
@@ -84,83 +85,86 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
     const barHeight = 48.0;
     const bar = ColoredBox(
       color: TopBar.background,
-      child: SizedBox(
-        height: barHeight,
-        child: Stack(
-          children: [
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              onHover: TopBar.update,
-              onExit: TopBar.reset,
-              child: TapRegion(
-                onTapInside: Route.travel,
-                child: SizedBox.expand(child: _Indicator()),
-              ),
+      child: Stack(
+        children: [
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onHover: TopBar.update,
+            onExit: TopBar.reset,
+            child: TapRegion(
+              onTapInside: Route.travel,
+              child: SizedBox.expand(child: Indicator()),
             ),
-            DefaultTextStyle(
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-                letterSpacing: 0.25,
-              ),
-              child: IgnorePointer(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 14, 8, 12),
-                              child: Image(image: AssetImage('assets/images/tolls.png')),
-                            ),
-                            Text.rich(
-                              maxLines: 1,
-                              overflow: TextOverflow.clip,
-                              TextSpan(children: [
-                                TextSpan(
-                                  text: 'N',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
-                                  ),
+          ),
+          DefaultTextStyle(
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+              letterSpacing: 0.25,
+            ),
+            child: IgnorePointer(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: _TollsBox(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 2, 8, 0),
+                            child: Image(image: AssetImage('assets/images/tolls.png')),
+                          ),
+                          Text.rich(
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                            TextSpan(children: [
+                              TextSpan(
+                                text: 'N',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
                                 ),
-                                TextSpan(text: 'ATE THE GRATE'),
-                              ]),
-                            ),
-                            SizedBox(width: 2),
-                          ],
-                        ),
+                              ),
+                              TextSpan(text: 'ATE THE GRATE'),
+                            ]),
+                          ),
+                          SizedBox(width: 2),
+                        ],
                       ),
                     ),
-                    _RouteButton(Route.stats),
-                    _RouteButton(Route.projects),
-                  ],
-                ),
+                  ),
+                  _RouteButton(Route.stats),
+                  _RouteButton(Route.projects),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
 
     final gapHeight = _gapAnimation.value;
     final appBar = PreferredSize(
-      preferredSize: Size.fromHeight(barHeight + gapHeight),
+      preferredSize: Size.fromHeight(barHeight + gapHeight * 2),
       child: MouseRegion(
         onEnter: openGap,
         onExit: closeGap,
         child: Column(
           children: [
-            bar,
+            SizedBox(height: barHeight + gapHeight, child: bar),
             if (gapHeight > 0)
               SizedBox(
                 width: double.infinity,
                 height: gapHeight,
-                child: const ColoredBox(color: Colors.black, child: _VoidGap()),
+                child: const Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ColoredBox(color: Color(0xff202020), child: _VoidGap()),
+                    BlurBox(),
+                  ],
+                ),
               ),
           ],
         ),
@@ -171,25 +175,156 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
   }
 }
 
-class _Indicator extends StatelessWidget {
-  const _Indicator();
+class _TollsBox extends HookWidget {
+  const _TollsBox({required this.child});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    const box = FractionallySizedBox(
-      widthFactor: 1 / TopBar.sections,
-      child: ColoredBox(color: Colors.white54, child: SizedBox.expand()),
-    );
+    final listenable = useAnimationFrom<_TopBarState, double>((s) => s._gapAnimation);
+    return TollsBox(listenable: listenable, child: child);
+  }
+}
 
-    return ValueListenableBuilder(
-      valueListenable: TopBar._focused,
-      builder: (context, route, child) => AnimatedAlign(
-        duration: Durations.short3,
-        curve: Curves.ease,
-        alignment: Alignment(route.index * 2 / (TopBar.sections - 1) - 1, 0),
-        child: box,
+class TollsBox extends SingleChildRenderObjectWidget with RenderListenable {
+  const TollsBox({super.key, super.child, required this.listenable});
+
+  static double getWidth([BuildContext? context]) {
+    final size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
+    return math.max(155.0, size.width / 3);
+  }
+
+  @override
+  final ValueListenable<double> listenable;
+
+  BoxConstraints _constraints(BuildContext context) {
+    return BoxConstraints.tightFor(
+      width: TollsBox.getWidth(context),
+      height: 25 + listenable.value / 2,
+    );
+  }
+
+  @override
+  RenderConstrainedBox createRenderObject(BuildContext context) {
+    return RenderConstrainedBox(additionalConstraints: _constraints(context));
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderConstrainedBox renderObject) {
+    renderObject.additionalConstraints = _constraints(context);
+  }
+}
+
+class BlurBox extends SingleChildRenderObjectWidget with RenderListenable {
+  const BlurBox({super.key});
+
+  @override
+  Listenable get listenable => TopBar._focused;
+
+  BoxDecoration get decoration {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          if (TopBar.focused == Route.home) ...const [
+            Color(0xa0c09030),
+            Color(0x00f7b943),
+          ] else ...const [
+            Color(0xa080ffff),
+            Color(0x0000ffff),
+          ],
+          const Color(0x00ffffff),
+          Colors.white,
+        ],
+        stops: const [0.0, 0.25, 0.75, 1.0],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
       ),
     );
+  }
+
+  @override
+  RenderDecoratedBox createRenderObject(BuildContext context) {
+    return RenderDecoratedBox(decoration: decoration);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderDecoratedBox renderObject) {
+    renderObject.decoration = decoration;
+  }
+}
+
+class Indicator extends StatefulHookWidget {
+  const Indicator({super.key});
+
+  @override
+  State<Indicator> createState() => _IndicatorState();
+}
+
+class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMixin {
+  EdgeInsets get _padding {
+    final tollsWidth = TollsBox.getWidth(context);
+    final othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
+
+    return switch (TopBar.focused) {
+      Route.home => EdgeInsets.only(right: othersWidth),
+      Route.stats => EdgeInsets.only(left: tollsWidth, right: othersWidth / 2),
+      Route.projects => EdgeInsets.only(left: tollsWidth + othersWidth / 2),
+      _ => throw Error(),
+    };
+  }
+
+  late final padding = ValueAnimation(
+    vsync: this,
+    initialValue: _padding,
+    duration: Durations.short3,
+    curve: Curves.ease,
+    lerp: EdgeInsets.lerp,
+  );
+  void _update() => padding.value = _padding;
+
+  @override
+  void initState() {
+    super.initState();
+    TopBar._focused.addListener(_update);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _update();
+  }
+
+  @override
+  void dispose() {
+    TopBar._focused.removeListener(_update);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _PaddingTransition(
+      padding: padding,
+      child: const SizedBox.expand(child: ColoredBox(color: Colors.white54)),
+    );
+  }
+}
+
+class _PaddingTransition extends SingleChildRenderObjectWidget with RenderListenable {
+  const _PaddingTransition({super.child, required Animation<EdgeInsets> padding})
+      : listenable = padding;
+
+  @override
+  final ValueListenable<EdgeInsets> listenable;
+
+  @override
+  RenderPadding createRenderObject(BuildContext context) {
+    return RenderPadding(padding: listenable.value);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderPadding renderObject) {
+    renderObject.padding = listenable.value;
   }
 }
 
@@ -200,7 +335,7 @@ class _VoidGap extends LeafRenderObjectWidget {
   VoidGap createRenderObject(BuildContext context) => VoidGap();
 }
 
-class VoidGap extends RenderBig {
+class VoidGap extends RenderBox with BiggestBox {
   VoidGap() {
     TopBar._focused.addListener(updateColor);
     updateColor();
@@ -258,7 +393,7 @@ class VoidGap extends RenderBig {
     final position = TopBar.position;
     for (final (index, animation) in animations.indexed.toList().reversed) {
       final t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
-      final color = Color.lerp(this.color, Colors.black, t)!;
+      final color = Color.lerp(this.color, const Color(0xff202020), t)!;
       animation.duration = Seconds(t / 2);
 
       if (animation.value != position) {
@@ -266,7 +401,7 @@ class VoidGap extends RenderBig {
       }
       canvas.drawRect(
         Rect.fromCenter(
-          center: Offset(animation.value * fullBox.width, fullBox.center.dy),
+          center: Offset(animation.value, fullBox.center.dy),
           width: size.width * t / 2,
           height: fullBox.height,
         ),
@@ -301,10 +436,10 @@ class NoMoreCSS extends LeafRenderObjectWidget {
   static final entry = OverlayEntry(builder: (_) => const NoMoreCSS());
 
   @override
-  RenderBig createRenderObject(BuildContext context) => RenderNoMoreCSS();
+  RenderBox createRenderObject(BuildContext context) => RenderNoMoreCSS();
 }
 
-class RenderNoMoreCSS extends RenderBig {
+class RenderNoMoreCSS extends RenderBox with BiggestBox {
   RenderNoMoreCSS() {
     ticker = App.vsync.createTicker(_tick)..start();
   }
@@ -363,10 +498,10 @@ class _BlankBox extends LeafRenderObjectWidget {
   const _BlankBox();
 
   @override
-  RenderBig createRenderObject(BuildContext context) => Blank();
+  RenderBox createRenderObject(BuildContext context) => Blank();
 }
 
-class Blank extends RenderBig {
+class Blank extends RenderBox with BiggestBox {
   Blank();
 
   static const duration = Durations.short2;

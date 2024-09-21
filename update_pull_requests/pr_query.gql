@@ -11,6 +11,7 @@ query flutterPRs() {
         url
         additions
         deletions
+        createdAt
         labels(first: 100) {
           nodes {
             name

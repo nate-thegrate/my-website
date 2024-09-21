@@ -10,6 +10,7 @@ class PullRequest extends StatelessWidget {
     super.key,
     required this.title,
     required this.url,
+    required this.date,
     required this.diffs,
     required this.refactor,
   }) : _isTotal = title == 'Total';
@@ -34,6 +35,7 @@ class PullRequest extends StatelessWidget {
     final pr = PullRequest(
       title: 'Total',
       url: url,
+      date: ' since 2023',
       diffs: (additions, deletions),
       refactor: onlyRefactor,
     );
@@ -46,6 +48,7 @@ class PullRequest extends StatelessWidget {
   final String title;
   final bool _isTotal;
   final String url;
+  final String date;
   final (int, int) diffs;
   final bool refactor;
 
@@ -83,9 +86,10 @@ class PullRequest extends StatelessWidget {
           );
         }
 
-        final diffs = Diffs(
-          this.diffs,
-          key: GlobalObjectKey((this.diffs, url)),
+        final rightColumn = RightColumn(
+          diffs,
+          date,
+          key: GlobalObjectKey((diffs, url)),
         );
         final contents = Padding(
           padding: const EdgeInsets.symmetric(vertical: 1),
@@ -105,7 +109,7 @@ class PullRequest extends StatelessWidget {
               Expanded(
                 child: Align(alignment: Alignment.centerLeft, child: text),
               ),
-              if (focused) diffs else ColoredBox(color: Colors.white54, child: diffs),
+              if (focused) rightColumn else ColoredBox(color: Colors.white54, child: rightColumn),
             ],
           ),
         );
@@ -131,51 +135,56 @@ class PullRequest extends StatelessWidget {
   }
 }
 
-class Diffs extends StatelessWidget {
-  const Diffs(this.diffs, {super.key});
+class RightColumn extends StatelessWidget {
+  const RightColumn(this.diffs, this.date, {super.key});
 
   final (int, int) diffs;
+  final String date;
 
   static const green = Color(0xff007060);
   static const red = Color(0xffc00060);
 
+  static const dateWidth = 115.0;
+  static const diffWidth = 150.0;
+
   @override
   Widget build(BuildContext context) {
-    final (additions, deletions) = diffs;
-    final delta = additions - deletions;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 50,
-            child: Center(
-              child: Text(
-                '+$additions',
-                style: const TextStyle(color: green),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 50,
-            child: Center(
-              child: Text(
-                '-$deletions',
-                style: const TextStyle(color: red),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 50,
-            child: Center(
-              child: Text(
-                '$delta',
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-        ],
+    if (Refactoring.of(context)) {
+      final (additions, deletions) = diffs;
+      final delta = additions - deletions;
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Row(children: [
+          Diffs('+$additions', style: const TextStyle(color: green)),
+          Diffs('-$deletions', style: const TextStyle(color: red)),
+          Diffs('$delta', style: const TextStyle(fontWeight: FontWeight.w600)),
+        ]),
+      );
+    }
+
+    return SizedBox(
+      width: dateWidth,
+      height: double.infinity,
+      child: DefaultTextStyle(
+        style: TextStyle(
+          color: Focus.of(context).hasFocus ? Colors.black87 : const Color(0xff606060),
+          fontSize: 14,
+          fontFamily: 'roboto mono',
+          fontVariations: const [FontVariation.weight(650)],
+        ),
+        child: Center(child: Text(date)),
       ),
+    );
+  }
+}
+
+class Diffs extends Text {
+  const Diffs(super.data, {super.key, super.style});
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: RightColumn.diffWidth / 3,
+      child: Center(child: super.build(context)),
     );
   }
 }

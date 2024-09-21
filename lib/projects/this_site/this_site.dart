@@ -12,7 +12,7 @@ class ThisSite extends UniqueWidget<TheVoidProvides> {
 }
 
 sealed class TheVoid extends Widget {
-  const factory TheVoid.gateway() = _GatewayToTheVoid;
+  const factory TheVoid.gateway() = _Gateway;
 
   const factory TheVoid.consume({required Widget child}) = _ConsumeTheVoid;
 
@@ -34,7 +34,7 @@ class _FadeToWhite extends LeafRenderObjectWidget {
   _RenderFadeToWhite createRenderObject(BuildContext context) => _RenderFadeToWhite();
 }
 
-class _RenderFadeToWhite extends RenderBig {
+class _RenderFadeToWhite extends RenderBox with BiggestBox {
   _RenderFadeToWhite() {
     animate();
   }
@@ -66,9 +66,8 @@ class _RenderFadeToWhite extends RenderBig {
   }
 }
 
-class _GatewayToTheVoid extends SizedBox implements TheVoid {
-  const _GatewayToTheVoid()
-      : super.expand(key: _key, child: const ColoredBox(color: Colors.white));
+class _Gateway extends SizedBox implements TheVoid {
+  const _Gateway() : super.expand(key: _key, child: const ColoredBox(color: Colors.white));
 
   static const _key = GlobalObjectKey(<void>{});
 
@@ -82,7 +81,7 @@ class _ApproachTheVoid extends Bloc {
     notifyListeners();
   }
 
-  static _ApproachTheVoid get instance => _GatewayToTheVoid.context.read();
+  static _ApproachTheVoid get instance => _Gateway.context.read();
 }
 
 class _ConsumeTheVoid extends StatelessWidget implements TheVoid {
@@ -116,17 +115,14 @@ class Dilation extends Curve {
 class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
   _ConsumedByTheVoid(BuildContext context, {super.child})
       : super(
-          value: _box(context).getTransformTo(_box()).scaled(1.001, 1.001, 1.0),
+          value: context.renderBox
+              .getTransformTo(_Gateway.context.renderBox)
+              .scaled(1.001, 1.001, 1.0),
           curve: const Dilation(),
           duration: const Seconds(2.5),
           initialValue: Matrix4.identity(),
           lerp: _lerp,
         );
-
-  static RenderBox _box([BuildContext? context]) {
-    context ??= _GatewayToTheVoid.context;
-    return context.findRenderObject()! as RenderBox;
-  }
 
   static Matrix4 _lerp(Matrix4 a, Matrix4 b, double t) {
     return Matrix4Tween(begin: a, end: b).transform(t);
@@ -268,7 +264,7 @@ class _Passage extends LeafRenderObjectWidget {
   TheSource createRenderObject(BuildContext context) => TheSource();
 }
 
-class TheSource extends RenderBig {
+class TheSource extends RenderBox with BiggestBox {
   TheSource() {
     final theVoidProvides = TheVoid.provide();
     journey = theVoidProvides.journey;

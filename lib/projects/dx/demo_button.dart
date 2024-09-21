@@ -142,15 +142,16 @@ class _PressToStretchState extends State<_PressToStretch> {
         Positioned.fill(
           child: FractionallySizedBox.scaled(
             scale: 3 / 4,
+            alignment: Alignment(0, 1 / 3),
             child: FittedBox(
               child: Text.rich(
                 TextSpan(children: [
-                  TextSpan(text: 'press to\n'),
+                  TextSpan(text: 'press & hold to\n'),
                   TextSpan(
                     text: 'stretch!',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 32,
+                      fontSize: 44,
                     ),
                   ),
                 ]),
@@ -189,10 +190,10 @@ class Streeeetch extends LeafRenderObjectWidget {
   const Streeeetch({super.key});
 
   @override
-  RenderBig createRenderObject(BuildContext context) => _Streeeetch();
+  RenderBox createRenderObject(BuildContext context) => _Streeeetch();
 }
 
-class _Streeeetch extends RenderBig {
+class _Streeeetch extends RenderBox with BiggestBox {
   static final yellowFill = Paint()..color = const Color(0xfff0ff30);
 
   @override

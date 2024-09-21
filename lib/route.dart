@@ -34,7 +34,7 @@ enum Route {
   static final _current = Cubit(home);
 
   static void go(Route route, {Map<String, String>? params, Object? extra}) {
-    _current.value = route;
+    _current.value = route == refactorStats ? stats : route;
     if (route == Route.home) {
       HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
     }
@@ -69,7 +69,7 @@ enum Route {
 
       case stats || projects:
         App.overlay.insert(Blank.entry);
-        await Future.delayed(Blank.duration);
+        await Future.delayed(Blank.duration + Durations.short1);
         go(destination!);
         Blank.entry.remove();
         destination = null;
@@ -111,62 +111,44 @@ final _goRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => const HomePage(),
-      routes: <RouteBase>[
-        GoRoute(
-          path: Route.stats.name,
-          redirect: (context, state) => '/stats/refactor=false',
-        ),
-        GoRoute(
-          path: Route.refactorStats.name,
-          redirect: (context, state) => '/stats/refactor=true',
-        ),
+      routes: [
+        _GoRoute.redirect(Route.stats, '/stats/refactor=false'),
+        _GoRoute.redirect(Route.refactorStats, '/stats/refactor=true'),
         GoRoute(
           name: Route.stats.name,
           path: 'stats/:refactor',
           pageBuilder: Stats.pageBuilder,
         ),
-        GoRoute(
-          path: Route.projects.name,
-          pageBuilder: (context, state) => const NoTransitionPage(child: Projects()),
-          routes: <RouteBase>[
+        _GoRoute(
+          Route.projects,
+          const _Page(Projects()),
+          routes: [
             GoRoute(
               path: Route.dx.name,
-              pageBuilder: (context, state) {
-                if (state.extra != null) {
-                  return const NoTransitionPage(child: DX.stack);
-                }
-                return const NoTransitionPage(child: DX());
-              },
+              pageBuilder: DX.pageBuilder,
               routes: [
-                GoRoute(
-                  path: Route.mapping.name,
-                  pageBuilder: (context, state) {
-                    return const NoTransitionPage(child: DemoScreen());
-                  },
-                ),
-                GoRoute(
-                  path: Route.animation.name,
-                  pageBuilder: (context, state) {
-                    return const NoTransitionPage(child: DemoScreen());
-                  },
-                ),
+                _GoRoute(Route.mapping, const _Page(DemoScreen())),
+                _GoRoute(Route.animation, const _Page(DemoScreen())),
               ],
             ),
-            GoRoute(
-              path: Route.hueman.name,
-              redirect: (context, state) => Route.projects.uri,
-            ),
-            GoRoute(
-              path: Route.recipes.name,
-              pageBuilder: (context, state) => const NoTransitionPage(child: Recipes()),
-            ),
-            GoRoute(
-              path: Route.thisSite.name,
-              pageBuilder: (context, state) => const NoTransitionPage(child: ThisSite()),
-            ),
+            _GoRoute.redirect(Route.hueman, Route.projects.uri),
+            _GoRoute(Route.recipes, const _Page(Recipes())),
+            _GoRoute(Route.thisSite, const _Page(ThisSite())),
           ],
         ),
       ],
     ),
   ],
 );
+
+class _Page extends NoTransitionPage<void> {
+  const _Page(Widget child) : super(child: child);
+}
+
+extension type _GoRoute._(GoRoute _route) implements GoRoute {
+  _GoRoute(Route route, Page<void> page, {List<RouteBase> routes = const []})
+      : _route = GoRoute(path: route.name, pageBuilder: (context, state) => page, routes: routes);
+
+  _GoRoute.redirect(Route route, String uri)
+      : _route = GoRoute(path: route.name, redirect: (context, state) => uri);
+}

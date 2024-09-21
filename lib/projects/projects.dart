@@ -17,7 +17,7 @@ class Projects extends TopBar {
         Spacer(),
         _Expanded(ProjectButton(HuemanCard())),
         Spacer(),
-        _Expanded(ProjectButton(DXCard())),
+        _Expanded(ProjectButton(DxCard())),
         Spacer(),
       ]),
     ),
@@ -80,23 +80,29 @@ class _ProjectButtonState extends State<_ProjectButton> {
     super.dispose();
   }
 
-  void hover(_) async {
+  void hover([_]) async {
     states.add(WidgetState.hovered);
   }
 
-  void endHover(_) async {
+  void endHover([_]) async {
     if (!states.contains(WidgetState.selected)) {
       _hide();
     }
-    states.removeAll({WidgetState.hovered, WidgetState.pressed});
+    states.removeAll(const {WidgetState.hovered, WidgetState.pressed});
   }
 
-  void handleDownpress(_) async {
-    states.add(WidgetState.pressed);
+  void handleDownpress([_]) async {
+    states.addAll(const {WidgetState.hovered, WidgetState.pressed});
     _show();
   }
 
-  void handlePressEnd(_) async {
+  void handlePan(DragUpdateDetails details) {
+    context.renderBox.semanticBounds.contains(details.localPosition)
+        ? states.add(WidgetState.hovered)
+        : states.remove(WidgetState.hovered);
+  }
+
+  void handlePressEnd([_]) async {
     if (states.contains(WidgetState.hovered)) {
       states.add(WidgetState.selected);
     }
@@ -117,6 +123,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
         onExit: endHover,
         child: GestureDetector(
           onPanDown: handleDownpress,
+          onPanUpdate: handlePan,
           onPanEnd: handlePressEnd,
           behavior: HitTestBehavior.opaque,
           child: widget.child,
@@ -127,10 +134,10 @@ class _ProjectButtonState extends State<_ProjectButton> {
     return OverlayPortal(
       controller: _controller,
       overlayChildBuilder: (_) {
-        final renderBox = context.findRenderObject()! as RenderBox;
-        final offset = renderBox.localToGlobal(renderBox.paintBounds.topLeft);
+        final box = context.renderBox;
+        final offset = box.localToGlobal(box.paintBounds.topLeft);
 
-        return Positioned.fromRect(rect: offset & renderBox.size, child: card);
+        return Positioned.fromRect(rect: offset & box.size, child: card);
       },
       child: _controller.isShowing ? null : card,
     );

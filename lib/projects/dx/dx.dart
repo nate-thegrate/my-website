@@ -23,6 +23,13 @@ class DX extends DecoratedBox {
     children: [DX(), FlutterApisTransition()],
   );
 
+  static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
+    if (state.extra != null) {
+      return const NoTransitionPage(child: DX.stack);
+    }
+    return const NoTransitionPage(child: DX());
+  }
+
   static const _child = DefaultTextStyle(
     style: DXButton.style,
     textAlign: TextAlign.center,

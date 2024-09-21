@@ -63,7 +63,7 @@ class _StatsState extends State<_Stats> {
 
   @override
   Widget build(BuildContext context) {
-    final onlyRefactorPRs = Refactoring.of(context);
+    final refactoring = Refactoring.of(context);
     final padding = EdgeInsets.symmetric(
       horizontal: math.max(
         Stats.insets,
@@ -73,13 +73,13 @@ class _StatsState extends State<_Stats> {
     final slivers = [
       SliverMainAxisGroup(
         slivers: [
-          const SliverPersistentHeader(
+          SliverPersistentHeader(
             pinned: true,
-            delegate: _TableHeader(),
+            delegate: _TableHeader(refactoring),
           ),
           SliverFixedExtentList.list(
             itemExtent: Stats.itemExtent,
-            children: onlyRefactorPRs ? refactorPRs : flutterPRs,
+            children: refactoring ? refactorPRs : flutterPRs,
           ),
         ],
       ),
@@ -94,7 +94,7 @@ class _StatsState extends State<_Stats> {
 
         Widget? total;
         if (remainingPaintExtent >= 36.0) {
-          total = PullRequest.total(onlyRefactor: onlyRefactorPRs);
+          total = PullRequest.total(onlyRefactor: refactoring);
         }
         return SliverToBoxAdapter(child: SizedBox(height: 36.0, child: total));
       }),
@@ -133,7 +133,7 @@ class _StatsState extends State<_Stats> {
                 height: 36.0,
                 child: ColoredBox(
                   color: const Color(0xe0f8ffff),
-                  child: PullRequest.total(onlyRefactor: onlyRefactorPRs),
+                  child: PullRequest.total(onlyRefactor: refactoring),
                 ),
               ),
             ),
@@ -172,7 +172,9 @@ class StickToBottom extends ClampingScrollPhysics {
 }
 
 class _TableHeader extends SliverPersistentHeaderDelegate {
-  const _TableHeader();
+  const _TableHeader(this.refactoring);
+
+  final bool refactoring;
 
   @override
   final double minExtent = 36.0;
@@ -180,76 +182,58 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
   final double maxExtent = 36.0;
 
   @override
-  bool shouldRebuild(_TableHeader oldDelegate) => false;
+  bool shouldRebuild(_TableHeader oldDelegate) => refactoring != oldDelegate.refactoring;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    const header = Row(
-      key: GlobalObjectKey('header'),
+    const diffs = [
+      Diffs('+', style: TextStyle(color: RightColumn.green)),
+      Diffs('–', style: TextStyle(color: RightColumn.red)),
+      Diffs('Δ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+    ];
+
+    final header = Row(
+      key: const GlobalObjectKey('header'),
       children: [
-        Expanded(child: Center(child: _TableTitle())),
-        SizedBox(
-          width: 50,
+        Expanded(
           child: Center(
             child: Text(
-              '+',
-              style: TextStyle(
-                color: Diffs.green,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              refactoring
+                  ? 'Refactoring (lines added/removed)'
+                  : 'Flutter framework contributions',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        if (refactoring)
+          ...diffs
+        else
+          ColoredBox(
+            color: shrinkOffset == 0 ? Colors.white54 : Colors.transparent,
+            child: const SizedBox(
+              width: RightColumn.dateWidth,
+              child: Center(
+                child: Text(
+                  'date',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ),
-        ),
-        SizedBox(
-          width: 50,
-          child: Center(
-            child: Text(
-              '–',
-              style: TextStyle(
-                color: Diffs.red,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 50,
-          child: Center(
-            child: Text(
-              'Δ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ),
       ],
     );
 
     if (shrinkOffset == 0) {
-      return const DecoratedBox(
-        decoration: BoxDecoration(
+      return DecoratedBox(
+        decoration: const BoxDecoration(
           border: Border(bottom: PullRequest.border),
         ),
         child: header,
       );
     }
-    return const ColoredBox(color: Color(0xe0f8ffff), child: header);
-  }
-}
-
-class _TableTitle extends StatelessWidget {
-  const _TableTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    final descriptor = Refactoring.of(context) ? 'refactoring' : 'contribution';
-    return Text(
-      'Flutter $descriptor diffs',
-      style: const TextStyle(fontWeight: FontWeight.w600),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
+    return ColoredBox(color: const Color(0xe0f8ffff), child: header);
   }
 }
 

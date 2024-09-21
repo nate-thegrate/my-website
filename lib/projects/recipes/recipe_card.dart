@@ -7,23 +7,30 @@ class RecipeCard extends StatefulWidget {
 
   static const transparentBackground = Color(0x00ddffbb);
   static const background = Color(0xffddffbb);
+
   @override
   State<RecipeCard> createState() => _RecipeCardState();
 }
 
-class _RecipeCardState extends State<RecipeCard> {
+class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
   late final _readStates = context.read<WidgetStates?>();
+  ToggleAnimation? _yeet;
 
   @override
   void initState() {
     super.initState();
-    _readStates?.addListener(_select);
+    if (_readStates != null) {
+      _readStates.addListener(_select);
+      _yeet = ToggleAnimation(vsync: this, duration: yeetDuration);
+    }
   }
 
   void _select() async {
-    if (selected) return;
     final WidgetStates? states = _readStates;
-    if (states == null || !states.contains(WidgetState.selected)) return;
+    if (states == null) return;
+    _yeet?.toggle(forward: states.contains(WidgetState.dragged));
+
+    if (selected || !states.contains(WidgetState.selected)) return;
 
     selected = true;
     final stash = Stache._stache;
@@ -48,10 +55,18 @@ class _RecipeCardState extends State<RecipeCard> {
   @override
   void dispose() {
     _readStates?.removeListener(_select);
+    _yeet?.dispose();
     super.dispose();
   }
 
   static const yeetDuration = Seconds(1);
+
+  static Matrix4 _onTransform(double t) {
+    final Size(:width, :height) = App.screenSize;
+    return Matrix4.rotationZ(math.pow(t, 1.5) * 5)
+      ..storage[12] = t * width
+      ..storage[13] = (2 * t * t - t) * height * 4;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,19 +81,16 @@ class _RecipeCardState extends State<RecipeCard> {
           elevation: 5 * (1 - t),
           color: RecipeCard.background,
           child: Center(
-            child: ToggleBuilder(
-              states.contains(WidgetState.dragged),
-              duration: yeetDuration,
-              builder: (context, t, child) {
-                final Size(:width, :height) = MediaQuery.sizeOf(context);
-                return Transform.translate(
-                  offset: Offset(t * width, (2 * t * t - t) * height * 4),
-                  child: Transform.rotate(
-                    angle: math.pow(t, 1.5) * 5,
-                    child: const StacheStash(),
-                  ),
-                );
-              },
+            child: MatrixTransition(
+              animation: _yeet ?? const AlwaysStoppedAnimation(0),
+              onTransform: _onTransform,
+              child: const FittedBox(
+                child: SizedBox(
+                  width: 230,
+                  height: 300,
+                  child: StacheStash(),
+                ),
+              ),
             ),
           ),
         );
@@ -178,7 +190,7 @@ class Stache extends HookWidget {
   }
 }
 
-class RenderStache extends RenderBig {
+class RenderStache extends RenderBox with BiggestBox {
   RenderStache(this.jiggle, this.states) {
     jiggle.addListener(markNeedsPaint);
     states?.addListener(_updateAnimation);

@@ -7,7 +7,7 @@ abstract class Funderline extends LeafRenderObjectWidget {
   const Funderline(this.rect, {super.key});
 
   factory Funderline.fromRoute(Route route) {
-    final box = route.key.currentContext!.findRenderObject()! as RenderBox;
+    final box = route.key.currentContext!.renderBox;
     final rect = box.localToGlobal(Offset.zero) & box.size;
 
     return switch (route) {
