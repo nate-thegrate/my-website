@@ -5,8 +5,10 @@ export 'dx_card.dart';
 export 'dx_button.dart';
 export 'vs_code.dart';
 
-class DX extends DecoratedBox {
-  const DX({super.key}) : super(decoration: background, child: _child);
+extension type const DX._(Widget _) implements Widget {
+  const DX() : _ = const DecoratedBox(decoration: background, child: _child);
+
+  const DX.stack() : _ = const Stack(fit: StackFit.expand, children: [DX(), DxTransition()]);
 
   static const bgImage = AssetImage('assets/images/gradient.png');
   static const background = BoxDecoration(
@@ -18,20 +20,16 @@ class DX extends DecoratedBox {
       filterQuality: FilterQuality.none,
     ),
   );
-  static const stack = Stack(
-    fit: StackFit.expand,
-    children: [DX(), DxTransition()],
-  );
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
     if (state.extra != null) {
-      return const NoTransitionPage(child: DX.stack);
+      return const NoTransitionPage(child: DX.stack());
     }
     return const NoTransitionPage(child: DX());
   }
 
   static const _child = DefaultTextStyle(
-    style: DXButton.style,
+    style: DxButton.style,
     textAlign: TextAlign.center,
     child: SizedBox.expand(
       child: Row(
@@ -40,7 +38,7 @@ class DX extends DecoratedBox {
           Spacer(),
           Expanded(
             flex: 9,
-            child: DXButton(
+            child: DxButton(
               Route.mapping,
               child: Text('WidgetState\nMapping'),
             ),
@@ -48,7 +46,7 @@ class DX extends DecoratedBox {
           Spacer(),
           Expanded(
             flex: 9,
-            child: DXButton(
+            child: DxButton(
               Route.animation,
               child: Text('Animated\nValues'),
             ),
@@ -75,7 +73,7 @@ extension type const DemoScreen._(Widget _) implements Widget {
         child: DecoratedBox(
           decoration: DX.background,
           child: DefaultTextStyle(
-            style: DXButton.style,
+            style: DxButton.style,
             textAlign: TextAlign.center,
             child: Column(
               children: [
@@ -87,7 +85,7 @@ extension type const DemoScreen._(Widget _) implements Widget {
                     child: Row(spacing: 8.0, children: [
                       SizedBox(
                         width: 40,
-                        child: DXButton(
+                        child: DxButton(
                           Route.projects,
                           border: CircleBorder(),
                           child: SizedBox.square(
@@ -98,7 +96,7 @@ extension type const DemoScreen._(Widget _) implements Widget {
                       ),
                       Expanded(
                         flex: 9,
-                        child: DXButton(
+                        child: DxButton(
                           Route.mapping,
                           border: buttonBorder,
                           child: Text('Mapping'),
@@ -107,7 +105,7 @@ extension type const DemoScreen._(Widget _) implements Widget {
                       SizedBox.shrink(),
                       Expanded(
                         flex: 9,
-                        child: DXButton(
+                        child: DxButton(
                           Route.animation,
                           border: buttonBorder,
                           child: Text('Animation'),

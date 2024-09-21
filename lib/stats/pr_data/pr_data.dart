@@ -190,9 +190,8 @@ class Diffs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isHeader = context.findAncestorWidgetOfExactType<SliverPersistentHeader>() != null;
     final style = TextStyle(
-      fontSize: isHeader ? 18 : 14,
+      fontSize: hasAncestor<SliverPersistentHeader>(context) ? 18 : 14,
       fontWeight: FontWeight.w600,
       color: color,
     );

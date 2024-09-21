@@ -99,7 +99,7 @@ class _CardRecursion extends StatelessWidget {
   Widget build(BuildContext context) {
     final recursions = RecursionCount.of(context);
     if (recursions > 6) {
-      if (context.findAncestorWidgetOfExactType<DxTransition>() != null) {
+      if (hasAncestor<DxTransition>(context)) {
         return const SizedBox.shrink();
       }
       return const Source.gateway();

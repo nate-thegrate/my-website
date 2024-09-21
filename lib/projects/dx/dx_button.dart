@@ -3,8 +3,8 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class DXButton extends StatefulWidget {
-  const DXButton(
+class DxButton extends StatefulWidget {
+  const DxButton(
     this.route, {
     super.key,
     this.border = Rekt.defaultBorder,
@@ -26,10 +26,10 @@ class DXButton extends StatefulWidget {
   );
 
   @override
-  State<DXButton> createState() => _DXButtonState();
+  State<DxButton> createState() => _DxButtonState();
 }
 
-class _DXButtonState extends State<DXButton> with SingleTickerProviderStateMixin {
+class _DxButtonState extends State<DxButton> with SingleTickerProviderStateMixin {
   late final depth = ValueAnimation(
     vsync: this,
     initialValue: 0.0,
@@ -46,46 +46,45 @@ class _DXButtonState extends State<DXButton> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    const interior = RouteHighlight(
+      child: SizedBox(
+        width: 500,
+        child: FittedBox(
+          child: SizedBox(
+            width: 200,
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: _DepthTransition(),
+            ),
+          ),
+        ),
+      ),
+    );
     final border = widget.border;
 
     return MouseRegion(
       onEnter: (event) => depth.value = 0.98,
       onExit: (event) => depth.value = 0.0,
-      child: ClipPath(
-        clipper: ShapeBorderClipper(shape: border),
-        child: RektTransition(
-          depth: depth,
-          border: border,
-          child: SplashBox(
-            child: InkWell(
-              onTap: () {
-                if (Route.current case Route.animation || Route.mapping) {
-                  return Route.go(widget.route);
-                }
-                Rekt.getRekt(context);
-              },
-              overlayColor: const WidgetStateColor.fromMap({
-                WidgetState.pressed: Color(0x24000000),
-                WidgetState.hovered: Color(0x14000000),
-                WidgetState.any: Colors.black12,
-              }),
-              child: RouteHighlight(
-                route: widget.route,
-                child: SizedBox(
-                  width: 500,
-                  child: FittedBox(
-                    child: SizedBox(
-                      width: 200,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: DepthTransition(
-                          depth: depth,
-                          child: widget.child,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+      child: RepaintBoundary(
+        child: ClipPath(
+          clipper: ShapeBorderClipper(shape: border),
+          child: RektTransition(
+            depth: depth,
+            border: border,
+            child: SplashBox(
+              child: InkWell(
+                onTap: () {
+                  if (Route.current case Route.animation || Route.mapping) {
+                    return Route.go(widget.route);
+                  }
+                  Rekt.getRekt(context);
+                },
+                overlayColor: const WidgetStateColor.fromMap({
+                  WidgetState.pressed: Color(0x24000000),
+                  WidgetState.hovered: Color(0x14000000),
+                  WidgetState.any: Colors.black12,
+                }),
+                child: interior,
               ),
             ),
           ),
@@ -96,11 +95,10 @@ class _DXButtonState extends State<DXButton> with SingleTickerProviderStateMixin
 }
 
 class RouteHighlight extends SingleChildRenderObjectWidget {
-  const RouteHighlight({super.key, required this.route, super.child});
-
-  final Route route;
+  const RouteHighlight({super.key, super.child});
 
   Color _color(BuildContext context) {
+    final route = findWidget<DxButton>(context).route;
     return Route.of(context) == route ? Colors.black12 : Colors.transparent;
   }
 
@@ -112,6 +110,18 @@ class RouteHighlight extends SingleChildRenderObjectWidget {
   @override
   void updateRenderObject(BuildContext context, RenderColoredBox renderObject) {
     renderObject.color = _color(context);
+  }
+}
+
+class _DepthTransition extends HookWidget {
+  const _DepthTransition();
+
+  @override
+  Widget build(BuildContext context) {
+    return DepthTransition(
+      depth: useControllerFrom<_DxButtonState>((s) => s.depth),
+      child: findWidget<DxButton>(context).child,
+    );
   }
 }
 
@@ -205,9 +215,9 @@ final class Rekt extends Decoration {
   static void getRekt(BuildContext context) {
     final box = context.renderBox;
     final rect = box.localToGlobal(Offset.zero) & box.size;
-    final DXButton apiButton = switch (context) {
-      Element(widget: final DXButton apiButton) => apiButton,
-      _ => context.findAncestorWidgetOfExactType<DXButton>()!,
+    final DxButton apiButton = switch (context) {
+      Element(widget: final DxButton apiButton) => apiButton,
+      _ => findWidget<DxButton>(context),
     };
     final route = apiButton.route;
     animation.forward();

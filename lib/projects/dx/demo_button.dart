@@ -89,12 +89,14 @@ class AnimatedStretch extends AnimatedValue<double> {
 
 extension type const PressToStretch._(Widget _) implements Widget {
   const PressToStretch()
-      : _ = const SizedBox(
-          width: double.infinity,
-          height: 100,
-          child: FractionallySizedBox(
-            widthFactor: 1 / 3,
-            child: _PressToStretch(),
+      : _ = const RepaintBoundary(
+          child: SizedBox(
+            width: double.infinity,
+            height: 100,
+            child: FractionallySizedBox(
+              widthFactor: 1 / 3,
+              child: _PressToStretch(),
+            ),
           ),
         );
 }

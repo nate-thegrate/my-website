@@ -175,9 +175,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
       ),
     );
 
-    final body = context.findAncestorWidgetOfExactType<TopBar>()!.body;
-
-    return Scaffold(appBar: appBar, body: body);
+    return Scaffold(appBar: appBar, body: findWidget<TopBar>(context).body);
   }
 }
 
@@ -188,7 +186,7 @@ class _TollsBox extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final listenable = useAnimationFrom<_TopBarState, double>((s) => s._gapAnimation);
+    final listenable = useControllerFrom<_TopBarState>((s) => s._gapAnimation);
     return TollsBox(listenable: listenable, child: child);
   }
 }

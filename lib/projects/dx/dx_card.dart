@@ -193,9 +193,7 @@ class _DxText extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = useValueListenable(
-      useAnimationFrom<_DxCardState, double>((s) => s.widthCurved),
-    );
+    final value = useValueListenable(useControllerFrom<_DxCardState>((s) => s.widthCurved));
     final visibleLetters = (value * 10).round();
     final textSpan = TextSpan(children: [
       const TextSpan(text: '{ d'),

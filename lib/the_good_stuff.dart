@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 
 import 'main.dart';
 
-export 'package:flutter/material.dart' hide Route;
+export 'package:flutter/material.dart'
+    hide Route, AnimationController, ChangeNotifier, ValueNotifier;
 export 'package:flutter/foundation.dart';
 export 'package:flutter/gestures.dart';
 export 'package:flutter/rendering.dart';
@@ -40,10 +41,23 @@ extension ToggleCubit on Cubit<bool> {
   void toggle() => value = !value;
 }
 
-/// The [s] parameter selects a [ValueListenable] from the given [State].
+typedef AnimationController = ValueListenable<double>;
+
+AnimationController useControllerFrom<S extends State>(AnimationController Function(S s) s) {
+  return useAnimationFrom(s);
+}
+
 ValueListenable<T> useAnimationFrom<S extends State, T>(ValueListenable<T> Function(S s) s) {
   final context = useContext();
   return useMemoized(() => s(context.findAncestorStateOfType<S>()!));
+}
+
+T findWidget<T extends Widget>(BuildContext context) {
+  return context.findAncestorWidgetOfExactType<T>()!;
+}
+
+bool hasAncestor<T extends Widget>(BuildContext context) {
+  return context.findAncestorWidgetOfExactType<T>() != null;
 }
 
 void postFrameCallback(VoidCallback callback) {
