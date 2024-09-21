@@ -4,69 +4,70 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'delayed_activation_hook.dart';
 
-class Recipes extends SizedBox {
-  const Recipes({super.key}) : super.expand(child: recipes);
-
-  static const recipes = ColoredBox(
-    color: RecipeCard.background,
-    child: DefaultTextStyle(
-      style: RecipeStyle(size: 36),
-      child: FittedBox(
-        child: SizedBox(
-          width: 400,
-          height: 500,
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Align(
-                alignment: Alignment(0, -0.6),
-                child: DefaultTextStyle(
-                  style: TextStyle(
-                    inherit: false,
-                    color: Color(0xffb0b0b0),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 72,
+extension type const Recipes._(Widget _) implements Widget {
+  const Recipes()
+      : _ = const SizedBox.expand(
+          child: ColoredBox(
+            color: RecipeCard.background,
+            child: DefaultTextStyle(
+              style: RecipeStyle(size: 36),
+              child: FittedBox(
+                child: SizedBox(
+                  width: 400,
+                  height: 500,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      Align(
+                        alignment: Alignment(0, -0.6),
+                        child: DefaultTextStyle(
+                          style: TextStyle(
+                            inherit: false,
+                            color: Color(0xffb0b0b0),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 72,
+                          ),
+                          child: _ComingSoon(),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(height: 8),
+                          AnimatedText(0, 'delicious'),
+                          AnimatedText(1, 'affordable'),
+                          AnimatedText(2, 'whole grain'),
+                          AnimatedText(3, 'sugar-free'),
+                          AnimatedText(4, 'plant-based'),
+                          Expanded(
+                            child: _FadeInButtons(),
+                          ),
+                          DefaultTextStyle(
+                            style: RecipeStyle(size: 60),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(width: 10),
+                                AnimatedText(8.6, 'r'),
+                                AnimatedText(8.8, 'e'),
+                                AnimatedText(9.0, 'c'),
+                                AnimatedText(9.2, 'i'),
+                                AnimatedText(9.4, 'p'),
+                                AnimatedText(9.6, 'e'),
+                                AnimatedText(9.8, 's'),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                        ],
+                      ),
+                      SpringDrop(),
+                    ],
                   ),
-                  child: _ComingSoon(),
                 ),
               ),
-              Column(
-                children: [
-                  SizedBox(height: 8),
-                  AnimatedText(0, 'delicious'),
-                  AnimatedText(1, 'affordable'),
-                  AnimatedText(2, 'whole grain'),
-                  AnimatedText(3, 'sugar-free'),
-                  AnimatedText(4, 'plant-based'),
-                  Expanded(
-                    child: _FadeInButtons(),
-                  ),
-                  DefaultTextStyle(
-                    style: RecipeStyle(size: 60),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(width: 10),
-                        AnimatedText(8.6, 'r'),
-                        AnimatedText(8.8, 'e'),
-                        AnimatedText(9.0, 'c'),
-                        AnimatedText(9.2, 'i'),
-                        AnimatedText(9.4, 'p'),
-                        AnimatedText(9.6, 'e'),
-                        AnimatedText(9.8, 's'),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-              SpringDrop(),
-            ],
+            ),
           ),
-        ),
-      ),
-    ),
-  );
+        );
 }
 
 class RecipeStyle extends TextStyle {

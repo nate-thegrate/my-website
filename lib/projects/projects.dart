@@ -4,11 +4,11 @@ export 'dx/dx.dart';
 export 'hueman/hueman_card.dart';
 export 'recipes/recipe_card.dart';
 export 'recipes/recipes.dart';
-export 'this_site/this_site.dart';
-export 'this_site/this_site_card.dart';
+export 'the_source/the_source.dart';
+export 'the_source/the_source_card.dart';
 
-class Projects extends TopBar {
-  const Projects({super.key}) : super(body: grid);
+extension type const Projects._(Widget _) implements Widget {
+  const Projects() : this._(const TopBar(body: grid));
 
   static const grid = Column(children: [
     Spacer(),
@@ -27,7 +27,7 @@ class Projects extends TopBar {
         Spacer(),
         _Expanded(ProjectButton(RecipeCard())),
         Spacer(),
-        _Expanded(ThisSiteCard()),
+        _Expanded(SourceCard()),
         Spacer(),
       ]),
     ),

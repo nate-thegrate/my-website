@@ -43,7 +43,7 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stache(child: TheVoid.consume(child: _TopBar(body: body)));
+    return Stache(child: Source.consume(child: _TopBar(body: body)));
   }
 }
 
@@ -274,7 +274,7 @@ class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMix
       Route.home => EdgeInsets.only(right: othersWidth),
       Route.stats => EdgeInsets.only(left: tollsWidth, right: othersWidth / 2),
       Route.projects => EdgeInsets.only(left: tollsWidth + othersWidth / 2),
-      _ => throw Error(),
+      _ => EdgeInsets.zero,
     };
   }
 

@@ -1,21 +1,21 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class ThisSiteCard extends StatelessWidget {
-  const ThisSiteCard({super.key});
+class SourceCard extends StatelessWidget {
+  const SourceCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     if (RecursionCount.of(context) > 0) return const _CardRecursion();
 
-    return const Stached(direction: AxisDirection.right, child: _ThisSiteCard());
+    return const Stached(direction: AxisDirection.right, child: _SourceCard());
   }
 }
 
-class _ThisSiteCard extends StatefulWidget {
-  const _ThisSiteCard();
+class _SourceCard extends StatefulWidget {
+  const _SourceCard();
 
   @override
-  State<_ThisSiteCard> createState() => _ThisSiteCardState();
+  State<_SourceCard> createState() => _SourceCardState();
 }
 
 class ColorAnimation extends ValueAnimation<Color> {
@@ -31,7 +31,7 @@ class ColorAnimation extends ValueAnimation<Color> {
   static Color of(BuildContext context) => context.watch<ColorAnimation>().value;
 }
 
-class _ThisSiteCardState extends State<_ThisSiteCard> with SingleTickerProviderStateMixin {
+class _SourceCardState extends State<_SourceCard> with SingleTickerProviderStateMixin {
   double scale = 1.0;
 
   late final colorAnimation = ColorAnimation(
@@ -66,10 +66,10 @@ class _ThisSiteCardState extends State<_ThisSiteCard> with SingleTickerProviderS
       onExit: (event) => states.remove(WidgetState.hovered),
       child: TapRegion(
         onTapInside: (event) async {
-          TheVoid.approach();
+          Source.approach();
           states.add(WidgetState.selected);
           await Future.delayed(const Seconds(2.35));
-          TheVoid.transcend();
+          Source.transcend();
         },
         behavior: HitTestBehavior.opaque,
         child: ListenableProvider(
@@ -97,14 +97,14 @@ class _CardRecursion extends StatelessWidget {
   Widget build(BuildContext context) {
     final recursions = RecursionCount.of(context);
     if (recursions > 6) {
-      if (context.findAncestorWidgetOfExactType<FlutterApisTransition>() != null) {
+      if (context.findAncestorWidgetOfExactType<DxTransition>() != null) {
         return const SizedBox.shrink();
       }
-      return const TheVoid.gateway();
+      return const Source.gateway();
     }
 
     return ToggleBuilder(
-      TheVoid.of(context),
+      Source.of(context),
       duration: Durations.medium1,
       builder: (context, t, child) {
         return ProjectCardTemplate(

@@ -131,25 +131,6 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     final altitude = math.max(elevation, 0.0);
     final shadowSize = math.max(-elevation, 0.0);
 
-    const column = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FittedBox(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 0, 16, 36),
-            child: DarkFlutterLogo(height: 150),
-          ),
-        ),
-        FittedBox(
-          fit: BoxFit.fitWidth,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: SizedBox(width: 325, child: _DxText()),
-          ),
-        ),
-      ],
-    );
-
     final overflowWidth = constraints.maxWidth * (1 + width / 10);
     final height = constraints.maxHeight;
     final launchWidth = overflowWidth * (1 - launchAnimation.value);
@@ -175,7 +156,12 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
                     height: height,
                     child: Transform.translate(
                       offset: Offset(0, -elevation / 5),
-                      child: const Center(child: column),
+                      child: const Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [DarkFlutterLogo(), DxText()],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -186,6 +172,17 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
       ),
     );
   }
+}
+
+extension type const DxText._(Widget _) implements Widget {
+  const DxText()
+      : _ = const FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: SizedBox(width: 325, child: _DxText()),
+          ),
+        );
 }
 
 class _DxText extends HookWidget {
@@ -219,9 +216,18 @@ class _DxText extends HookWidget {
   }
 }
 
-class DarkFlutterLogo extends SizedBox {
-  const DarkFlutterLogo({super.key, required double height})
-      : super.square(dimension: height, child: const _FlutterLogo());
+extension type const DarkFlutterLogo._(Widget _) implements Widget {
+  const DarkFlutterLogo() : this._(_widget);
+
+  static const _widget = FittedBox(
+    child: Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 36),
+      child: SizedBox.square(
+        dimension: 150,
+        child: _FlutterLogo(),
+      ),
+    ),
+  );
 
   static const color = Color(0xff202020);
 }
@@ -309,8 +315,8 @@ class CardPainter extends BoxPainter {
   }
 }
 
-class FlutterApisTransition extends AnimatedSlide {
-  const FlutterApisTransition({super.key})
+class DxTransition extends AnimatedSlide {
+  const DxTransition({super.key})
       : super(
           offset: const Offset(0, 1.2),
           initialOffset: Offset.zero,

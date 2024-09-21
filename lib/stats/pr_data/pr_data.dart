@@ -28,13 +28,9 @@ class PullRequest extends StatelessWidget {
       deletions += diffs.$2;
     }
 
-    String url =
-        'https://github.com/pulls?q=author%3Anate-thegrate+is%3Amerged+label%3Aautosubmit';
-    if (onlyRefactor) url += '+label%3Arefactor';
-
     final pr = PullRequest(
       title: 'Total',
-      url: url,
+      url: '',
       date: ' since 2023',
       diffs: (additions, deletions),
       refactor: onlyRefactor,
@@ -58,79 +54,83 @@ class PullRequest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      child: Builder(builder: (context) {
-        final focusNode = Focus.of(context);
-        final focused = focusNode.hasFocus;
-        void focus(_) {
-          if (!focusNode.hasFocus) focusNode.requestFocus();
-        }
+    if (_isTotal) {
+      return ExcludeFocus(child: _builder(context));
+    }
+    return Focus(child: Builder(builder: _builder));
+  }
 
-        const border = Border.symmetric(
-          vertical: BorderSide(color: Colors.transparent),
-          horizontal: PullRequest.border,
-        );
+  Widget _builder(BuildContext context) {
+    final focusNode = Focus.maybeOf(context);
+    final focused = focusNode?.hasFocus ?? false;
+    void focus(_) {
+      if (focusNode?.hasFocus ?? true) return;
+      focusNode!.requestFocus();
+    }
 
-        late final prCount = (refactor ? refactorPRs : flutterPRs).length;
+    const border = Border.symmetric(
+      vertical: BorderSide(color: Colors.transparent),
+      horizontal: PullRequest.border,
+    );
 
-        final textStyle = TextStyle(color: focused ? PullRequest.color : null);
-        final Text text;
-        if (_isTotal) {
-          text = Text('$prCount contributions', style: textStyle);
-        } else {
-          text = Text.rich(
-            TickedOff(title),
-            style: textStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          );
-        }
+    late final prCount = (refactor ? refactorPRs : flutterPRs).length;
 
-        final rightColumn = RightColumn(
-          diffs,
-          date,
-          key: GlobalObjectKey((diffs, url)),
-        );
-        final contents = Padding(
-          padding: const EdgeInsets.symmetric(vertical: 1),
-          child: Row(
-            children: [
-              const SizedBox(width: 8),
-              if (_isTotal)
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Text(
-                    title,
-                    style: textStyle.copyWith(fontWeight: FontWeight.w600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              Expanded(
-                child: Align(alignment: Alignment.centerLeft, child: text),
+    final textStyle = TextStyle(color: focused ? PullRequest.color : null);
+    final Text text;
+    if (_isTotal) {
+      text = Text('$prCount contributions', style: textStyle);
+    } else {
+      text = Text.rich(
+        TickedOff(title),
+        style: textStyle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    final rightColumn = RightColumn(
+      diffs,
+      date,
+      key: GlobalObjectKey((diffs, url)),
+    );
+    final contents = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Row(
+        children: [
+          const SizedBox(width: 8),
+          if (_isTotal)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Text(
+                title,
+                style: textStyle.copyWith(fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              if (focused) rightColumn else ColoredBox(color: Colors.white54, child: rightColumn),
-            ],
-          ),
-        );
-
-        return MouseRegion(
-          cursor: SystemMouseCursors.click,
-          onEnter: focus,
-          onHover: focus,
-          onExit: (_) => Future.microtask(focusNode.unfocus),
-          child: GestureDetector(
-            onTap: () => launchUrlString(url),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: focused ? Colors.white70 : Colors.transparent,
-                border: border,
-              ),
-              child: contents,
             ),
+          Expanded(
+            child: Align(alignment: Alignment.centerLeft, child: text),
           ),
-        );
-      }),
+          if (focused) rightColumn else ColoredBox(color: Colors.white54, child: rightColumn),
+        ],
+      ),
+    );
+
+    return MouseRegion(
+      cursor: focused ? SystemMouseCursors.click : MouseCursor.defer,
+      onEnter: focus,
+      onHover: focus,
+      onExit: (_) => Future.microtask(() => focusNode?.unfocus()),
+      child: GestureDetector(
+        onTap: () => launchUrlString(url),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: focused ? Colors.white70 : Colors.transparent,
+            border: border,
+          ),
+          child: contents,
+        ),
+      ),
     );
   }
 }

@@ -4,8 +4,8 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'pr_data/pr_data.dart';
 
-class Stats extends TopBar {
-  const Stats({super.key}) : super(body: const _Stats());
+extension type const Stats._(Widget _) implements Widget {
+  const Stats() : _ = const TopBar(body: _Stats());
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
     final param = state.pathParameters['refactor'];

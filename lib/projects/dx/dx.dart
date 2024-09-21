@@ -20,7 +20,7 @@ class DX extends DecoratedBox {
   );
   static const stack = Stack(
     fit: StackFit.expand,
-    children: [DX(), FlutterApisTransition()],
+    children: [DX(), DxTransition()],
   );
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
@@ -60,8 +60,8 @@ class DX extends DecoratedBox {
   );
 }
 
-class DemoScreen extends RouteProvider {
-  const DemoScreen({super.key}) : super(child: _child);
+extension type const DemoScreen._(Widget _) implements Widget {
+  const DemoScreen() : this._(_widget);
 
   static const buttonBorder = BeveledRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -69,83 +69,85 @@ class DemoScreen extends RouteProvider {
   static const bodyBorder = BeveledRectangleBorder(
     borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
   );
-  static const _child = ApiToggle(
-    child: SizedBox.expand(
-      child: DecoratedBox(
-        decoration: DX.background,
-        child: DefaultTextStyle(
-          style: DXButton.style,
-          textAlign: TextAlign.center,
-          child: Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: kToolbarHeight,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  child: Row(spacing: 8.0, children: [
-                    SizedBox(
-                      width: 40,
-                      child: DXButton(
-                        Route.projects,
-                        border: CircleBorder(),
-                        child: SizedBox.square(
-                          dimension: 200,
-                          child: Icon(Icons.arrow_back, size: 125),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 9,
-                      child: DXButton(
-                        Route.mapping,
-                        border: buttonBorder,
-                        child: Text('Mapping'),
-                      ),
-                    ),
-                    SizedBox.shrink(),
-                    Expanded(
-                      flex: 9,
-                      child: DXButton(
-                        Route.animation,
-                        border: buttonBorder,
-                        child: Text('Animation'),
-                      ),
-                    ),
-                  ]),
-                ),
-              ),
-              Expanded(
-                child: ClipPath(
-                  clipper: ShapeBorderClipper(shape: bodyBorder),
-                  child: SizedBox.expand(
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        DecoratedBox(
-                          decoration: Rekt(depth: 1.0, border: bodyBorder),
-                          position: DecorationPosition.foreground,
-                          child: ColoredBox(
-                            color: Color(0xff303030),
+  static const _widget = RouteProvider(
+    child: ApiToggle(
+      child: SizedBox.expand(
+        child: DecoratedBox(
+          decoration: DX.background,
+          child: DefaultTextStyle(
+            style: DXButton.style,
+            textAlign: TextAlign.center,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: kToolbarHeight,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    child: Row(spacing: 8.0, children: [
+                      SizedBox(
+                        width: 40,
+                        child: DXButton(
+                          Route.projects,
+                          border: CircleBorder(),
+                          child: SizedBox.square(
+                            dimension: 200,
+                            child: Icon(Icons.arrow_back, size: 125),
                           ),
                         ),
-                        Column(
-                          children: [
-                            CodeCaption(),
-                            Expanded(
-                              flex: 16,
-                              child: CodeSample(),
-                            ),
-                            DemoButton(),
-                            Spacer(),
-                          ],
+                      ),
+                      Expanded(
+                        flex: 9,
+                        child: DXButton(
+                          Route.mapping,
+                          border: buttonBorder,
+                          child: Text('Mapping'),
                         ),
-                      ],
+                      ),
+                      SizedBox.shrink(),
+                      Expanded(
+                        flex: 9,
+                        child: DXButton(
+                          Route.animation,
+                          border: buttonBorder,
+                          child: Text('Animation'),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+                Expanded(
+                  child: ClipPath(
+                    clipper: ShapeBorderClipper(shape: bodyBorder),
+                    child: SizedBox.expand(
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          DecoratedBox(
+                            decoration: Rekt(depth: 1.0, border: bodyBorder),
+                            position: DecorationPosition.foreground,
+                            child: ColoredBox(
+                              color: Color(0xff303030),
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              CodeCaption(),
+                              Expanded(
+                                flex: 16,
+                                child: CodeSample(),
+                              ),
+                              DemoButton(),
+                              Spacer(),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -225,13 +227,15 @@ class CodeCaption extends StatelessWidget {
   }
 }
 
-class CodeSample extends FittedBox {
-  const CodeSample({super.key}) : super(alignment: Alignment.topLeft, child: _child);
-
-  static const _child = Padding(
-    padding: EdgeInsets.fromLTRB(32, 8, 32, 32),
-    child: _CodeSample(),
-  );
+extension type const CodeSample._(Widget _) implements Widget {
+  const CodeSample()
+      : _ = const FittedBox(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(32, 8, 32, 32),
+            child: _CodeSample(),
+          ),
+        );
 }
 
 class _CodeSample extends StatelessWidget {

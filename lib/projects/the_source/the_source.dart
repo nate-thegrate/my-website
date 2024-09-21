@@ -3,26 +3,28 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-/// I sure hope this class isn't deprecated anytime soon!
-class ThisSite extends UniqueWidget<TheVoidProvides> {
-  const ThisSite() : super(key: const GlobalObjectKey(<void>[]));
+sealed class Source extends Widget {
+  const factory Source() = _Source;
 
-  @override
-  TheVoidProvides createState() => TheVoidProvides.createState();
-}
+  const factory Source.gateway() = _Gateway;
 
-sealed class TheVoid extends Widget {
-  const factory TheVoid.gateway() = _Gateway;
+  const factory Source.consume({required Widget child}) = _Consume;
 
-  const factory TheVoid.consume({required Widget child}) = _ConsumeTheVoid;
+  static TheSourceProvides provide() => TheSourceProvides();
 
-  static TheVoidProvides provide() => TheVoidProvides();
-
-  static void approach() => _ApproachTheVoid.instance.approach();
+  static void approach() => _Approach.instance.approach();
 
   static void transcend() => App.overlay.insert(_FadeToWhite.entry);
 
-  static bool of(BuildContext context) => !context.watch<_ApproachTheVoid>().approaching;
+  static bool of(BuildContext context) => !context.watch<_Approach>().approaching;
+}
+
+/// I sure hope this class isn't deprecated anytime soon!
+class _Source extends UniqueWidget<TheSourceProvides> implements Source {
+  const _Source() : super(key: const GlobalObjectKey(Source));
+
+  @override
+  TheSourceProvides createState() => TheSourceProvides.createState();
 }
 
 class _FadeToWhite extends LeafRenderObjectWidget {
@@ -66,39 +68,39 @@ class _RenderFadeToWhite extends RenderBox with BiggestBox {
   }
 }
 
-class _Gateway extends SizedBox implements TheVoid {
+class _Gateway extends SizedBox implements Source {
   const _Gateway() : super.expand(key: _key, child: const ColoredBox(color: Colors.white));
 
-  static const _key = GlobalObjectKey(<void>{});
+  static const _key = GlobalObjectKey(_Gateway);
 
   static BuildContext get context => _key.currentContext!;
 }
 
-class _ApproachTheVoid extends Bloc {
+class _Approach extends Bloc {
   bool approaching = false;
   void approach() {
     approaching = true;
     notifyListeners();
   }
 
-  static _ApproachTheVoid get instance => _Gateway.context.read();
+  static _Approach get instance => _Gateway.context.read();
 }
 
-class _ConsumeTheVoid extends StatelessWidget implements TheVoid {
-  const _ConsumeTheVoid({required this.child});
+class _Consume extends StatelessWidget implements Source {
+  const _Consume({required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => _ApproachTheVoid(),
+      create: (_) => _Approach(),
       child: Consumer(builder: _consume, child: child),
     );
   }
 
-  Widget _consume(BuildContext context, _ApproachTheVoid theVoid, Widget? child) {
-    return theVoid.approaching ? _ConsumedByTheVoid(context, child: child) : child!;
+  Widget _consume(BuildContext context, _Approach theSource, Widget? child) {
+    return theSource.approaching ? _Consumed(context, child: child) : child!;
   }
 }
 
@@ -112,8 +114,8 @@ class Dilation extends Curve {
   double transformInternal(double t) => (math.pow(a, t - 1) - aInverse) / (1 - aInverse);
 }
 
-class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
-  _ConsumedByTheVoid(BuildContext context, {super.child})
+class _Consumed extends AnimatedValue<Matrix4> implements Source {
+  _Consumed(BuildContext context, {super.child})
       : super(
           value: context.renderBox
               .getTransformTo(_Gateway.context.renderBox)
@@ -136,12 +138,12 @@ class _ConsumedByTheVoid extends AnimatedValue<Matrix4> implements TheVoid {
 
 enum Journey { whiteVoid, sourceOfWisdom, activated }
 
-Journey useTheVoid() => useValueListenable(useMemoized(() => TheVoid.provide().journey));
+Journey useTheVoid() => useValueListenable(useMemoized(() => Source.provide().journey));
 
-class TheVoidProvides extends State<ThisSite> with TickerProviderStateMixin {
-  factory TheVoidProvides() => const ThisSite().currentState!;
+class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
+  factory TheSourceProvides() => const _Source().currentState!;
 
-  TheVoidProvides.createState();
+  TheSourceProvides.createState();
 
   final journey = Cubit(Journey.whiteVoid);
 
@@ -230,14 +232,20 @@ class _GitHubButton extends StatelessWidget {
   const _GitHubButton();
 
   static void _viewTheSource() {
-    TheVoid.provide().journey.value = Journey.activated;
+    Source.provide().journey.value = Journey.activated;
   }
 
   @override
   Widget build(BuildContext context) {
     final alpha = DefaultTextStyle.of(context).style.color!.a;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+      padding: EdgeInsets.fromLTRB(
+        4,
+        0,
+        4,
+        defaultTargetPlatform == TargetPlatform.android ? 0 : 4,
+      ),
       child: TextButton(
         onPressed: alpha > 0 ? _viewTheSource : null,
         child: Text(
@@ -266,7 +274,7 @@ class _Passage extends LeafRenderObjectWidget {
 
 class TheSource extends RenderBox with BiggestBox {
   TheSource() {
-    final theVoidProvides = TheVoid.provide();
+    final theVoidProvides = Source.provide();
     journey = theVoidProvides.journey;
 
     void theVoid() {

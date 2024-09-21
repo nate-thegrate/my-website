@@ -133,7 +133,7 @@ final _goRouter = GoRouter(
             ),
             _GoRoute.redirect(Route.hueman, Route.projects.uri),
             _GoRoute(Route.recipes, const _Page(Recipes())),
-            _GoRoute(Route.thisSite, const _Page(ThisSite())),
+            _GoRoute(Route.thisSite, const _Page(Source())),
           ],
         ),
       ],
