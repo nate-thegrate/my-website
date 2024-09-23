@@ -8,9 +8,13 @@ export 'the_source/the_source.dart';
 export 'the_source/the_source_card.dart';
 
 extension type const Projects._(Widget _) implements Widget {
-  const Projects() : this._(const TopBar(body: grid));
+  const Projects() : this._(const TopBar(body: ProjectGrid()));
+}
 
-  static const grid = Column(children: [
+class ProjectGrid extends Column {
+  const ProjectGrid({super.key}) : super(children: _children);
+
+  static const _children = [
     Spacer(),
     _Expanded(
       Row(children: [
@@ -32,7 +36,23 @@ extension type const Projects._(Widget _) implements Widget {
       ]),
     ),
     Spacer(),
-  ]);
+  ];
+
+  @override
+  ProjectGridElement createElement() => ProjectGridElement(this);
+}
+
+class ProjectGridElement extends MultiChildRenderObjectElement {
+  ProjectGridElement(ProjectGrid super.widget);
+
+  @override
+  void mount(Element? parent, Object? newSlot) {
+    super.mount(parent, newSlot);
+    if (hasAncestor<DxTransition>(this) || RecursionCount.of(this) > 0) return;
+
+    Future.delayed(Durations.long2, () => Route.current = TopBar.focused = Route.projects);
+    postFrameCallback(() => HomePageElement.instance.opacity.value = 0.0);
+  }
 }
 
 class _Expanded extends Expanded {
@@ -117,9 +137,9 @@ class _ProjectButtonState extends State<_ProjectButton> {
 
   @override
   Widget build(BuildContext context) {
-    final card = BlocProvider.value(
+    final card = WidgetStatesProvider(
       key: GlobalObjectKey(states),
-      value: states,
+      states: states,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: hover,
@@ -154,7 +174,7 @@ class ProjectCardTemplate extends PhysicalShape {
     required super.color,
     super.shadowColor = Colors.black45,
     super.clipBehavior = Clip.antiAlias,
-    Widget super.child = const SizedBox.expand(),
+    required Widget super.child,
   }) : super(clipper: const ShapeBorderClipper(shape: shape));
 
   static const shape = ContinuousRectangleBorder(
@@ -163,7 +183,7 @@ class ProjectCardTemplate extends PhysicalShape {
 
   @override
   RenderPhysicalShape createRenderObject(BuildContext context) {
-    return _EtherealCard(
+    return EtherealCard(
       clipper: clipper,
       clipBehavior: clipBehavior,
       elevation: elevation,
@@ -173,8 +193,8 @@ class ProjectCardTemplate extends PhysicalShape {
   }
 }
 
-class _EtherealCard extends RenderPhysicalShape {
-  _EtherealCard({
+class EtherealCard extends RenderPhysicalShape {
+  EtherealCard({
     required super.clipper,
     super.clipBehavior,
     super.elevation,

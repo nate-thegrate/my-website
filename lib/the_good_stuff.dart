@@ -2,7 +2,6 @@ import 'package:collection_notifiers/collection_notifiers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
 
 import 'main.dart';
 
@@ -14,7 +13,6 @@ export 'package:flutter/rendering.dart';
 export 'package:flutter/scheduler.dart';
 export 'package:flutter_hooks/flutter_hooks.dart';
 export 'package:go_router/go_router.dart' hide GoRouterHelper;
-export 'package:provider/provider.dart' hide ChangeNotifierProvider, Dispose;
 export 'package:url_launcher/url_launcher_string.dart';
 
 export 'main.dart';
@@ -35,7 +33,6 @@ mixin BiggestBox on RenderBox {
 
 typedef Bloc = ChangeNotifier;
 typedef Cubit<T> = ValueNotifier<T>;
-typedef BlocProvider<T extends Bloc?> = ChangeNotifierProvider<T>;
 
 extension ToggleCubit on Cubit<bool> {
   void toggle() => value = !value;
@@ -68,7 +65,18 @@ typedef _States = SetNotifier<WidgetState>;
 extension type WidgetStates._(_States _states) implements _States {
   WidgetStates([_]) : _states = _States();
 
-  static Set<WidgetState> of(BuildContext context) {
-    return RecursionCount.of(context) > 0 ? <WidgetState>{} : context.watch<WidgetStates>();
+  static WidgetStates? maybeOf(BuildContext context) {
+    return context.getInheritedWidgetOfExactType<WidgetStatesProvider>()?.notifier;
   }
+
+  static Set<WidgetState> of(BuildContext context) {
+    return RecursionCount.of(context) > 0
+        ? <WidgetState>{}
+        : context.dependOnInheritedWidgetOfExactType<WidgetStatesProvider>()!.notifier!;
+  }
+}
+
+class WidgetStatesProvider extends InheritedNotifier<WidgetStates> {
+  const WidgetStatesProvider({super.key, required WidgetStates states, required super.child})
+      : super(notifier: states);
 }

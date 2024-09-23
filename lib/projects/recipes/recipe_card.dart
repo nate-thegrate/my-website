@@ -13,7 +13,7 @@ class RecipeCard extends StatefulWidget {
 }
 
 class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
-  late final _readStates = context.read<WidgetStates?>();
+  late final _readStates = WidgetStates.maybeOf(context);
   ToggleAnimation? _yeet;
 
   @override
@@ -71,7 +71,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final states = WidgetStates.of(context);
-    return ToggleBuilder(
+    return AnimatedValue.toggle(
       (WidgetState.hovered | WidgetState.selected).isSatisfiedBy(states),
       duration: Durations.medium1,
       curve: Curves.ease,
@@ -132,7 +132,7 @@ class StacheStash extends LeafRenderObjectWidget {
   @override
   RenderStache createRenderObject(BuildContext context) {
     final jiggle = JiggleStache(vsync: App.vsync);
-    final states = context.read<WidgetStates?>();
+    final states = WidgetStates.maybeOf(context);
 
     return RenderStache(jiggle, states);
   }

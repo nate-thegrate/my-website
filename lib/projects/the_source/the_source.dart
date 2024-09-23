@@ -75,16 +75,16 @@ class _Gateway extends SizedBox implements Source {
   static BuildContext get context => _key.currentContext!;
 }
 
-class Approach extends Bloc {
-  bool approaching = false;
+class Approach extends InheritedNotifier<Cubit<bool>> {
+  Approach({super.key, required super.child}) : super(notifier: _approaching);
 
-  static void approach() => instance
-    ..approaching = true
-    ..notifyListeners();
+  static final _approaching = Cubit(false);
 
-  static bool approaches(BuildContext context) => context.watch<Approach>().approaching;
+  static void approach() => _approaching.value = true;
 
-  static Approach get instance => _Gateway.context.read();
+  static bool approaches(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<Approach>()!.notifier!.value;
+  }
 }
 
 class _Consume extends StatelessWidget implements Source {
@@ -94,14 +94,12 @@ class _Consume extends StatelessWidget implements Source {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => Approach(),
-      child: Consumer(builder: _consume, child: child),
+    return Approach(
+      child: Builder(
+        builder: (context) =>
+            Approach.approaches(context) ? _Consumed(context, child: child) : child,
+      ),
     );
-  }
-
-  Widget _consume(BuildContext context, Approach theSource, Widget? child) {
-    return theSource.approaching ? _Consumed(context, child: child) : child!;
   }
 }
 
@@ -178,10 +176,10 @@ class _InnerSource extends HookWidget {
   Widget build(BuildContext context) {
     final journey = useTheVoid();
 
-    return ToggleBuilder(
+    return AnimatedValue.toggle(
       journey != Journey.whiteVoid,
       duration: const Seconds(TheSource.seconds),
-      builder: (context, value, child) => ToggleBuilder(
+      builder: (context, value, child) => AnimatedValue.toggle(
         journey == Journey.activated,
         duration: const Seconds(TheSource.endTransitionSeconds),
         curve: Curves.easeInExpo,

@@ -49,7 +49,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   );
 
   late final listenables = Listenable.merge({widthAnimation, depthAnimation, launchAnimation});
-  late final states = context.read<WidgetStates?>();
+  late final states = WidgetStates.maybeOf(context);
 
   bool prepareToLaunch = false;
 

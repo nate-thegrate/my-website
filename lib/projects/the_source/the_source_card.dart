@@ -27,8 +27,6 @@ class ColorAnimation extends ValueAnimation<Color> {
 
   static const lightGray = Color(0xffe0e0e0);
   static const offWhite = Color(0xfff0f0f0);
-
-  static Color of(BuildContext context) => context.watch<ColorAnimation>().value;
 }
 
 class _SourceCardState extends State<_SourceCard> with SingleTickerProviderStateMixin {
@@ -49,8 +47,6 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
       colorAnimation.value =
           active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.lightGray;
     });
-    Future.delayed(Durations.long2, () => Route.current = TopBar.focused = Route.projects);
-    postFrameCallback(() => HomePageElement.instance.opacity.value = 0.0);
   }
 
   @override
@@ -74,10 +70,7 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
           Source.transcend();
         },
         behavior: HitTestBehavior.opaque,
-        child: ListenableProvider(
-          create: (_) => colorAnimation,
-          child: const _CardRecursion(),
-        ),
+        child: const _CardRecursion(),
       ),
     );
   }
@@ -92,7 +85,7 @@ class RecursionCount extends KeyedSubtree {
   }
 }
 
-class _CardRecursion extends StatelessWidget {
+class _CardRecursion extends HookWidget {
   const _CardRecursion();
 
   @override
@@ -105,23 +98,28 @@ class _CardRecursion extends StatelessWidget {
       return const Source.gateway();
     }
 
-    return ToggleBuilder(
+    return AnimatedValue.toggle(
       Source.approaches(context),
       duration: Durations.medium1,
-      builder: (context, t, child) {
-        return ProjectCardTemplate(
-          color: ColorAnimation.of(context),
+      builder: (context, t, child) => HookBuilder(
+        builder: (context) => ProjectCardTemplate(
+          color: useValueListenable(
+            useAnimationFrom<_SourceCardState, Color>((s) => s.colorAnimation),
+          ),
           elevation: (1 - t) * 5,
           child: child!,
-        );
-      },
+        ),
+      ),
       child: Center(
         child: IgnorePointer(
           child: FittedBox(
             fit: BoxFit.cover,
             child: SizedBox.fromSize(
               size: MediaQuery.sizeOf(context),
-              child: RecursionCount(key: ValueKey(recursions), child: Projects.grid),
+              child: RecursionCount(
+                key: ValueKey(recursions),
+                child: const ProjectGrid(),
+              ),
             ),
           ),
         ),

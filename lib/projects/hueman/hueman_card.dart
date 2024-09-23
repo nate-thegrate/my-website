@@ -77,7 +77,7 @@ class HuemanCard extends StatelessWidget {
         scale: scale.resolve(states),
         duration: ProjectButton.duration,
         curve: Curves.ease,
-        child: ToggleBuilder(
+        child: AnimatedValue.toggle(
           states.contains(WidgetState.selected),
           duration: ProjectButton.duration,
           curve: Curves.easeInOutSine,
