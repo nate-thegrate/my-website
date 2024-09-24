@@ -12,31 +12,30 @@ extension type const Projects._(Widget _) implements Widget {
 }
 
 class ProjectGrid extends Column {
-  const ProjectGrid({super.key}) : super(children: _children);
-
-  static const _children = [
-    Spacer(),
-    _Expanded(
-      Row(children: [
-        Spacer(),
-        _Expanded(ProjectButton(HuemanCard())),
-        Spacer(),
-        _Expanded(ProjectButton(DxCard())),
-        Spacer(),
-      ]),
-    ),
-    Spacer(),
-    _Expanded(
-      Row(children: [
-        Spacer(),
-        _Expanded(ProjectButton(RecipeCard())),
-        Spacer(),
-        _Expanded(SourceCard()),
-        Spacer(),
-      ]),
-    ),
-    Spacer(),
-  ];
+  const ProjectGrid({super.key})
+      : super(children: const [
+          Spacer(),
+          _Expanded(
+            Row(children: [
+              Spacer(),
+              _Expanded(ProjectButton(HuemanCard())),
+              Spacer(),
+              _Expanded(ProjectButton(DxCard())),
+              Spacer(),
+            ]),
+          ),
+          Spacer(),
+          _Expanded(
+            Row(children: [
+              Spacer(),
+              _Expanded(ProjectButton(RecipeCard())),
+              Spacer(),
+              _Expanded(SourceCard()),
+              Spacer(),
+            ]),
+          ),
+          Spacer(),
+        ]);
 
   @override
   ProjectGridElement createElement() => ProjectGridElement(this);
@@ -195,13 +194,13 @@ class ProjectCardTemplate extends PhysicalShape {
 
 class EtherealCard extends RenderPhysicalShape {
   EtherealCard({
-    required super.clipper,
-    super.clipBehavior,
-    super.elevation,
+    super.clipper = const ShapeBorderClipper(shape: ProjectCardTemplate.shape),
+    super.clipBehavior = Clip.antiAlias,
+    required super.elevation,
     required super.color,
-    super.shadowColor,
+    super.shadowColor = Colors.black45,
   });
 
   @override
-  bool hitTest(BoxHitTestResult result, {required Offset position}) => false;
+  bool hitTest(BoxHitTestResult result, {Offset? position}) => false;
 }

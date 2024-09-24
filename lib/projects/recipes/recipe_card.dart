@@ -61,7 +61,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
 
   static const yeetDuration = Seconds(1);
 
-  static Matrix4 _onTransform(double t) {
+  static Matrix4 yeetTransform(double t) {
     final Size(:width, :height) = App.screenSize;
     return Matrix4.rotationZ(math.pow(t, 1.5) * 5)
       ..storage[12] = t * width
@@ -71,7 +71,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final states = WidgetStates.of(context);
-    return AnimatedValue.toggle(
+    return AnimatedToggle.builder(
       (WidgetState.hovered | WidgetState.selected).isSatisfiedBy(states),
       duration: Durations.medium1,
       curve: Curves.ease,
@@ -83,7 +83,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
           child: Center(
             child: MatrixTransition(
               animation: _yeet ?? const AlwaysStoppedAnimation(0),
-              onTransform: _onTransform,
+              onTransform: yeetTransform,
               child: const FittedBox(
                 child: SizedBox(
                   width: 230,
@@ -310,10 +310,26 @@ class _FadeToGreen extends AnimatedValue<Color> {
   }
 
   @override
-  Widget build(BuildContext context, Color value) {
-    return ColoredBox(
-      color: value,
+  Widget build(BuildContext context, Animation<Color> animation) {
+    return _ColorTransition(
+      listenable: animation,
       child: const SizedBox.expand(),
     );
+  }
+}
+
+class _ColorTransition extends SingleChildRenderObjectWidget {
+  const _ColorTransition({required this.listenable, super.child});
+
+  final ValueListenable<Color> listenable;
+
+  @override
+  RenderColoredBox createRenderObject(BuildContext context) {
+    return RenderColoredBox(color: listenable.value);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderColoredBox renderObject) {
+    renderObject.color = listenable.value;
   }
 }

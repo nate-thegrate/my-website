@@ -98,11 +98,12 @@ extension type VsCode._(TextSpan _textSpan) implements TextSpan {
     }
     return switch (word) {
       'double' || 'dynamic' || '_AnimatedStretchState' => _class,
-      'class' || 'extends' || 'super' || 'this' => _blueKeyword,
+      'class' || 'extends' || 'super' || 'this' || 'static' => _blueKeyword,
       'final' || 'const' || 'required' || 'as' || 'void' => _blueKeyword,
       'return' || 'if' => _purpleKeyword,
-      'forEachTween' || 'createState' || 'build' || '_toggle' => _function,
-      'evaluate' || 'resolveWith' || 'contains' => _function,
+      'forEachTween' || 'createState' || 'build' || '_toggle' || '_stretch' => _function,
+      'evaluate' || 'resolveWith' || 'contains' || 'lerpDouble' => _function,
+      'scale' || 'diagonal3Values' => _function,
       'pressed' || 'hovered' => _enum,
       _ => _variable,
     };
@@ -184,9 +185,13 @@ class AnimatedStretch extends AnimatedValue<double> {
     super.child,
   }) : super(value: stretch, lerp: lerpDouble);
 
+  static Matrix4 _stretch(double value) {
+    return Matrix4.diagonal3Values(value, 1 / value, 1.0);
+  }
+
   @override
-  Widget build(BuildContext context, double value) {
-    return Transform.scale(scaleX: value, scaleY: 1 / value, child: child);
+  Widget build(BuildContext context, Animation<double> animation) {
+    return MatrixTransition(animation: animation, onTransform: _stretch, child: child);
   }
 }
 ''';

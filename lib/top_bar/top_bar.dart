@@ -41,7 +41,7 @@ class TopBar extends StatelessWidget {
     focused = Route.destination ?? Route.current;
   }
 
-  static const _stuff = Stache(child: Source.consume(child: _TopBar()));
+  static const _stuff = Stache(child: Source.theApproach(child: _TopBar()));
 
   @override
   Widget build(BuildContext context) => _stuff;
@@ -148,34 +148,40 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
     );
 
     final gapHeight = _gapAnimation.value;
-    final appBar = PreferredSize(
-      preferredSize: Size.fromHeight(barHeight + gapHeight * 2),
-      child: MouseRegion(
-        onEnter: openGap,
-        onExit: closeGap,
-        child: RepaintBoundary(
-          child: Column(
-            children: [
-              SizedBox(height: barHeight + gapHeight, child: bar),
-              if (gapHeight > 0)
-                SizedBox(
-                  width: double.infinity,
-                  height: gapHeight,
-                  child: const Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ColoredBox(color: Color(0xff202020), child: _VoidGap()),
-                      BlurBox(),
-                    ],
-                  ),
+    final appBar = MouseRegion(
+      onEnter: openGap,
+      onExit: closeGap,
+      child: RepaintBoundary(
+        child: Column(
+          children: [
+            SizedBox(height: barHeight + gapHeight, child: bar),
+            if (gapHeight > 0)
+              SizedBox(
+                width: double.infinity,
+                height: gapHeight,
+                child: const Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ColoredBox(color: Color(0xff202020), child: _VoidGap()),
+                    BlurBox(),
+                  ],
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );
 
-    return Scaffold(appBar: appBar, body: findWidget<TopBar>(context).body);
+    return ColoredBox(
+      color: Colors.white,
+      child: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyMedium!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [appBar, Expanded(child: findWidget<TopBar>(context).body)],
+        ),
+      ),
+    );
   }
 }
 

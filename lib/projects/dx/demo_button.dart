@@ -81,9 +81,13 @@ class AnimatedStretch extends AnimatedValue<double> {
     super.child,
   }) : super(value: stretch, lerp: lerpDouble);
 
+  static Matrix4 _stretch(double value) {
+    return Matrix4.diagonal3Values(value, 1 / value, 1.0);
+  }
+
   @override
-  Widget build(BuildContext context, double value) {
-    return Transform.scale(scaleX: value, scaleY: 1 / value, child: child);
+  Widget build(BuildContext context, Animation<double> animation) {
+    return MatrixTransition(animation: animation, onTransform: _stretch, child: child);
   }
 }
 

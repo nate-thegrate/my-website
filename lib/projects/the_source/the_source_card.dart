@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class SourceCard extends StatelessWidget {
@@ -25,7 +27,7 @@ class ColorAnimation extends ValueAnimation<Color> {
     required super.duration,
   }) : super(lerp: Color.lerp);
 
-  static const lightGray = Color(0xffe0e0e0);
+  static const grey = Color(0xffe0e0e0);
   static const offWhite = Color(0xfff0f0f0);
 }
 
@@ -34,7 +36,7 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
 
   late final colorAnimation = ColorAnimation(
     vsync: this,
-    initialValue: ColorAnimation.lightGray,
+    initialValue: ColorAnimation.grey,
     duration: Durations.short2,
   );
   final states = WidgetStates();
@@ -45,7 +47,7 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
     super.initState();
     states.addListener(() {
       colorAnimation.value =
-          active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.lightGray;
+          active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.grey;
     });
   }
 
@@ -66,8 +68,6 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
         onTapInside: (event) async {
           Source.approach();
           states.add(WidgetState.selected);
-          await Future.delayed(const Seconds(2.35));
-          Source.transcend();
         },
         behavior: HitTestBehavior.opaque,
         child: const _CardRecursion(),
@@ -76,17 +76,13 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
   }
 }
 
-class RecursionCount extends KeyedSubtree {
-  const RecursionCount({required ValueKey<int> super.key, required super.child});
+class RecursionCount extends StatelessWidget {
+  const RecursionCount({super.key});
 
   static int of(BuildContext context) {
-    final key = context.findAncestorWidgetOfExactType<RecursionCount>()?.key as ValueKey<int>?;
+    final key = context.findAncestorWidgetOfExactType<_RecursionCount>()?.key as ValueKey<int>?;
     return key != null ? key.value + 1 : 0;
   }
-}
-
-class _CardRecursion extends HookWidget {
-  const _CardRecursion();
 
   @override
   Widget build(BuildContext context) {
@@ -98,32 +94,79 @@ class _CardRecursion extends HookWidget {
       return const Source.gateway();
     }
 
-    return AnimatedValue.toggle(
-      Source.approaches(context),
-      duration: Durations.medium1,
-      builder: (context, t, child) => HookBuilder(
-        builder: (context) => ProjectCardTemplate(
-          color: useValueListenable(
-            useAnimationFrom<_SourceCardState, Color>((s) => s.colorAnimation),
-          ),
-          elevation: (1 - t) * 5,
-          child: child!,
-        ),
+    return SizedBox.fromSize(
+      size: MediaQuery.sizeOf(context),
+      child: _RecursionCount(
+        key: ValueKey(recursions),
+        child: const ProjectGrid(),
       ),
-      child: Center(
-        child: IgnorePointer(
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox.fromSize(
-              size: MediaQuery.sizeOf(context),
-              child: RecursionCount(
-                key: ValueKey(recursions),
-                child: const ProjectGrid(),
-              ),
-            ),
+    );
+  }
+}
+
+class _RecursionCount extends KeyedSubtree {
+  const _RecursionCount({required ValueKey<int> super.key, required super.child});
+}
+
+class _CardRecursion extends HookWidget {
+  const _CardRecursion();
+
+  @override
+  Widget build(BuildContext context) {
+    final color = useAnimationFrom<_SourceCardState, Color>((s) => s.colorAnimation);
+    const child = Center(
+      child: IgnorePointer(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: _ScreenSizedBox(
+            child: RecursionCount(),
           ),
         ),
       ),
     );
+
+    return AnimatedValue.transition(
+      useValueListenable(TheApproach.approaching) ? 0.0 : 5.0,
+      lerp: lerpDouble,
+      duration: Durations.medium1,
+      builder: (context, elevation) => _InnerSourceCard(elevation, color, child: child),
+    );
+  }
+}
+
+class _ScreenSizedBox extends StatelessWidget {
+  const _ScreenSizedBox({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.fromSize(size: MediaQuery.sizeOf(context), child: child);
+  }
+}
+
+class _InnerSourceCard extends SingleChildRenderObjectWidget with RenderListenable {
+  const _InnerSourceCard(
+    this.elevation,
+    this.color, {
+    super.child,
+  });
+
+  final ValueListenable<double> elevation;
+  final ValueListenable<Color> color;
+
+  @override
+  Listenable get listenable => Listenable.merge({elevation, color});
+
+  @override
+  EtherealCard createRenderObject(BuildContext context) {
+    return EtherealCard(elevation: elevation.value, color: color.value);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, EtherealCard renderObject) {
+    renderObject
+      ..elevation = elevation.value
+      ..color = color.value;
   }
 }

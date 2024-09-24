@@ -6,13 +6,9 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 sealed class Source implements Widget {
   const factory Source() = _Source;
   const factory Source.gateway() = _Gateway;
-  const factory Source.consume({required Widget child}) = _Consume;
+  const factory Source.theApproach({required Widget child}) = TheApproach;
 
-  static void approach() => Approach.approach();
-
-  static bool approaches(BuildContext context) => Approach.approaches(context);
-
-  static void transcend() => FadeToWhite.transcend();
+  static void approach() => TheApproach.approach();
 
   static TheSourceProvides provide() => TheSourceProvides.provide();
 }
@@ -25,48 +21,6 @@ class _Source extends UniqueWidget<TheSourceProvides> implements Source {
   TheSourceProvides createState() => TheSourceProvides.createState();
 }
 
-class _FadeToWhite extends LeafRenderObjectWidget {
-  const _FadeToWhite();
-
-  @override
-  FadeToWhite createRenderObject(BuildContext context) => FadeToWhite();
-}
-
-class FadeToWhite extends RenderBox with BiggestBox {
-  FadeToWhite() {
-    animate();
-  }
-
-  static final entry = OverlayEntry(builder: (context) => const _FadeToWhite());
-  static void transcend() => App.overlay.insert(entry);
-
-  void animate() async {
-    animation.addListener(markNeedsPaint);
-    try {
-      await animation.animateTo(Colors.white).orCancel;
-    } on TickerCanceled {
-      // probs won't happen
-    }
-    await Future.delayed(const Seconds(0.5));
-    animation.dispose();
-    Route.go(Route.source);
-    entry.remove();
-  }
-
-  final animation = ValueAnimation(
-    vsync: App.vsync,
-    initialValue: const Color(0x00ffffff),
-    duration: Durations.short3,
-    curve: Curves.easeInOutSine,
-    lerp: Color.lerp,
-  );
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    context.canvas.drawRect(offset & size, Paint()..color = animation.value);
-  }
-}
-
 class _Gateway extends SizedBox implements Source {
   const _Gateway() : super.expand(key: _key, child: const ColoredBox(color: Colors.white));
 
@@ -75,31 +29,47 @@ class _Gateway extends SizedBox implements Source {
   static BuildContext get context => _key.currentContext!;
 }
 
-class Approach extends InheritedNotifier<Cubit<bool>> {
-  Approach({super.key, required super.child}) : super(notifier: _approaching);
-
-  static final _approaching = Cubit(false);
-
-  static void approach() => _approaching.value = true;
-
-  static bool approaches(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<Approach>()!.notifier!.value;
-  }
-}
-
-class _Consume extends StatelessWidget implements Source {
-  const _Consume({required this.child});
+class TheApproach extends HookWidget implements Source {
+  const TheApproach({super.key, required this.child});
 
   final Widget child;
 
+  static final approaching = Cubit(false);
+
+  static void approach() => approaching.value = true;
+
   @override
   Widget build(BuildContext context) {
-    return Approach(
-      child: Builder(
-        builder: (context) =>
-            Approach.approaches(context) ? _Consumed(context, child: child) : child,
-      ),
+    Matrix4 transform = Matrix4.identity();
+    if (useTheApproach()) {
+      transform = context.renderBox.getTransformTo(_Gateway.context.renderBox);
+    }
+    return AnimatedValue.transition(
+      transform,
+      curve: const Dilation(),
+      duration: const Seconds(2.5),
+      lerp: MatrixUtils.lerp,
+      onEnd: () => Route.go(Route.source),
+      builder: (context, transform) => _Approach(transform: transform, child: child),
     );
+  }
+}
+
+class _Approach extends SingleChildRenderObjectWidget with RenderListenable {
+  const _Approach({required ValueListenable<Matrix4> transform, super.child})
+      : listenable = transform;
+
+  @override
+  final ValueListenable<Matrix4> listenable;
+
+  @override
+  RenderTransform createRenderObject(BuildContext context) {
+    return RenderTransform(transform: listenable.value);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderTransform renderObject) {
+    renderObject.transform = listenable.value;
   }
 }
 
@@ -113,31 +83,10 @@ class Dilation extends Curve {
   double transformInternal(double t) => (math.pow(a, t - 1) - aInverse) / (1 - aInverse);
 }
 
-class _Consumed extends AnimatedValue<Matrix4> implements Source {
-  _Consumed(BuildContext context, {super.child})
-      : super(
-          value: context.renderBox
-              .getTransformTo(_Gateway.context.renderBox)
-              .scaled(1.001, 1.001, 1.0),
-          curve: const Dilation(),
-          duration: const Seconds(2.5),
-          initialValue: Matrix4.identity(),
-          lerp: _lerp,
-        );
-
-  static Matrix4 _lerp(Matrix4 a, Matrix4 b, double t) {
-    return Matrix4Tween(begin: a, end: b).transform(t);
-  }
-
-  @override
-  Widget build(BuildContext context, Matrix4 value) {
-    return Transform(transform: value, child: child);
-  }
-}
-
 enum Journey { whiteVoid, sourceOfWisdom, activated }
 
-Journey useTheVoid() => useValueListenable(useMemoized(() => Source.provide().journey));
+bool useTheApproach() => useValueListenable(TheApproach.approaching);
+Journey useTheSource() => useValueListenable(useMemoized(() => Source.provide().journey));
 
 class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
   factory TheSourceProvides.provide() => const _Source().currentState!;
@@ -174,12 +123,24 @@ class _InnerSource extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final journey = useTheVoid();
+    final journey = useTheSource();
+    const theSource = Text.rich(
+      TextSpan(children: [
+        TextSpan(text: 'Head over to'),
+        WidgetSpan(child: _GitHubButton()),
+        TextSpan(text: 'to\nsee '),
+        TextSpan(
+          text: 'the source ',
+          style: TextStyle(color: fromLight),
+        ),
+        TextSpan(text: 'code\nfor this website!'),
+      ]),
+    );
 
-    return AnimatedValue.toggle(
+    return AnimatedToggle.builder(
       journey != Journey.whiteVoid,
       duration: const Seconds(TheSource.seconds),
-      builder: (context, value, child) => AnimatedValue.toggle(
+      builder: (context, value, child) => AnimatedToggle.builder(
         journey == Journey.activated,
         duration: const Seconds(TheSource.endTransitionSeconds),
         curve: Curves.easeInExpo,
@@ -207,20 +168,7 @@ class _InnerSource extends HookWidget {
         initialOpacity: 0.0,
         duration: Seconds(TheSource.transitionSeconds / 2),
         child: FittedBox(
-          child: SizedBox(
-            width: 375,
-            height: 150,
-            child: Text.rich(TextSpan(children: [
-              TextSpan(text: 'Head over to'),
-              WidgetSpan(child: _GitHubButton()),
-              TextSpan(text: 'to\nsee '),
-              TextSpan(
-                text: 'the source ',
-                style: TextStyle(color: fromLight),
-              ),
-              TextSpan(text: 'code\nfor this website!'),
-            ])),
-          ),
+          child: SizedBox(width: 375, height: 150, child: theSource),
         ),
       ),
     );
