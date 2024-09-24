@@ -216,6 +216,8 @@ class _Passage extends LeafRenderObjectWidget {
 
 class TheSource extends RenderBox with BiggestBox {
   TheSource() {
+    TheApproach.approaching.value = false;
+
     final theVoidProvides = Source.provide();
     journey = theVoidProvides.journey;
 
