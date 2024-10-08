@@ -4,8 +4,76 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'funderline.dart';
 
-class HomePage extends ColoredBox {
-  const HomePage() : super(key: HomePageElement.key, color: Colors.white, child: _child);
+sealed class HomePage extends ColoredBox {
+  const HomePage({super.child}) : super(key: HomePageElement.key, color: Colors.white);
+
+  @override
+  HomePageElement createElement() => HomePageElement(this);
+}
+
+class MobileHomePage extends HomePage {
+  const MobileHomePage() : super(child: _child);
+
+  static const textStyle = TextStyle(
+    inherit: false,
+    color: Color(0xff202020),
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 1,
+  );
+  static const buttonStyle = ButtonStyle(
+    backgroundColor: WidgetStatePropertyAll(Color(0xff00ffff)),
+    overlayColor: WidgetStatePropertyAll(Colors.white12),
+    foregroundColor: WidgetStatePropertyAll(Colors.black),
+    textStyle: WidgetStatePropertyAll(textStyle),
+    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 16)),
+  );
+
+  static void stats() => Route.go(Route.stats);
+  static void projects() => Route.go(Route.projects);
+
+  static const _child = SizedBox.expand(
+    child: Column(
+      children: [
+        Spacer(flex: 6),
+        SizedBox.square(
+          dimension: 200,
+          child: ClipPath(
+            clipper: ShapeBorderClipper(
+              shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(96)),
+              ),
+            ),
+            child: ColoredBox(
+              color: TopBar.background,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(18, 21, 24, 24),
+                child: Image(image: AssetImage('assets/images/tolls.png')),
+              ),
+            ),
+          ),
+        ),
+        Spacer(),
+        SizedBox(
+          width: 200,
+          child: FittedBox(fit: BoxFit.fitWidth, child: Text('NATE', style: textStyle)),
+        ),
+        SizedBox(
+          width: 200,
+          child: FittedBox(fit: BoxFit.fitWidth, child: Text('THE GRATE', style: textStyle)),
+        ),
+        Spacer(flex: 3),
+        FilledButton(style: buttonStyle, onPressed: stats, child: Text('stats')),
+        Spacer(),
+        FilledButton(style: buttonStyle, onPressed: projects, child: Text('projects')),
+        Spacer(flex: 7),
+      ],
+    ),
+  );
+}
+
+class DesktopHomePage extends HomePage {
+  const DesktopHomePage() : super(child: _child);
 
   static const _child = DefaultTextStyle(
     style: TextStyle(
@@ -46,13 +114,10 @@ class HomePage extends ColoredBox {
       ),
     ),
   );
-
-  @override
-  HomePageElement createElement() => HomePageElement(this);
 }
 
 class HomePageElement extends SingleChildRenderObjectElement {
-  HomePageElement(HomePage super.widget) {
+  HomePageElement(super.widget) {
     final entry = OverlayEntry(
       builder: (context) => Positioned(
         bottom: 0,
@@ -68,7 +133,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
     fricksToGive = initialFricks;
   }
 
-  static const key = GlobalObjectKey(HomePage);
+  static const key = GlobalObjectKey(DesktopHomePage);
   static HomePageElement? _instance;
   static HomePageElement get instance => _instance ??= key.currentContext! as HomePageElement;
 

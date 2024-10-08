@@ -4,7 +4,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'pr_data/pr_data.dart';
 
-extension type const Stats._(Widget _) implements Widget {
+extension type const Stats._(TopBar _) implements TopBar {
   const Stats() : _ = const TopBar(body: _Stats());
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {

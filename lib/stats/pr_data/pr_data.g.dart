@@ -2,6 +2,27 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''Inherited Theme: zero rebuilds''',
+    url: '''https://github.com/flutter/flutter/pull/155699''',
+    date: 'Sep 25 2024',
+    diffs: (105, 0),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Refactor devfs_web_ddc_modules_test.dart''',
+    url: '''https://github.com/flutter/flutter/pull/155609''',
+    date: 'Sep 24 2024',
+    diffs: (1334, 1574),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''pattern-matching refactor''',
+    url: '''https://github.com/flutter/flutter/pull/154753''',
+    date: 'Sep 06 2024',
+    diffs: (380, 673),
+    refactor: true,
+  ),
+  PullRequest(
     title: '''un-break `ThemeData` equality''',
     url: '''https://github.com/flutter/flutter/pull/154695''',
     date: 'Sep 05 2024',

@@ -6,7 +6,7 @@ This website is made with Flutter! [flutter.dev](https://flutter.dev/)
 
 ## Framework
 
-This site uses [a specific branch](https://github.com/nate-thegrate/flutter/tree/portfolio-site) of the Flutter framework, to allow for a few things:
+This site uses [a specific branch](https://github.com/nate-thegrate/flutter/tree/nate-thegrate.com) of the Flutter framework, to allow for a few things:
 
 - Allowing `RenderObjectWidget`s to subscribe to `Listenable`s, so that components can be re-rendered directly without rebuilding a widget subtree.
   - This applies to both [implicit](https://api.flutter.dev/flutter/widgets/ImplicitlyAnimatedWidget-class.html) and [explicit](https://api.flutter.dev/flutter/animation/AnimationController-class.html) animations!

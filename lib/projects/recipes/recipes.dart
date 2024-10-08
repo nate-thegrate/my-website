@@ -4,7 +4,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'delayed_activation_hook.dart';
 
-extension type const Recipes._(Widget _) implements Widget {
+extension type const Recipes._(SizedBox _) implements SizedBox {
   const Recipes()
       : _ = const SizedBox.expand(
           child: ColoredBox(

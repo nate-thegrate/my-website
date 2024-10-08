@@ -177,7 +177,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   }
 }
 
-extension type const DxText._(Widget _) implements Widget {
+extension type const DxText._(FittedBox _) implements FittedBox {
   const DxText()
       : _ = const FittedBox(
           fit: BoxFit.fitWidth,
@@ -217,7 +217,7 @@ class _DxText extends HookWidget {
   }
 }
 
-extension type const DarkFlutterLogo._(Widget _) implements Widget {
+extension type const DarkFlutterLogo._(FittedBox _) implements FittedBox {
   const DarkFlutterLogo() : this._(_widget);
 
   static const _widget = FittedBox(

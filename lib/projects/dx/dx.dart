@@ -5,7 +5,7 @@ export 'dx_card.dart';
 export 'dx_button.dart';
 export 'vs_code.dart';
 
-extension type const DX._(Widget _) implements Widget {
+extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
   const DX() : _ = const DecoratedBox(decoration: background, child: _child);
 
   const DX.stack() : _ = const Stack(fit: StackFit.expand, children: [DX(), DxTransition()]);
@@ -58,7 +58,7 @@ extension type const DX._(Widget _) implements Widget {
   );
 }
 
-extension type const DemoScreen._(Widget _) implements Widget {
+extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
   const DemoScreen() : this._(_widget);
 
   static const buttonBorder = BeveledRectangleBorder(
@@ -225,7 +225,7 @@ class CodeCaption extends StatelessWidget {
   }
 }
 
-extension type const CodeSample._(Widget _) implements Widget {
+extension type const CodeSample._(FittedBox _) implements FittedBox {
   const CodeSample()
       : _ = const FittedBox(
           alignment: Alignment.topLeft,

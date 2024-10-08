@@ -91,7 +91,7 @@ class AnimatedStretch extends AnimatedValue<double> {
   }
 }
 
-extension type const PressToStretch._(Widget _) implements Widget {
+extension type const PressToStretch._(RepaintBoundary _) implements RepaintBoundary {
   const PressToStretch()
       : _ = const RepaintBoundary(
           child: SizedBox(

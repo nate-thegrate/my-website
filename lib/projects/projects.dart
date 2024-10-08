@@ -7,8 +7,8 @@ export 'recipes/recipes.dart';
 export 'the_source/the_source.dart';
 export 'the_source/the_source_card.dart';
 
-extension type const Projects._(Widget _) implements Widget {
-  const Projects() : this._(const TopBar(body: ProjectGrid()));
+extension type const Projects._(TopBar _) implements TopBar {
+  const Projects() : _ = const TopBar(body: ProjectGrid());
 }
 
 class ProjectGrid extends Column {
@@ -116,7 +116,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
   }
 
   void handlePan(DragUpdateDetails details) {
-    context.renderBox.semanticBounds.contains(details.localPosition)
+    context.renderBox.paintBounds.contains(details.localPosition)
         ? states.add(WidgetState.hovered)
         : states.remove(WidgetState.hovered);
   }
@@ -161,7 +161,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
 
         return Positioned.fromRect(rect: offset & box.size, child: card);
       },
-      child: _controller.isShowing ? null : card,
+      child: _controller.isShowing ? const SizedBox.expand() : card,
     );
   }
 }

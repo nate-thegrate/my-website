@@ -216,8 +216,6 @@ class _Passage extends LeafRenderObjectWidget {
 
 class TheSource extends RenderBox with BiggestBox {
   TheSource() {
-    TheApproach.approaching.value = false;
-
     final theVoidProvides = Source.provide();
     journey = theVoidProvides.journey;
 
@@ -231,6 +229,7 @@ class TheSource extends RenderBox with BiggestBox {
 
     journey.addListener(theVoid);
     ticker = theVoidProvides.createTicker(_tick)..start();
+    postFrameCallback(() => TheApproach.approaching.value = false);
   }
 
   late final Cubit<Journey> journey;

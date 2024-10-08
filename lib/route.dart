@@ -1,5 +1,10 @@
 part of 'main.dart';
 
+final bool mobile = switch (defaultTargetPlatform) {
+  TargetPlatform.android || TargetPlatform.iOS => true,
+  TargetPlatform() => false,
+};
+
 enum Route {
   home,
   stats,
@@ -115,7 +120,9 @@ final _goRouter = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomePage(),
+      builder: mobile
+          ? (context, state) => const MobileHomePage()
+          : (context, state) => const DesktopHomePage(),
       routes: [
         _GoRoute.redirect(Route.stats, '/stats/refactor=false'),
         _GoRoute.redirect(Route.refactorStats, '/stats/refactor=true'),
