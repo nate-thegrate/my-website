@@ -30,14 +30,14 @@ class _ApiLaunchProvider extends InheritedWidget {
   bool updateShouldNotify(_ApiLaunchProvider oldWidget) => launch != oldWidget.launch;
 }
 
-class _DxCard extends StatefulWidget {
+class _DxCard extends ConsumerStatefulWidget {
   const _DxCard();
 
   @override
-  State<_DxCard> createState() => _DxCardState();
+  ConsumerState<_DxCard> createState() => _DxCardState();
 }
 
-class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
+class _DxCardState extends ConsumerState<_DxCard> with TickerProviderStateMixin {
   late final widthAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
   late final depthAnimation = ToggleAnimation(vsync: this, duration: Durations.short1);
   late final launchAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
@@ -49,14 +49,10 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   );
 
   late final listenables = Listenable.merge({widthAnimation, depthAnimation, launchAnimation});
-  late final states = WidgetStates.maybeOf(context);
 
   bool prepareToLaunch = false;
 
-  void _updateAnimations() async {
-    final states = this.states;
-    if (states == null) return;
-
+  void _updateAnimations(Set<WidgetState> states) async {
     widthAnimation.toggle(
       forward: (WidgetState.hovered | WidgetState.pressed).isSatisfiedBy(states),
     );
@@ -91,17 +87,19 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     }
   }
 
+  ProviderSubscription? subscription;
+
   @override
   void initState() {
     super.initState();
+    subscription = WidgetStates.maybeListen(context, _updateAnimations);
     (widthAnimation, depthAnimation, launchAnimation);
-    states?.addListener(_updateAnimations);
     postFrameCallback(() => precacheImage(DX.bgImage, context));
   }
 
   @override
   void dispose() {
-    states?.removeListener(_updateAnimations);
+    subscription?.close();
     widthAnimation.dispose();
     depthAnimation.dispose();
     launchAnimation.dispose();

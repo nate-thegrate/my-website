@@ -308,6 +308,7 @@ class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMix
   @override
   void dispose() {
     TopBar._focused.removeListener(_update);
+    padding.dispose();
     super.dispose();
   }
 

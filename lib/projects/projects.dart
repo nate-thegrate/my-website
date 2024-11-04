@@ -6,6 +6,7 @@ export 'recipes/recipe_card.dart';
 export 'recipes/recipes.dart';
 export 'the_source/the_source.dart';
 export 'the_source/the_source_card.dart';
+export 'widget_states_provider.dart';
 
 extension type const Projects._(TopBar _) implements TopBar {
   const Projects() : _ = const TopBar(body: ProjectGrid());
@@ -72,16 +73,16 @@ class ProjectButton extends StatelessWidget {
   }
 }
 
-class _ProjectButton extends StatefulWidget {
+class _ProjectButton extends ConsumerStatefulWidget {
   const _ProjectButton(this.child);
 
   final Widget child;
 
   @override
-  State<_ProjectButton> createState() => _ProjectButtonState();
+  ConsumerState<_ProjectButton> createState() => _ProjectButtonState();
 }
 
-class _ProjectButtonState extends State<_ProjectButton> {
+class _ProjectButtonState extends ConsumerState<_ProjectButton> {
   final _controller = OverlayPortalController();
   void _show() {
     if (!_controller.isShowing) setState(_controller.show);
@@ -93,25 +94,19 @@ class _ProjectButtonState extends State<_ProjectButton> {
 
   final states = WidgetStates();
 
-  @override
-  void dispose() {
-    states.dispose();
-    super.dispose();
-  }
-
   void hover([_]) async {
     states.add(WidgetState.hovered);
   }
 
   void endHover([_]) async {
-    if (!states.contains(WidgetState.selected)) {
+    if (!states.satisfies(WidgetState.selected)) {
       _hide();
     }
-    states.removeAll(const {WidgetState.hovered, WidgetState.pressed});
+    states.remove(WidgetState.hovered, WidgetState.pressed);
   }
 
   void handleDownpress([_]) async {
-    states.addAll(const {WidgetState.hovered, WidgetState.pressed});
+    states.add(WidgetState.hovered, WidgetState.pressed);
     _show();
   }
 
@@ -122,23 +117,28 @@ class _ProjectButtonState extends State<_ProjectButton> {
   }
 
   void handlePressEnd([_]) async {
-    if (states.contains(WidgetState.hovered)) {
+    if (states.satisfies(WidgetState.hovered)) {
       states.add(WidgetState.selected);
     }
     if (defaultTargetPlatform case TargetPlatform.iOS || TargetPlatform.android) {
-      states.removeAll(const {WidgetState.hovered, WidgetState.pressed});
+      states.remove(WidgetState.hovered, WidgetState.pressed);
     } else {
       states.remove(WidgetState.pressed);
     }
-    await Future.delayed(const Seconds(2));
+    await Future.delayed(const Seconds(5));
+    states.reset();
     if (mounted) _hide();
   }
 
+  late final _overrides = [
+    widgetStatesProvider.overrideWith(() => states),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final card = WidgetStatesProvider(
+    final card = ProviderScope(
       key: GlobalObjectKey(states),
-      states: states,
+      overrides: _overrides,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: hover,

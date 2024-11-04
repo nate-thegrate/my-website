@@ -7,7 +7,14 @@ export 'top_bar/top_bar.dart';
 
 part 'route.dart';
 
-void main() => runApp(const App());
+void main() {
+  runApp(
+    UncontrolledProviderScope(
+      container: App._container,
+      child: const App(),
+    ),
+  );
+}
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -47,12 +54,17 @@ class App extends StatelessWidget {
     }),
   );
 
+  static final _container = ProviderContainer();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      theme: _theme,
-      debugShowCheckedModeBanner: false,
-      routerConfig: _goRouter,
+    return UncontrolledProviderScope(
+      container: _container,
+      child: MaterialApp.router(
+        theme: _theme,
+        debugShowCheckedModeBanner: false,
+        routerConfig: _goRouter,
+      ),
     );
   }
 }

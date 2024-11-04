@@ -1,9 +1,7 @@
-import 'package:collection_notifiers/collection_notifiers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
-import 'main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 export 'package:flutter/material.dart'
     hide Route, AnimationController, ChangeNotifier, ValueNotifier;
@@ -12,8 +10,10 @@ export 'package:flutter/gestures.dart';
 export 'package:flutter/rendering.dart';
 export 'package:flutter/scheduler.dart';
 export 'package:flutter_hooks/flutter_hooks.dart';
+export 'package:flutter_riverpod/flutter_riverpod.dart' hide describeIdentity, shortHash;
 export 'package:go_router/go_router.dart' hide GoRouterHelper;
 export 'package:url_launcher/url_launcher_string.dart';
+export 'package:meta/meta.dart' show redeclare;
 
 export 'main.dart';
 
@@ -24,6 +24,8 @@ extension Rebuild on State {
 
 extension FindRenderBox on BuildContext {
   RenderBox get renderBox => findRenderObject()! as RenderBox;
+
+  ProviderContainer get ref => ProviderScope.containerOf(this);
 }
 
 mixin BiggestBox on RenderBox {
@@ -59,24 +61,4 @@ bool hasAncestor<T extends Widget>(BuildContext context) {
 
 void postFrameCallback(VoidCallback callback) {
   WidgetsBinding.instance.addPostFrameCallback((_) => callback());
-}
-
-typedef _States = SetNotifier<WidgetState>;
-extension type WidgetStates._(_States _states) implements _States {
-  WidgetStates([_]) : _states = _States();
-
-  static WidgetStates? maybeOf(BuildContext context) {
-    return context.getInheritedWidgetOfExactType<WidgetStatesProvider>()?.notifier;
-  }
-
-  static Set<WidgetState> of(BuildContext context) {
-    return RecursionCount.of(context) > 0
-        ? <WidgetState>{}
-        : context.dependOnInheritedWidgetOfExactType<WidgetStatesProvider>()!.notifier!;
-  }
-}
-
-class WidgetStatesProvider extends InheritedNotifier<WidgetStates> {
-  const WidgetStatesProvider({super.key, required WidgetStates states, required super.child})
-      : super(notifier: states);
 }

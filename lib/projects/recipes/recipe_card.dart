@@ -2,33 +2,34 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class RecipeCard extends StatefulWidget {
+class RecipeCard extends ConsumerStatefulWidget {
   const RecipeCard({super.key});
 
   static const transparentBackground = Color(0x00ddffbb);
   static const background = Color(0xffddffbb);
 
   @override
-  State<RecipeCard> createState() => _RecipeCardState();
+  ConsumerState<RecipeCard> createState() => _RecipeCardState();
 }
 
-class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
-  late final _readStates = WidgetStates.maybeOf(context);
+class _RecipeCardState extends ConsumerState<RecipeCard> with TickerProviderStateMixin {
   ToggleAnimation? _yeet;
+
+  ProviderSubscription? subscription;
 
   @override
   void initState() {
     super.initState();
-    if (_readStates != null) {
-      _readStates.addListener(_select);
+    subscription = WidgetStates.maybeListen(context, _select);
+    if (subscription != null) {
       _yeet = ToggleAnimation(vsync: this, duration: yeetDuration);
     }
   }
 
-  void _select() async {
-    final WidgetStates? states = _readStates;
-    if (states == null) return;
-    _yeet?.toggle(forward: states.contains(WidgetState.dragged));
+  void _select(Set<WidgetState> states) async {
+    assert(_yeet != null);
+    _yeet!.toggle(forward: states.contains(WidgetState.dragged));
+    final notifier = ref.read(widgetStatesProvider.notifier);
 
     if (selected || !states.contains(WidgetState.selected)) return;
 
@@ -39,7 +40,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
     stash.value = true;
     await Future.delayed(Durations.medium1);
 
-    states.add(WidgetState.dragged);
+    notifier.add(WidgetState.dragged);
     await Future.delayed(yeetDuration);
 
     if (!mounted) return;
@@ -54,7 +55,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
   bool selected = false;
   @override
   void dispose() {
-    _readStates?.removeListener(_select);
+    subscription?.close();
     _yeet?.dispose();
     super.dispose();
   }
@@ -70,9 +71,8 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final states = WidgetStates.of(context);
     return AnimatedToggle.builder(
-      (WidgetState.hovered | WidgetState.selected).isSatisfiedBy(states),
+      ref.watch(widgetStatesProvider.satisfies(WidgetState.hovered | WidgetState.selected)),
       duration: Durations.medium1,
       curve: Curves.ease,
       builder: (context, t, child) {
@@ -132,9 +132,8 @@ class StacheStash extends LeafRenderObjectWidget {
   @override
   RenderStache createRenderObject(BuildContext context) {
     final jiggle = JiggleStache(vsync: App.vsync);
-    final states = WidgetStates.maybeOf(context);
 
-    return RenderStache(jiggle, states);
+    return RenderStache(jiggle, context);
   }
 }
 
@@ -191,15 +190,17 @@ class Stache extends HookWidget {
 }
 
 class RenderStache extends RenderBox with BiggestBox {
-  RenderStache(this.jiggle, this.states) {
+  RenderStache(this.jiggle, BuildContext context) {
     jiggle.addListener(markNeedsPaint);
-    states?.addListener(_updateAnimation);
+    subscription = WidgetStates.maybeListen(context, _updateAnimation);
   }
+
+  ProviderSubscription? subscription;
 
   @override
   void dispose() {
     jiggle.removeListener(markNeedsPaint);
-    states?.removeListener(_updateAnimation);
+    subscription?.close();
     super.dispose();
   }
 
@@ -211,8 +212,9 @@ class RenderStache extends RenderBox with BiggestBox {
     }
   }
 
-  void _updateAnimation() {
-    final isPressed = states!.contains(WidgetState.pressed);
+  void _updateAnimation(Set<WidgetState> states) {
+    final isPressed = states.contains(WidgetState.pressed);
+
     if (isPressed != jiggle.isForwardOrCompleted) {
       if (isPressed) {
         jiggle.forward();
@@ -225,7 +227,6 @@ class RenderStache extends RenderBox with BiggestBox {
   }
 
   final JiggleStache jiggle;
-  final WidgetStates? states;
 
   static final stache = Path()
     ..moveTo(38, 10)

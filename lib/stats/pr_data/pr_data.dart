@@ -1,7 +1,7 @@
 import 'package:nate_thegrate/stats/ticked_off.dart';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-part 'pr_data.g.dart';
+part 'imported_pr_data.dart';
 
 final List<PullRequest> refactorPRs = flutterPRs.where((pr) => pr.refactor).toList();
 

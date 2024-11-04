@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class HuemanCard extends StatelessWidget {
+class HuemanCard extends ConsumerWidget {
   const HuemanCard({super.key});
 
   static const _graphic = FittedBox(
@@ -52,49 +52,56 @@ class HuemanCard extends StatelessWidget {
     ),
   );
 
-  @override
-  Widget build(BuildContext context) {
-    final states = WidgetStates.of(context);
-    void launch() async {
-      if (!states.contains(WidgetState.selected)) return;
-
-      launchUrlString('https://hue-man.app/');
-
-      await Future.delayed(const Seconds(1.5));
-      states.remove(WidgetState.selected);
-    }
-
-    const scale = WidgetStateMapper<double>({
+  static (double, bool) _selector(Set<WidgetState> states) {
+    const scaleMapper = WidgetStateMapper<double>({
       WidgetState.selected: 8,
       WidgetState.pressed: 1.1,
       WidgetState.hovered: 1.05,
       WidgetState.any: 1.0,
     });
 
+    return (scaleMapper.resolve(states), states.contains(WidgetState.selected));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    void launch() async {
+      final states = ref.read(widgetStatesProvider.notifier);
+      if (!states.satisfies(WidgetState.selected)) return;
+
+      launchUrlString('https://hue-man.app/');
+    }
+
+    final (double scale, bool selected) = ref.watch(widgetStatesProvider.select(_selector));
+
     return Stached(
       direction: AxisDirection.left,
       child: AnimatedScale(
-        scale: scale.resolve(states),
+        scale: scale,
         duration: ProjectButton.duration,
         curve: Curves.ease,
         child: AnimatedToggle.builder(
-          states.contains(WidgetState.selected),
+          selected,
           duration: ProjectButton.duration,
           curve: Curves.easeInOutSine,
-          builder: (context, value, child) => ProjectCardTemplate(
-            shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
-                ? Colors.black
-                : Colors.black45,
-            color: Color.lerp(const Color(0xffeef3f8), Colors.white, value)!,
-            child: Center(
-              child: Opacity(
-                opacity: 1 - math.min(value * 2, 1),
-                child: child,
-              ),
-            ),
+          builder: (context, t, child) => Consumer(
+            builder: (context, ref, child) {
+              final bool active = ref.watch(
+                widgetStatesProvider.satisfies(WidgetState.pressed | WidgetState.hovered),
+              );
+              return ProjectCardTemplate(
+                shadowColor: active ? Colors.black : Colors.black45,
+                color: Color.lerp(const Color(0xffeef3f8), Colors.white, t)!,
+                child: Center(
+                  child: Opacity(
+                    opacity: 1 - math.min(t * 2, 1),
+                    child: _graphic,
+                  ),
+                ),
+              );
+            },
           ),
           onEnd: launch,
-          child: _graphic,
         ),
       ),
     );

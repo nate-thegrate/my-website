@@ -13,11 +13,11 @@ class SourceCard extends StatelessWidget {
   }
 }
 
-class _SourceCard extends StatefulWidget {
+class _SourceCard extends ConsumerStatefulWidget {
   const _SourceCard();
 
   @override
-  State<_SourceCard> createState() => _SourceCardState();
+  ConsumerState<_SourceCard> createState() => _SourceCardState();
 }
 
 class ColorAnimation extends ValueAnimation<Color> {
@@ -31,7 +31,16 @@ class ColorAnimation extends ValueAnimation<Color> {
   static const offWhite = Color(0xfff0f0f0);
 }
 
-class _SourceCardState extends State<_SourceCard> with SingleTickerProviderStateMixin {
+final _sourceStatesProvider = WidgetStatesProvider(WidgetStates.new);
+final _active = WidgetState.hovered | WidgetState.selected;
+
+final colorProvider = Provider((Ref ref) {
+  final Set<WidgetState> states = ref.watch(_sourceStatesProvider)!;
+
+  return _active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.grey;
+});
+
+class _SourceCardState extends ConsumerState<_SourceCard> with SingleTickerProviderStateMixin {
   double scale = 1.0;
 
   late final colorAnimation = ColorAnimation(
@@ -39,21 +48,21 @@ class _SourceCardState extends State<_SourceCard> with SingleTickerProviderState
     initialValue: ColorAnimation.grey,
     duration: Durations.short2,
   );
-  final states = WidgetStates();
-  static final active = WidgetState.hovered | WidgetState.selected;
+  late final states = ref.read(_sourceStatesProvider.notifier);
+  late final ProviderSubscription subscription;
 
   @override
   void initState() {
     super.initState();
-    states.addListener(() {
-      colorAnimation.value =
-          active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.grey;
-    });
+    subscription = ref.listenManual(
+      colorProvider,
+      (_, color) => colorAnimation.value = color,
+    );
   }
 
   @override
   void dispose() {
-    states.dispose();
+    subscription.close();
     colorAnimation.dispose();
     super.dispose();
   }
