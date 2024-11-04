@@ -92,7 +92,7 @@ class _DxCardState extends ConsumerState<_DxCard> with TickerProviderStateMixin 
   @override
   void initState() {
     super.initState();
-    subscription = WidgetStates.maybeListen(context, _updateAnimations);
+    subscription = WidgetStates.maybeListen(this, _updateAnimations);
     (widthAnimation, depthAnimation, launchAnimation);
     postFrameCallback(() => precacheImage(DX.bgImage, context));
   }

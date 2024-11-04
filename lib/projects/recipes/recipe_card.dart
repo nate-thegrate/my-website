@@ -20,7 +20,7 @@ class _RecipeCardState extends ConsumerState<RecipeCard> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    subscription = WidgetStates.maybeListen(context, _select);
+    subscription = WidgetStates.maybeListen(this, _select);
     if (subscription != null) {
       _yeet = ToggleAnimation(vsync: this, duration: yeetDuration);
     }
