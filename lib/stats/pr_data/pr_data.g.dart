@@ -2,6 +2,41 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''Fix `NestedScrollView` inner position logic''',
+    url: '''https://github.com/flutter/flutter/pull/157756''',
+    date: 'Oct 28 2024',
+    diffs: (117, 1),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Factor out "shaker" class''',
+    url: '''https://github.com/flutter/flutter/pull/157748''',
+    date: 'Oct 28 2024',
+    diffs: (31, 49),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''Fix `ResizeImage` documentation''',
+    url: '''https://github.com/flutter/flutter/pull/157619''',
+    date: 'Oct 25 2024',
+    diffs: (9, 7),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''`WidgetStateInputBorder`''',
+    url: '''https://github.com/flutter/flutter/pull/157190''',
+    date: 'Oct 18 2024',
+    diffs: (349, 0),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Arrow syntax for getters''',
+    url: '''https://github.com/flutter/flutter/pull/156483''',
+    date: 'Oct 09 2024',
+    diffs: (240, 346),
+    refactor: true,
+  ),
+  PullRequest(
     title: '''Inherited Theme: zero rebuilds''',
     url: '''https://github.com/flutter/flutter/pull/155699''',
     date: 'Sep 25 2024',
@@ -16,6 +51,13 @@ const flutterPRs = <PullRequest>[
     refactor: true,
   ),
   PullRequest(
+    title: '''Monomorphic Mapper''',
+    url: '''https://github.com/flutter/flutter/pull/154972''',
+    date: 'Sep 11 2024',
+    diffs: (263, 85),
+    refactor: false,
+  ),
+  PullRequest(
     title: '''pattern-matching refactor''',
     url: '''https://github.com/flutter/flutter/pull/154753''',
     date: 'Sep 06 2024',
@@ -28,6 +70,13 @@ const flutterPRs = <PullRequest>[
     date: 'Sep 05 2024',
     diffs: (357, 561),
     refactor: true,
+  ),
+  PullRequest(
+    title: '''Fix `WidgetStateProperty` documentation''',
+    url: '''https://github.com/flutter/flutter/pull/154298''',
+    date: 'Aug 28 2024',
+    diffs: (74, 109),
+    refactor: false,
   ),
   PullRequest(
     title: '''Refactor `CircularNotchedRectangle.getOuterPath()`''',
