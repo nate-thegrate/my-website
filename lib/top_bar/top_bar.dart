@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -29,7 +29,7 @@ class TopBar extends StatelessWidget {
     _position = newValue;
     newValue -= TollsBox.getWidth();
 
-    final index = newValue < 0 ? 0 : (newValue * sections / App.screenSize.width).ceil();
+    final int index = newValue < 0 ? 0 : (newValue * sections / App.screenSize.width).ceil();
     focused = Route.values[index];
   }
 
@@ -147,7 +147,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
       ),
     );
 
-    final gapHeight = _gapAnimation.value;
+    final double gapHeight = _gapAnimation.value;
     final appBar = MouseRegion(
       onEnter: openGap,
       onExit: closeGap,
@@ -192,7 +192,8 @@ class _TollsBox extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final listenable = useControllerFrom<_TopBarState>((s) => s._gapAnimation);
+    final AnimationController listenable =
+        useControllerFrom<_TopBarState>((s) => s._gapAnimation);
     return TollsBox(listenable: listenable, child: child);
   }
 }
@@ -201,7 +202,7 @@ class TollsBox extends SingleChildRenderObjectWidget with RenderListenable {
   const TollsBox({super.key, super.child, required this.listenable});
 
   static double getWidth([BuildContext? context]) {
-    final size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
+    final Size size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
     return math.max(155.0, size.width / 3);
   }
 
@@ -273,8 +274,8 @@ class Indicator extends StatefulHookWidget {
 
 class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMixin {
   EdgeInsets get _padding {
-    final tollsWidth = TollsBox.getWidth(context);
-    final othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
+    final double tollsWidth = TollsBox.getWidth(context);
+    final double othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
 
     return switch (TopBar.focused) {
       Route.home => EdgeInsets.only(right: othersWidth),
@@ -380,7 +381,7 @@ class VoidGap extends RenderBox with BiggestBox {
   void dispose() {
     ticker.dispose();
     TopBar._focused.removeListener(updateColor);
-    for (final animation in animations) {
+    for (final ValueAnimation<double> animation in animations) {
       animation.dispose();
     }
     super.dispose();
@@ -397,13 +398,13 @@ class VoidGap extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final canvas = context.canvas;
-    final fullBox = offset & size;
+    final Canvas canvas = context.canvas;
+    final Rect fullBox = offset & size;
 
-    final position = TopBar.position;
+    final double position = TopBar.position;
     for (final (index, animation) in animations.indexed.toList().reversed) {
-      final t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
-      final color = Color.lerp(this.color, const Color(0xff202020), t)!;
+      final double t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
+      final Color color = Color.lerp(this.color, const Color(0xff202020), t)!;
       animation.duration = Seconds(t / 2);
 
       if (animation.value != position) {
@@ -470,7 +471,7 @@ class RenderNoMoreCSS extends RenderBox with BiggestBox {
 
   void _tick(Duration elapsed) {
     if (fadingIn) {
-      final t = elapsed.inMicroseconds / fadeInMicros;
+      final double t = elapsed.inMicroseconds / fadeInMicros;
       if (t >= 1) {
         fadingIn = false;
         Route.go(Route.home);
@@ -480,12 +481,12 @@ class RenderNoMoreCSS extends RenderBox with BiggestBox {
       final hsv = HSVColor.fromAHSV(1, 40, 1, 1 - t);
       color = hsv.toColor().withValues(alpha: Curves.easeInOutSine.transform(t));
     } else {
-      final t = (elapsed.inMicroseconds - fadeInMicros) / fadeOutMicros;
+      final double t = (elapsed.inMicroseconds - fadeInMicros) / fadeOutMicros;
       if (t >= 1) {
         ticker.dispose();
         return NoMoreCSS.entry.remove();
       }
-      final alpha = 1 - Curves.easeOutCubic.transform(t);
+      final double alpha = 1 - Curves.easeOutCubic.transform(t);
       color = Colors.black.withValues(alpha: alpha);
       white = Colors.white.withValues(alpha: alpha);
     }
@@ -494,8 +495,8 @@ class RenderNoMoreCSS extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final rect = offset & size;
-    final canvas = context.canvas;
+    final Rect rect = offset & size;
+    final Canvas canvas = context.canvas;
 
     if (white case final color?) {
       canvas.drawRect(rect, Paint()..color = color);

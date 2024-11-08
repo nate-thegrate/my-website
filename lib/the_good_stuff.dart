@@ -5,10 +5,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'main.dart';
 
-export 'package:flutter/material.dart'
-    hide Route, AnimationController, ChangeNotifier, ValueNotifier;
 export 'package:flutter/foundation.dart';
 export 'package:flutter/gestures.dart';
+export 'package:flutter/material.dart'
+    hide AnimationController, ChangeNotifier, Route, ValueNotifier;
 export 'package:flutter/rendering.dart';
 export 'package:flutter/scheduler.dart';
 export 'package:flutter_hooks/flutter_hooks.dart';
@@ -45,7 +45,7 @@ AnimationController useControllerFrom<S extends State>(AnimationController Funct
 }
 
 ValueListenable<T> useAnimationFrom<S extends State, T>(ValueListenable<T> Function(S s) s) {
-  final context = useContext();
+  final BuildContext context = useContext();
   return useMemoized(() => s(context.findAncestorStateOfType<S>()!));
 }
 

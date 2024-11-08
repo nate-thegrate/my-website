@@ -33,18 +33,18 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
     if (selected || !states.contains(WidgetState.selected)) return;
 
     selected = true;
-    final stash = Stache._stache;
-    await Future.delayed(Durations.medium1);
+    final ValueNotifier<bool> stash = Stache._stache;
+    await Future<void>.delayed(Durations.medium1);
 
     stash.value = true;
-    await Future.delayed(Durations.medium1);
+    await Future<void>.delayed(Durations.medium1);
 
     states.add(WidgetState.dragged);
-    await Future.delayed(yeetDuration);
+    await Future<void>.delayed(yeetDuration);
 
     if (!mounted) return;
     App.overlay.insert(_FadeToGreen.entry);
-    await Future.delayed(_FadeToGreen._duration);
+    await Future<void>.delayed(_FadeToGreen._duration);
 
     stash.value = false;
     states.removeAll({WidgetState.selected, WidgetState.dragged});
@@ -62,7 +62,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
   static const yeetDuration = Seconds(1);
 
   static Matrix4 yeetTransform(double t) {
-    final Size(:width, :height) = App.screenSize;
+    final Size(:double width, :double height) = App.screenSize;
     return Matrix4.rotationZ(math.pow(t, 1.5) * 5)
       ..storage[12] = t * width
       ..storage[13] = (2 * t * t - t) * height * 4;
@@ -70,7 +70,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final states = WidgetStates.of(context);
+    final Set<WidgetState> states = WidgetStates.of(context);
     return AnimatedToggle.builder(
       (WidgetState.hovered | WidgetState.selected).isSatisfiedBy(states),
       duration: Durations.medium1,
@@ -132,7 +132,7 @@ class StacheStash extends LeafRenderObjectWidget {
   @override
   RenderStache createRenderObject(BuildContext context) {
     final jiggle = JiggleStache(vsync: App.vsync);
-    final states = WidgetStates.maybeOf(context);
+    final WidgetStates? states = WidgetStates.maybeOf(context);
 
     return RenderStache(jiggle, states);
   }
@@ -153,7 +153,7 @@ class Stached extends StatelessWidget {
       AxisDirection.down => const Offset(0, 2),
     };
 
-    final stash = Stache.of(context) ? offset : Offset.zero;
+    final Offset stash = Stache.of(context) ? offset : Offset.zero;
 
     return AnimatedSlide(
       offset: stash,
@@ -212,7 +212,7 @@ class RenderStache extends RenderBox with BiggestBox {
   }
 
   void _updateAnimation() {
-    final isPressed = states!.contains(WidgetState.pressed);
+    final bool isPressed = states!.contains(WidgetState.pressed);
     if (isPressed != jiggle.isForwardOrCompleted) {
       if (isPressed) {
         jiggle.forward();
@@ -273,12 +273,12 @@ class RenderStache extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final JiggleStache(:top, :bottom) = jiggle;
+    final JiggleStache(:double top, :double bottom) = jiggle;
 
-    final vScale = 1 + (bottom - top) / 6;
-    final hScale = 1.25 - vScale / 4;
+    final double vScale = 1 + (bottom - top) / 6;
+    final double hScale = 1.25 - vScale / 4;
 
-    final Offset(:dx, :dy) = (offset & size).center - const Offset(108, 133);
+    final Offset(:double dx, :double dy) = (offset & size).center - const Offset(108, 133);
 
     context.canvas
       ..save()

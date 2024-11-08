@@ -7,8 +7,8 @@ abstract class Funderline extends LeafRenderObjectWidget {
   const Funderline(this.rect, {super.key});
 
   factory Funderline.fromRoute(Route route) {
-    final box = route.key.currentContext!.renderBox;
-    final rect = box.localToGlobal(Offset.zero) & box.size;
+    final RenderBox box = route.key.currentContext!.renderBox;
+    final Rect rect = box.localToGlobal(Offset.zero) & box.size;
 
     return switch (route) {
       Route.stats => _StatsFunderline(rect),
@@ -20,7 +20,7 @@ abstract class Funderline extends LeafRenderObjectWidget {
   final Rect rect;
 
   static void show(Route route) {
-    final entry = switch (route) {
+    final OverlayEntry entry = switch (route) {
       Route.stats => statsEntry,
       Route.projects => projectsEntry,
       _ => throw Error(),
@@ -60,7 +60,7 @@ abstract class RenderFunder extends RenderBox {
       case AnimationStatus.completed:
         Route.go(route);
         HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
-        Future.delayed(Durations.short2, controller.reverse);
+        Future<void>.delayed(Durations.short2, controller.reverse);
       case AnimationStatus.dismissed:
         (route == Route.stats ? statsEntry : projectsEntry).remove();
       case AnimationStatus.forward:
@@ -114,7 +114,7 @@ class _RenderStatsFunderline extends RenderFunder {
   void performLayout() {
     super.performLayout();
     maxWidth = math.min(size.width - 2 * Stats.insets, Stats.maxWidth);
-    final baseline = start.topLeft.dy;
+    final double baseline = start.topLeft.dy;
     rowsDown = (size.height - baseline + 8) ~/ spacing;
     targetRect = Rect.fromCenter(
       center: Offset(fullScreen.center.dx, start.center.dy),
@@ -127,16 +127,16 @@ class _RenderStatsFunderline extends RenderFunder {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final ToggleAnimation(:status, value: t) = controller;
-    final canvas = context.canvas;
+    final ToggleAnimation(:AnimationStatus status, value: double t) = controller;
+    final Canvas canvas = context.canvas;
 
     if (status.isForwardOrCompleted) {
-      final alpha = math.min(t * 2.5, 1.0);
-      final x = Curves.easeOutQuart.transform(alpha);
-      final y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
+      final double alpha = math.min(t * 2.5, 1.0);
+      final double x = Curves.easeOutQuart.transform(alpha);
+      final double y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
 
-      final rect = Rect.lerp(start, targetRect, x)!;
-      final color = Color.lerp(
+      final Rect rect = Rect.lerp(start, targetRect, x)!;
+      final Color color = Color.lerp(
         FunLink.color,
         PullRequest.borderColor,
         Curves.easeOutSine.transform(t),
@@ -158,13 +158,13 @@ class _RenderStatsFunderline extends RenderFunder {
         }
       }
     } else {
-      final reveal = Curves.easeInOutSine.transform(t);
+      final double reveal = Curves.easeInOutSine.transform(t);
       canvas.drawRect(
         Offset.zero & Size(size.width, (targetRect.top - 2 * spacing - 8) * reveal),
         bgFill,
       );
       for (int i = -2; i < rowsDown; i++) {
-        final rect = targetRect.translate(0, i * spacing - 8);
+        final Rect rect = targetRect.translate(0, i * spacing - 8);
         canvas.drawRect(
           Rect.fromLTWH(0, rect.top - spacing + 1, size.width, (spacing - 2) * reveal),
           bgFill,
@@ -174,7 +174,7 @@ class _RenderStatsFunderline extends RenderFunder {
           Paint()..color = PullRequest.borderColor.withValues(alpha: reveal),
         );
       }
-      final top = targetRect.bottom + (rowsDown - 1) * spacing;
+      final double top = targetRect.bottom + (rowsDown - 1) * spacing;
       final rect = Rect.fromPoints(
         Offset(0, top),
         Offset(size.width, lerpDouble(size.height, top, 1 - reveal)!),
@@ -199,16 +199,16 @@ class _RenderProjectFunderline extends RenderFunder {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final ToggleAnimation(:status, value: t) = controller;
+    final ToggleAnimation(:AnimationStatus status, value: double t) = controller;
     final Rect rect;
     final Color color;
 
     if (status.isForwardOrCompleted) {
-      final x = Curves.easeOutQuart.transform(math.min(t * 2.5, 1));
-      final y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
+      final double x = Curves.easeOutQuart.transform(math.min(t * 2.5, 1));
+      final double y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
 
-      final Rect(:left, :width) = Rect.lerp(start, fullScreen, x)!;
-      final Rect(:top, :height) = Rect.lerp(start, fullScreen, y)!;
+      final Rect(:double left, :double width) = Rect.lerp(start, fullScreen, x)!;
+      final Rect(:double top, :double height) = Rect.lerp(start, fullScreen, y)!;
 
       rect = Rect.fromLTWH(left, top, width, height);
       color = Color.lerp(FunLink.color, const Color(0xff80ffff), t)!;

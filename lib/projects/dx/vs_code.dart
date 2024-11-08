@@ -92,7 +92,7 @@ extension type VsCode._(TextSpan _textSpan) implements TextSpan {
   static const _purpleKeyword = Color(0xffc586c0);
 
   static Color _wordColor(String word) {
-    final start = word[0];
+    final String start = word[0];
     if (start != start.toLowerCase()) {
       return _class;
     }
@@ -240,7 +240,7 @@ class _AnimatedStretchState extends AnimatedWidgetBaseState<AnimatedStretch> {
     overflow: TextOverflow.clip,
   );
   static Text of(BuildContext context) {
-    final text = switch ((Route.of(context), ApiToggle.of(context))) {
+    final String text = switch ((Route.of(context), ApiToggle.of(context))) {
       (Route.mapping, true) => _mapping,
       (Route.mapping, false) => _resolveWith,
       (Route.animation, true) => _animatedValue,

@@ -23,7 +23,7 @@ class _DelayedActivationHookState extends HookState<bool, _DelayedActivationHook
 
   @override
   void initHook() async {
-    await Future.delayed(Seconds(hook.delay));
+    await Future<void>.delayed(Seconds(hook.delay));
     if (!context.mounted) return;
 
     setState(() => activated = true);

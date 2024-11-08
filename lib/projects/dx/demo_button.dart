@@ -27,7 +27,7 @@ class Mapping extends StatelessWidget {
     const spring2 = Color(0xff60ffb0);
     const spring3 = Color(0x4000ff80);
 
-    final elevation = WidgetStateMapper({
+    final elevation = WidgetStateMapper<double>({
       WidgetState.hovered & ~WidgetState.pressed: 3.0,
       WidgetState.any: 0.0,
     });
@@ -206,12 +206,12 @@ class _Streeeetch extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final Size(width: w, height: h) = size;
+    final Size(width: double w, height: double h) = size;
 
-    final r = h / 4;
+    final double r = h / 4;
     final radius = Radius.circular(r);
-    final squeeze = r / 4;
-    final firmness = h / 2;
+    final double squeeze = r / 4;
+    final double firmness = h / 2;
 
     final path = Path()
       ..moveTo(0, r)

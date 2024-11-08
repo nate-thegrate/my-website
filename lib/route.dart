@@ -18,9 +18,9 @@ enum Route {
   source;
 
   factory Route.fromUri(Uri uri) {
-    final segments = uri.pathSegments;
-    final name = switch (segments.last) {
-      final s when !s.contains('true') && !s.contains('false') => s,
+    final List<String> segments = uri.pathSegments;
+    final String name = switch (segments.last) {
+      final String s when !s.contains('true') && !s.contains('false') => s,
       _ => segments[segments.length - 2],
     };
 
@@ -56,7 +56,7 @@ enum Route {
   String get uri {
     if (this == home) return '/';
 
-    final parent = switch (this) {
+    final String parent = switch (this) {
       home => throw Error(),
       stats || refactorStats || projects => '',
       hueman || dx || recipes || source => projects.uri,
@@ -74,16 +74,17 @@ enum Route {
       case home:
         App.overlay.insert(NoMoreCSS.entry);
         HomePageElement.instance.fricksToGive = HomePageElement.initialFricks;
-        await Future.delayed(const Duration(microseconds: RenderNoMoreCSS.fadeInMicros));
+        await Future<void>.delayed(const Duration(microseconds: RenderNoMoreCSS.fadeInMicros));
         destination = null;
 
       case stats || projects:
         App.overlay.insert(Blank.entry);
-        await Future.delayed(Blank.duration + Durations.short1);
+        await Future<void>.delayed(Blank.duration + Durations.short1);
         go(destination!);
         Blank.entry.remove();
         destination = null;
 
+      // ignore: no_default_cases, to make things concise :)
       default:
         throw Error();
     }

@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -60,7 +60,7 @@ class _DxButtonState extends State<DxButton> with SingleTickerProviderStateMixin
         ),
       ),
     );
-    final border = widget.border;
+    final OutlinedBorder border = widget.border;
 
     return MouseRegion(
       onEnter: (event) => depth.value = 0.98,
@@ -98,7 +98,7 @@ class RouteHighlight extends SingleChildRenderObjectWidget {
   const RouteHighlight({super.key, super.child});
 
   Color _color(BuildContext context) {
-    final route = findWidget<DxButton>(context).route;
+    final Route route = findWidget<DxButton>(context).route;
     return Route.of(context) == route ? Colors.black12 : Colors.transparent;
   }
 
@@ -179,8 +179,8 @@ class RektTransition extends SingleChildRenderObjectWidget with RenderListenable
 double _lerpDouble(double a, double b, double t) => a * (1 - t) + b * t;
 
 Rect funRectLerp(Rect a, Rect b, double t) {
-  final tWidth = Curves.easeInOutSine.transform(math.max((t - 1) * 1.5 + 1, 0.0));
-  final tHeight = Curves.easeInOutSine.transform(math.min(t * 1.5, 1.0));
+  final double tWidth = Curves.easeInOutSine.transform(math.max((t - 1) * 1.5 + 1, 0.0));
+  final double tHeight = Curves.easeInOutSine.transform(math.min(t * 1.5, 1.0));
 
   return Rect.fromLTWH(
     _lerpDouble(a.left, b.left, tWidth),
@@ -213,13 +213,13 @@ final class Rekt extends Decoration {
         duration: Durations.short3,
       );
   static void getRekt(BuildContext context) {
-    final box = context.renderBox;
-    final rect = box.localToGlobal(Offset.zero) & box.size;
+    final RenderBox box = context.renderBox;
+    final Rect rect = box.localToGlobal(Offset.zero) & box.size;
     final DxButton apiButton = switch (context) {
       Element(widget: final DxButton apiButton) => apiButton,
       _ => findWidget<DxButton>(context),
     };
-    final route = apiButton.route;
+    final Route route = apiButton.route;
     animation.forward();
     App.overlay.insert(
       _entry = OverlayEntry(builder: (context) {
@@ -257,8 +257,8 @@ class _RektPainter extends BoxPainter {
 
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    final path = rekt.border.getOuterPath(offset & configuration.size!);
-    final depth = rekt.depth;
+    final Path path = rekt.border.getOuterPath(offset & configuration.size!);
+    final double depth = rekt.depth;
 
     canvas.save();
     canvas.drawPath(
@@ -309,7 +309,7 @@ class _RenderRekt extends RenderBox with BiggestBox {
       ticker.dispose();
 
       Route.go(route);
-      await Future.delayed(Durations.short3);
+      await Future<void>.delayed(Durations.short3);
       try {
         await Rekt.animation.reverse().orCancel;
       } on TickerCanceled {
@@ -335,12 +335,12 @@ class _RenderRekt extends RenderBox with BiggestBox {
     assert(offset == Offset.zero);
     final targetRect = Rect.fromLTRB(0, kToolbarHeight, size.width, size.height);
 
-    final rect = funRectLerp(this.rect, targetRect, t);
+    final Rect rect = funRectLerp(this.rect, targetRect, t);
 
-    final border = OutlinedBorder.lerp(Rekt.defaultBorder, _targetBorder, t)!;
+    final OutlinedBorder border = OutlinedBorder.lerp(Rekt.defaultBorder, _targetBorder, t)!;
     final painter = _RektPainter(Rekt(border: border, depth: 1.0));
 
-    final canvas = context.canvas;
+    final Canvas canvas = context.canvas;
     canvas.drawPath(
       border.getOuterPath(rect),
       Paint()..color = const Color(0xff303030).withValues(alpha: t),

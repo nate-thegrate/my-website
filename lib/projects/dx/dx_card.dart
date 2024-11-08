@@ -54,7 +54,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   bool prepareToLaunch = false;
 
   void _updateAnimations() async {
-    final states = this.states;
+    final WidgetStates? states = this.states;
     if (states == null) return;
 
     widthAnimation.toggle(
@@ -74,7 +74,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
       }
       DxCard.launching.value = true;
 
-      await Future.delayed(Durations.medium1);
+      await Future<void>.delayed(Durations.medium1);
       if (!mounted) return;
 
       states.removeAll(const {
@@ -83,7 +83,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
         WidgetState.pressed,
       });
       Route.go(Route.dx, extra: const Projects());
-      await Future.delayed(const Seconds(1));
+      await Future<void>.delayed(const Seconds(1));
 
       DxCard.launching.value = false;
       prepareToLaunch = false;
@@ -94,6 +94,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    // ignore: unnecessary_statements, need to reference the late values so they get initialized
     (widthAnimation, depthAnimation, launchAnimation);
     states?.addListener(_updateAnimations);
     postFrameCallback(() => precacheImage(DX.bgImage, context));
@@ -125,18 +126,18 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   }
 
   Widget _build(BuildContext context, BoxConstraints constraints) {
-    final width = widthCurved.value;
+    final double width = widthCurved.value;
     const top = 5.0;
-    const bottom = -2.0;
-    final elevation = prepareToLaunch
+    const double bottom = -2.0;
+    final double elevation = prepareToLaunch
         ? bottom
         : lerpDouble(top, bottom, Curves.ease.transform(depthAnimation.value))!;
-    final altitude = math.max(elevation, 0.0);
-    final shadowSize = math.max(-elevation, 0.0);
+    final double altitude = math.max(elevation, 0.0);
+    final double shadowSize = math.max(-elevation, 0.0);
 
-    final overflowWidth = constraints.maxWidth * (1 + width / 10);
-    final height = constraints.maxHeight;
-    final launchWidth = overflowWidth * (1 - launchAnimation.value);
+    final double overflowWidth = constraints.maxWidth * (1 + width / 10);
+    final double height = constraints.maxHeight;
+    final double launchWidth = overflowWidth * (1 - launchAnimation.value);
 
     return Center(
       child: OverflowBox(
@@ -193,8 +194,9 @@ class _DxText extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = useValueListenable(useControllerFrom<_DxCardState>((s) => s.widthCurved));
-    final visibleLetters = (value * 10).round();
+    final double value =
+        useValueListenable(useControllerFrom<_DxCardState>((s) => s.widthCurved));
+    final int visibleLetters = (value * 10).round();
     final textSpan = TextSpan(children: [
       const TextSpan(text: '{ d'),
       TextSpan(text: 'eveloper e'.substring(0, visibleLetters)),
@@ -244,7 +246,7 @@ class _RenderFlutterLogo extends RenderBox {
   late double scale;
   @override
   void performLayout() {
-    final maxSize = constraints.biggest;
+    final Size maxSize = constraints.biggest;
     scale = math.min(maxSize.width, maxSize.height) / 100;
 
     size = maxSize;
@@ -296,7 +298,7 @@ class CardPainter extends BoxPainter {
 
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    final rect = offset & configuration.size!;
+    final Rect rect = offset & configuration.size!;
     canvas.drawPaint(
       Paint()
         ..shader = const LinearGradient(

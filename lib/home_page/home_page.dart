@@ -143,8 +143,8 @@ class HomePageElement extends SingleChildRenderObjectElement {
         text.value = message;
       }
       if (opacity.isDismissed) {
-        final currentText = text.value;
-        await Future.delayed(Durations.short2);
+        final String currentText = text.value;
+        await Future<void>.delayed(Durations.short2);
         if (text.value != currentText) return;
       }
     }
@@ -157,8 +157,8 @@ class HomePageElement extends SingleChildRenderObjectElement {
   void hide([_]) async {
     if (fricksToGive == 0) return;
 
-    final currentText = text.value;
-    await Future.delayed(Durations.short2);
+    final String currentText = text.value;
+    await Future<void>.delayed(Durations.short2);
     if (text.value == currentText && fricksToGive > 0) {
       opacity.reverse();
     }
@@ -232,7 +232,7 @@ class FunLink extends StatelessWidget {
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               onEnter: (event) async {
-                final text = switch (route) {
+                final String text = switch (route) {
                   Route.stats => 'read: "bragging about LOC reduction"',
                   Route.projects => 'just some things I made :)',
                   _ => throw Error(),
@@ -264,11 +264,12 @@ class _FunPreview extends HookWidget {
   const _FunPreview();
 
   static void touch([PointerEvent? _]) {
-    final HomePageElement(:text, :opacity) = HomePageElement.instance;
+    final HomePageElement(:ValueNotifier<String> text, :ToggleAnimation opacity) =
+        HomePageElement.instance;
 
     if (text.value.contains('...')) {
       text.value = 'touché.';
-      Future.delayed(const Seconds(2.5), opacity.reverse);
+      Future<void>.delayed(const Seconds(2.5), opacity.reverse);
     }
   }
 

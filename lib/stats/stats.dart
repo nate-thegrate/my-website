@@ -8,7 +8,7 @@ extension type const Stats._(TopBar _) implements TopBar {
   const Stats() : _ = const TopBar(body: _Stats());
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
-    final param = state.pathParameters['refactor'];
+    final String? param = state.pathParameters['refactor'];
 
     return NoTransitionPage(
       child: Refactoring(
@@ -54,30 +54,30 @@ class _StatsState extends State<_Stats> {
   void initState() {
     super.initState();
     controller.addListener(() {
-      final shouldFloat = controller.offset < targetExtent;
+      final bool shouldFloat = controller.offset < targetExtent;
       if (shouldFloat != floatingFooter) {
         setState(() => floatingFooter = shouldFloat);
       }
     });
-    Future.delayed(Durations.long2, () => Route.current = TopBar.focused = Route.stats);
+    Future<void>.delayed(Durations.long2, () => Route.current = TopBar.focused = Route.stats);
     postFrameCallback(() => HomePageElement.instance.opacity.value = 0.0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final refactoring = Refactoring.of(context);
+    final bool refactoring = Refactoring.of(context);
     final padding = EdgeInsets.symmetric(
       horizontal: math.max(
         Stats.insets,
         (MediaQuery.sizeOf(context).width - Stats.maxWidth) / 2,
       ),
     );
-    final slivers = [
+    final List<RenderObjectWidget> slivers = [
       SliverMainAxisGroup(
         slivers: [
           SliverPersistentHeader(
             pinned: true,
-            delegate: _TableHeader(refactoring),
+            delegate: _TableHeader(refactoring: refactoring),
           ),
           SliverFixedExtentList.list(
             itemExtent: Stats.itemExtent,
@@ -87,9 +87,9 @@ class _StatsState extends State<_Stats> {
       ),
       SliverLayoutBuilder(builder: (context, constraints) {
         final SliverConstraints(
-          :precedingScrollExtent,
-          :viewportMainAxisExtent,
-          :remainingPaintExtent,
+          :double precedingScrollExtent,
+          :double viewportMainAxisExtent,
+          :double remainingPaintExtent,
         ) = constraints;
 
         targetExtent = precedingScrollExtent + 36.0 - viewportMainAxisExtent;
@@ -174,14 +174,14 @@ class StickToBottom extends ClampingScrollPhysics {
 }
 
 class _TableHeader extends SliverPersistentHeaderDelegate {
-  const _TableHeader(this.refactoring);
+  const _TableHeader({required this.refactoring});
 
   final bool refactoring;
 
   @override
-  final double minExtent = 36.0;
+  double get minExtent => 36.0;
   @override
-  final double maxExtent = 36.0;
+  double get maxExtent => 36.0;
 
   @override
   bool shouldRebuild(_TableHeader oldDelegate) => refactoring != oldDelegate.refactoring;
@@ -248,9 +248,10 @@ class _RefactorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onlyRefactorPRs = Refactoring.of(context);
+    final bool onlyRefactorPRs = Refactoring.of(context);
 
-    const padding = WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 18));
+    const WidgetStatePropertyAll<EdgeInsets> padding =
+        WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 18));
     const boringStyle = ButtonStyle(
       side: WidgetStatePropertyAll(
         BorderSide(width: 2, color: Color(0xff80a0a0)),

@@ -86,7 +86,7 @@ class RecursionCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recursions = RecursionCount.of(context);
+    final int recursions = RecursionCount.of(context);
     if (recursions > 6) {
       if (hasAncestor<DxTransition>(context)) {
         return const SizedBox.shrink();
@@ -113,7 +113,8 @@ class _CardRecursion extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = useAnimationFrom<_SourceCardState, Color>((s) => s.colorAnimation);
+    final ValueListenable<Color> color =
+        useAnimationFrom<_SourceCardState, Color>((s) => s.colorAnimation);
     const child = Center(
       child: IgnorePointer(
         child: FittedBox(
