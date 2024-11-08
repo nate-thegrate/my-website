@@ -34,13 +34,13 @@ class TheApproach extends HookWidget implements Source {
 
   final Widget child;
 
-  static final approaching = Cubit(false);
+  static final approaching = Get.value(false);
 
-  static void approach() => approaching.value = true;
+  static void approach() => approaching.it.value = true;
 
   @override
   Widget build(BuildContext context) {
-    Matrix4 transform = Matrix4.identity();
+    var transform = Matrix4.identity();
     if (useTheApproach()) {
       transform = context.renderBox.getTransformTo(_Gateway.context.renderBox);
     }
@@ -85,7 +85,7 @@ class Dilation extends Curve {
 
 enum Journey { whiteVoid, sourceOfWisdom, activated }
 
-bool useTheApproach() => useValueListenable(TheApproach.approaching);
+bool useTheApproach() => Use.watch(TheApproach.approaching);
 Journey useTheSource() => useValueListenable(useMemoized(() => Source.provide().journey));
 
 class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
@@ -229,7 +229,7 @@ class TheSource extends RenderBox with BiggestBox {
 
     journey.addListener(theVoid);
     ticker = theVoidProvides.createTicker(_tick)..start();
-    postFrameCallback(() => TheApproach.approaching.value = false);
+    postFrameCallback(() => TheApproach.approaching.it.value = false);
   }
 
   late final Cubit<Journey> journey;

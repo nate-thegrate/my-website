@@ -84,7 +84,7 @@ enum Route {
         Blank.entry.remove();
         destination = null;
 
-      // ignore: no_default_cases, to make things concise :)
+      // ignore: no_default_cases, since there's a lot here :)
       default:
         throw Error();
     }

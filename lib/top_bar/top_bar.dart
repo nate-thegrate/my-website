@@ -47,6 +47,8 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) => _stuff;
 }
 
+final _topGap = Get.vsyncValue(0.0);
+
 class _TopBar extends StatefulWidget {
   const _TopBar();
 
@@ -54,31 +56,28 @@ class _TopBar extends StatefulWidget {
   State<_TopBar> createState() => _TopBarState();
 }
 
-class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
-  late final _gapAnimation = ValueAnimation(
-    vsync: this,
-    initialValue: 0.0,
-    duration: Duration.zero,
-    lerp: lerpDouble,
-  )..addListener(rebuild);
+class _TopBarState extends State<_TopBar> {
+  late final gapAnimation = _topGap.attach(context)..addListener(rebuild);
 
   Timer? timer;
 
   void openGap([_]) {
     timer = Timer(Durations.extralong4, () {
       if (!mounted) return;
-      _gapAnimation.animateTo(18, duration: Durations.long2, curve: Curves.easeInOutSine);
+      gapAnimation.animateTo(18, duration: Durations.long2, curve: Curves.easeInOutSine);
     });
   }
 
   void closeGap([_]) {
     timer?.cancel();
-    _gapAnimation.animateTo(0, duration: Blank.duration, curve: Curves.ease);
+    gapAnimation.animateTo(0, duration: Blank.duration, curve: Curves.ease);
   }
 
   @override
   void dispose() {
-    _gapAnimation.dispose();
+    gapAnimation
+      ..stop()
+      ..removeListener(rebuild);
     super.dispose();
   }
 
@@ -110,7 +109,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Center(
-                    child: _TollsBox(
+                    child: TollsBox(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -147,7 +146,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
       ),
     );
 
-    final double gapHeight = _gapAnimation.value;
+    final double gapHeight = gapAnimation.value;
     final appBar = MouseRegion(
       onEnter: openGap,
       onExit: closeGap,
@@ -185,21 +184,8 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
   }
 }
 
-class _TollsBox extends HookWidget {
-  const _TollsBox({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final AnimationController listenable =
-        useControllerFrom<_TopBarState>((s) => s._gapAnimation);
-    return TollsBox(listenable: listenable, child: child);
-  }
-}
-
-class TollsBox extends SingleChildRenderObjectWidget with RenderListenable {
-  const TollsBox({super.key, super.child, required this.listenable});
+class TollsBox extends SingleChildRenderObjectWidget {
+  const TollsBox({super.key, super.child});
 
   static double getWidth([BuildContext? context]) {
     final Size size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
@@ -207,37 +193,61 @@ class TollsBox extends SingleChildRenderObjectWidget with RenderListenable {
   }
 
   @override
-  final ValueListenable<double> listenable;
-
-  BoxConstraints _constraints(BuildContext context) {
-    return BoxConstraints.tightFor(
-      width: TollsBox.getWidth(context),
-      height: 25 + listenable.value / 2,
-    );
+  RenderAnimatedConstraints createRenderObject(BuildContext context) {
+    return RenderAnimatedConstraints(_topGap.it);
   }
 
   @override
-  RenderConstrainedBox createRenderObject(BuildContext context) {
-    return RenderConstrainedBox(additionalConstraints: _constraints(context));
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderConstrainedBox renderObject) {
-    renderObject.additionalConstraints = _constraints(context);
+  void updateRenderObject(BuildContext context, RenderAnimatedConstraints renderObject) {
+    renderObject._listener();
   }
 }
 
-class BlurBox extends SingleChildRenderObjectWidget with RenderListenable {
-  const BlurBox({super.key});
+class RenderAnimatedConstraints extends RenderConstrainedBox {
+  RenderAnimatedConstraints(this.heightAnimation)
+      : super(additionalConstraints: _getConstraints(heightAnimation));
 
   @override
-  Listenable get listenable => TopBar._focused;
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    heightAnimation.addListener(_listener);
+  }
 
-  BoxDecoration get decoration {
+  @override
+  void detach() {
+    heightAnimation.removeListener(_listener);
+
+    super.detach();
+  }
+
+  @override
+  void dispose() {
+    heightAnimation.removeListener(_listener);
+    super.dispose();
+  }
+
+  final ValueListenable<double> heightAnimation;
+
+  static BoxConstraints _getConstraints(ValueListenable<double> animation) {
+    return BoxConstraints.tightFor(
+      width: TollsBox.getWidth(),
+      height: 25 + animation.value / 2,
+    );
+  }
+
+  void _listener() {
+    additionalConstraints = _getConstraints(heightAnimation);
+  }
+}
+
+class BlurBox extends SingleChildRenderObjectWidget {
+  const BlurBox({super.key});
+
+  static BoxDecoration _decoration(Route route) {
     return BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          if (TopBar.focused == Route.home) ...const [
+          if (route == Route.home) ...const [
             Color(0xa0c09030),
             Color(0x00f7b943),
           ] else ...const [
@@ -256,16 +266,15 @@ class BlurBox extends SingleChildRenderObjectWidget with RenderListenable {
 
   @override
   RenderDecoratedBox createRenderObject(BuildContext context) {
-    return RenderDecoratedBox(decoration: decoration);
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderDecoratedBox renderObject) {
-    renderObject.decoration = decoration;
+    return RenderAnimatedDecoration<Route>(
+      context,
+      listenable: TopBar._focused,
+      computeDecoration: _decoration,
+    );
   }
 }
 
-class Indicator extends StatefulHookWidget {
+class Indicator extends StatefulWidget {
   const Indicator({super.key});
 
   @override
@@ -309,6 +318,7 @@ class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMix
   @override
   void dispose() {
     TopBar._focused.removeListener(_update);
+    padding.stop();
     super.dispose();
   }
 

@@ -116,63 +116,63 @@ class RouteHighlight extends SingleChildRenderObjectWidget {
 class _DepthTransition extends HookWidget {
   const _DepthTransition();
 
+  static Matrix4 _transformed(double depth) {
+    return Matrix4.translationValues(0, depth * 2, 0);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DepthTransition(
-      depth: useControllerFrom<_DxButtonState>((s) => s.depth),
+    return MatrixTransition(
+      onTransform: _transformed,
+      animation: useAnimationFrom<_DxButtonState, ValueAnimation<double>>((s) => s.depth),
       child: findWidget<DxButton>(context).child,
     );
   }
 }
 
-class DepthTransition extends SingleChildRenderObjectWidget with RenderListenable {
-  const DepthTransition({super.key, required this.depth, super.child});
-
-  final ValueListenable<double> depth;
-
-  @override
-  Listenable get listenable => depth;
-
-  static Matrix4 _transformed(ValueListenable<double> depth) {
-    return Matrix4.translationValues(0, depth.value * 2, 0);
-  }
-
-  @override
-  RenderTransform createRenderObject(BuildContext context) {
-    final renderTransform = RenderTransform(
-      transform: _transformed(depth),
-      filterQuality: FilterQuality.none,
-    );
-
-    return renderTransform;
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderTransform renderObject) {
-    renderObject.transform = _transformed(depth);
-  }
-}
-
-class RektTransition extends SingleChildRenderObjectWidget with RenderListenable {
+class RektTransition extends SingleChildRenderObjectWidget {
   const RektTransition({super.key, required this.depth, this.border, super.child});
 
   final ValueListenable<double> depth;
   final OutlinedBorder? border;
 
-  @override
-  Listenable get listenable => depth;
-
-  @override
-  RenderDecoratedBox createRenderObject(BuildContext context) {
-    return RenderDecoratedBox(
-      decoration: Rekt(depth: depth.value, border: border ?? Rekt.defaultBorder),
-      configuration: createLocalImageConfiguration(context),
-    );
+  Rekt _decoration(double depth) {
+    return Rekt(depth: depth, border: border ?? Rekt.defaultBorder);
   }
 
   @override
-  void updateRenderObject(BuildContext context, RenderDecoratedBox renderObject) {
-    renderObject.decoration = Rekt(depth: depth.value, border: border ?? Rekt.defaultBorder);
+  RenderAnimatedDecoration<double> createRenderObject(BuildContext context) {
+    return RenderAnimatedDecoration<double>(
+      context,
+      listenable: depth,
+      computeDecoration: _decoration,
+    );
+  }
+}
+
+class RenderAnimatedDecoration<T> extends RenderDecoratedBox {
+  RenderAnimatedDecoration(
+    BuildContext context, {
+    required this.listenable,
+    required this.computeDecoration,
+  }) : super(
+          configuration: createLocalImageConfiguration(context),
+          decoration: computeDecoration(listenable.value),
+        ) {
+    listenable.addListener(_listener);
+  }
+
+  final ValueListenable<T> listenable;
+  final Decoration Function(T) computeDecoration;
+
+  void _listener() {
+    decoration = computeDecoration(listenable.value);
+  }
+
+  @override
+  void dispose() {
+    listenable.removeListener(_listener);
+    super.dispose();
   }
 }
 

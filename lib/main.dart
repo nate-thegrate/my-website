@@ -49,6 +49,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Vsync.defaultCurve = Curves.ease;
+
     return MaterialApp.router(
       theme: _theme,
       debugShowCheckedModeBanner: false,

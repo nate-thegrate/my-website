@@ -94,7 +94,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    // ignore: unnecessary_statements, need to reference the late values so they get initialized
+    // ignore: unnecessary_statements, late values need to be initialized
     (widthAnimation, depthAnimation, launchAnimation);
     states?.addListener(_updateAnimations);
     postFrameCallback(() => precacheImage(DX.bgImage, context));
@@ -194,8 +194,9 @@ class _DxText extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double value =
-        useValueListenable(useControllerFrom<_DxCardState>((s) => s.widthCurved));
+    final double value = useValueListenable(
+      useAnimationFrom<_DxCardState, ValueListenable<double>>((s) => s.widthCurved),
+    );
     final int visibleLetters = (value * 10).round();
     final textSpan = TextSpan(children: [
       const TextSpan(text: '{ d'),

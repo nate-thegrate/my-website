@@ -72,7 +72,7 @@ class _StatsState extends State<_Stats> {
         (MediaQuery.sizeOf(context).width - Stats.maxWidth) / 2,
       ),
     );
-    final List<RenderObjectWidget> slivers = [
+    final slivers = <Widget>[
       SliverMainAxisGroup(
         slivers: [
           SliverPersistentHeader(

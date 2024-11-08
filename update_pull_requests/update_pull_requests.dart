@@ -11,7 +11,7 @@ import 'token.dart';
 
 void main() async {
   final String prList = await query('update_pull_requests/pr_query.gql');
-  final String text = """\
+  final text = """\
 part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[$prList];
