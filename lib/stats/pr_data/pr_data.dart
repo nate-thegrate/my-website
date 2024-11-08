@@ -20,7 +20,7 @@ class PullRequest extends StatelessWidget {
       return cached;
     }
 
-    final pulls = onlyRefactor ? refactorPRs : flutterPRs;
+    final List<PullRequest> pulls = onlyRefactor ? refactorPRs : flutterPRs;
 
     int additions = 0, deletions = 0;
     for (final PullRequest(:diffs) in pulls) {
@@ -61,8 +61,8 @@ class PullRequest extends StatelessWidget {
   }
 
   Widget _builder(BuildContext context) {
-    final focusNode = Focus.maybeOf(context);
-    final focused = focusNode?.hasFocus ?? false;
+    final FocusNode? focusNode = Focus.maybeOf(context);
+    final bool focused = focusNode?.hasFocus ?? false;
     void focus(_) {
       if (focusNode?.hasFocus ?? true) return;
       focusNode!.requestFocus();
@@ -73,7 +73,7 @@ class PullRequest extends StatelessWidget {
       horizontal: PullRequest.border,
     );
 
-    late final prCount = (refactor ? refactorPRs : flutterPRs).length;
+    late final int prCount = (refactor ? refactorPRs : flutterPRs).length;
 
     final textStyle = TextStyle(color: focused ? PullRequest.color : null);
     final Text text;
@@ -154,8 +154,8 @@ class RightColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (Refactoring.of(context)) {
-      final (additions, deletions) = diffs;
-      final delta = additions - deletions;
+      final (int additions, int deletions) = diffs;
+      final int delta = additions - deletions;
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Row(children: [

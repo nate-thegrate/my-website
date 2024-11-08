@@ -1,8 +1,8 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'demo_button.dart';
-export 'dx_card.dart';
 export 'dx_button.dart';
+export 'dx_card.dart';
 export 'vs_code.dart';
 
 extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
@@ -201,7 +201,7 @@ class CodeCaption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final newStuff = ApiToggle.of(context);
+    final bool newStuff = ApiToggle.of(context);
     final subtitle = newStuff ? 'after' : 'before';
     return Text.rich(
       TextSpan(children: [

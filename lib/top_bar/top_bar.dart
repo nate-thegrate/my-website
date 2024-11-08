@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
@@ -29,7 +29,7 @@ class TopBar extends StatelessWidget {
     _position = newValue;
     newValue -= TollsBox.getWidth();
 
-    final index = newValue < 0 ? 0 : (newValue * sections / App.screenSize.width).ceil();
+    final int index = newValue < 0 ? 0 : (newValue * sections / App.screenSize.width).ceil();
     focused = Route.values[index];
   }
 
@@ -47,6 +47,8 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) => _stuff;
 }
 
+final _topGap = Get.vsyncValue(0.0);
+
 class _TopBar extends StatefulWidget {
   const _TopBar();
 
@@ -54,31 +56,28 @@ class _TopBar extends StatefulWidget {
   State<_TopBar> createState() => _TopBarState();
 }
 
-class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
-  late final _gapAnimation = ValueAnimation(
-    vsync: this,
-    initialValue: 0.0,
-    duration: Duration.zero,
-    lerp: lerpDouble,
-  )..addListener(rebuild);
+class _TopBarState extends State<_TopBar> {
+  late final gapAnimation = _topGap.attach(context)..addListener(rebuild);
 
   Timer? timer;
 
   void openGap([_]) {
     timer = Timer(Durations.extralong4, () {
       if (!mounted) return;
-      _gapAnimation.animateTo(18, duration: Durations.long2, curve: Curves.easeInOutSine);
+      gapAnimation.animateTo(18, duration: Durations.long2, curve: Curves.easeInOutSine);
     });
   }
 
   void closeGap([_]) {
     timer?.cancel();
-    _gapAnimation.animateTo(0, duration: Blank.duration, curve: Curves.ease);
+    gapAnimation.animateTo(0, duration: Blank.duration, curve: Curves.ease);
   }
 
   @override
   void dispose() {
-    _gapAnimation.dispose();
+    gapAnimation
+      ..stop()
+      ..removeListener(rebuild);
     super.dispose();
   }
 
@@ -110,7 +109,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Center(
-                    child: _TollsBox(
+                    child: TollsBox(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -147,7 +146,7 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
       ),
     );
 
-    final gapHeight = _gapAnimation.value;
+    final double gapHeight = gapAnimation.value;
     final appBar = MouseRegion(
       onEnter: openGap,
       onExit: closeGap,
@@ -185,58 +184,70 @@ class _TopBarState extends State<_TopBar> with SingleTickerProviderStateMixin {
   }
 }
 
-class _TollsBox extends HookWidget {
-  const _TollsBox({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final listenable = useControllerFrom<_TopBarState>((s) => s._gapAnimation);
-    return TollsBox(listenable: listenable, child: child);
-  }
-}
-
-class TollsBox extends SingleChildRenderObjectWidget with RenderListenable {
-  const TollsBox({super.key, super.child, required this.listenable});
+class TollsBox extends SingleChildRenderObjectWidget {
+  const TollsBox({super.key, super.child});
 
   static double getWidth([BuildContext? context]) {
-    final size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
+    final Size size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
     return math.max(155.0, size.width / 3);
   }
 
   @override
-  final ValueListenable<double> listenable;
-
-  BoxConstraints _constraints(BuildContext context) {
-    return BoxConstraints.tightFor(
-      width: TollsBox.getWidth(context),
-      height: 25 + listenable.value / 2,
-    );
+  RenderAnimatedConstraints createRenderObject(BuildContext context) {
+    return RenderAnimatedConstraints(_topGap.it);
   }
 
   @override
-  RenderConstrainedBox createRenderObject(BuildContext context) {
-    return RenderConstrainedBox(additionalConstraints: _constraints(context));
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderConstrainedBox renderObject) {
-    renderObject.additionalConstraints = _constraints(context);
+  void updateRenderObject(BuildContext context, RenderAnimatedConstraints renderObject) {
+    renderObject._listener();
   }
 }
 
-class BlurBox extends SingleChildRenderObjectWidget with RenderListenable {
-  const BlurBox({super.key});
+class RenderAnimatedConstraints extends RenderConstrainedBox {
+  RenderAnimatedConstraints(this.heightAnimation)
+      : super(additionalConstraints: _getConstraints(heightAnimation));
 
   @override
-  Listenable get listenable => TopBar._focused;
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    heightAnimation.addListener(_listener);
+  }
 
-  BoxDecoration get decoration {
+  @override
+  void detach() {
+    heightAnimation.removeListener(_listener);
+
+    super.detach();
+  }
+
+  @override
+  void dispose() {
+    heightAnimation.removeListener(_listener);
+    super.dispose();
+  }
+
+  final ValueListenable<double> heightAnimation;
+
+  static BoxConstraints _getConstraints(ValueListenable<double> animation) {
+    return BoxConstraints.tightFor(
+      width: TollsBox.getWidth(),
+      height: 25 + animation.value / 2,
+    );
+  }
+
+  void _listener() {
+    additionalConstraints = _getConstraints(heightAnimation);
+  }
+}
+
+class BlurBox extends SingleChildRenderObjectWidget {
+  const BlurBox({super.key});
+
+  static BoxDecoration _decoration(Route route) {
     return BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          if (TopBar.focused == Route.home) ...const [
+          if (route == Route.home) ...const [
             Color(0xa0c09030),
             Color(0x00f7b943),
           ] else ...const [
@@ -255,16 +266,15 @@ class BlurBox extends SingleChildRenderObjectWidget with RenderListenable {
 
   @override
   RenderDecoratedBox createRenderObject(BuildContext context) {
-    return RenderDecoratedBox(decoration: decoration);
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderDecoratedBox renderObject) {
-    renderObject.decoration = decoration;
+    return RenderAnimatedDecoration<Route>(
+      context,
+      listenable: TopBar._focused,
+      computeDecoration: _decoration,
+    );
   }
 }
 
-class Indicator extends StatefulHookWidget {
+class Indicator extends StatefulWidget {
   const Indicator({super.key});
 
   @override
@@ -273,8 +283,8 @@ class Indicator extends StatefulHookWidget {
 
 class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMixin {
   EdgeInsets get _padding {
-    final tollsWidth = TollsBox.getWidth(context);
-    final othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
+    final double tollsWidth = TollsBox.getWidth(context);
+    final double othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
 
     return switch (TopBar.focused) {
       Route.home => EdgeInsets.only(right: othersWidth),
@@ -308,6 +318,7 @@ class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMix
   @override
   void dispose() {
     TopBar._focused.removeListener(_update);
+    padding.stop();
     super.dispose();
   }
 
@@ -380,7 +391,7 @@ class VoidGap extends RenderBox with BiggestBox {
   void dispose() {
     ticker.dispose();
     TopBar._focused.removeListener(updateColor);
-    for (final animation in animations) {
+    for (final ValueAnimation<double> animation in animations) {
       animation.dispose();
     }
     super.dispose();
@@ -397,13 +408,13 @@ class VoidGap extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final canvas = context.canvas;
-    final fullBox = offset & size;
+    final Canvas canvas = context.canvas;
+    final Rect fullBox = offset & size;
 
-    final position = TopBar.position;
+    final double position = TopBar.position;
     for (final (index, animation) in animations.indexed.toList().reversed) {
-      final t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
-      final color = Color.lerp(this.color, const Color(0xff202020), t)!;
+      final double t = (frame + 1) / (cycleFrames * rectCount) + index / rectCount;
+      final Color color = Color.lerp(this.color, const Color(0xff202020), t)!;
       animation.duration = Seconds(t / 2);
 
       if (animation.value != position) {
@@ -470,7 +481,7 @@ class RenderNoMoreCSS extends RenderBox with BiggestBox {
 
   void _tick(Duration elapsed) {
     if (fadingIn) {
-      final t = elapsed.inMicroseconds / fadeInMicros;
+      final double t = elapsed.inMicroseconds / fadeInMicros;
       if (t >= 1) {
         fadingIn = false;
         Route.go(Route.home);
@@ -480,12 +491,12 @@ class RenderNoMoreCSS extends RenderBox with BiggestBox {
       final hsv = HSVColor.fromAHSV(1, 40, 1, 1 - t);
       color = hsv.toColor().withValues(alpha: Curves.easeInOutSine.transform(t));
     } else {
-      final t = (elapsed.inMicroseconds - fadeInMicros) / fadeOutMicros;
+      final double t = (elapsed.inMicroseconds - fadeInMicros) / fadeOutMicros;
       if (t >= 1) {
         ticker.dispose();
         return NoMoreCSS.entry.remove();
       }
-      final alpha = 1 - Curves.easeOutCubic.transform(t);
+      final double alpha = 1 - Curves.easeOutCubic.transform(t);
       color = Colors.black.withValues(alpha: alpha);
       white = Colors.white.withValues(alpha: alpha);
     }
@@ -494,8 +505,8 @@ class RenderNoMoreCSS extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final rect = offset & size;
-    final canvas = context.canvas;
+    final Rect rect = offset & size;
+    final Canvas canvas = context.canvas;
 
     if (white case final color?) {
       canvas.drawRect(rect, Paint()..color = color);

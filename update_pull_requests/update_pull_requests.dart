@@ -11,7 +11,7 @@ import 'token.dart';
 
 void main() async {
   final String prList = await query('update_pull_requests/pr_query.gql');
-  final String text = """\
+  final text = """\
 part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[$prList];
@@ -39,7 +39,7 @@ Future<String> query(String filepath) async {
 String parse(Map<String, dynamic> data) {
   final buffer = StringBuffer()..writeln();
 
-  final {'user': {'pullRequests': {'nodes': nodes as List}}} = data;
+  final {'user': {'pullRequests': {'nodes': List<Object?> nodes}}} = data;
   for (final pr in nodes) {
     final {
       'title': title as String,
@@ -47,11 +47,11 @@ String parse(Map<String, dynamic> data) {
       'additions': additions as int,
       'deletions': deletions as int,
       'createdAt': createdAt as String,
-      'labels': {'nodes': labels as List},
-    } = pr as Map;
+      'labels': {'nodes': labels as List<Map>},
+    } = pr! as Map;
 
-    final dateTime = DateTime.parse(createdAt);
-    final month = switch (dateTime.month) {
+    final DateTime dateTime = DateTime.parse(createdAt);
+    final String month = switch (dateTime.month) {
       1 => 'Jan',
       2 => 'Feb',
       3 => 'Mar',
@@ -66,8 +66,8 @@ String parse(Map<String, dynamic> data) {
       12 => 'Dec',
       _ => throw Error(),
     };
-    final day = dateTime.day.toString().padLeft(2, '0');
-    final year = dateTime.year;
+    final String day = dateTime.day.toString().padLeft(2, '0');
+    final int year = dateTime.year;
 
     final bool refactor = labels.any((label) => label['name'] == 'refactor');
 

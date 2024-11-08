@@ -130,7 +130,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
     } else {
       states.remove(WidgetState.pressed);
     }
-    await Future.delayed(const Seconds(2));
+    await Future<void>.delayed(const Seconds(2));
     if (mounted) _hide();
   }
 
@@ -156,8 +156,8 @@ class _ProjectButtonState extends State<_ProjectButton> {
     return OverlayPortal(
       controller: _controller,
       overlayChildBuilder: (_) {
-        final box = context.renderBox;
-        final offset = box.localToGlobal(box.paintBounds.topLeft);
+        final RenderBox box = context.renderBox;
+        final Offset offset = box.localToGlobal(box.paintBounds.topLeft);
 
         return Positioned.fromRect(rect: offset & box.size, child: card);
       },

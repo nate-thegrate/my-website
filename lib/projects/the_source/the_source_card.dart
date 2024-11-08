@@ -1,9 +1,13 @@
-import 'dart:ui';
-
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class SourceCard extends StatelessWidget {
   const SourceCard({super.key});
+
+  static final color = Get.vsyncValue(grey, duration: Durations.short2, curve: Curves.linear);
+  static final elevation = Get.vsyncValue(5.0);
+
+  static const grey = Color(0xffe0e0e0);
+  static const offWhite = Color(0xfff0f0f0);
 
   @override
   Widget build(BuildContext context) {
@@ -20,41 +24,32 @@ class _SourceCard extends StatefulWidget {
   State<_SourceCard> createState() => _SourceCardState();
 }
 
-class ColorAnimation extends ValueAnimation<Color> {
-  ColorAnimation({
-    required super.vsync,
-    required super.initialValue,
-    required super.duration,
-  }) : super(lerp: Color.lerp);
-
-  static const grey = Color(0xffe0e0e0);
-  static const offWhite = Color(0xfff0f0f0);
-}
-
-class _SourceCardState extends State<_SourceCard> with SingleTickerProviderStateMixin {
+class _SourceCardState extends State<_SourceCard> {
   double scale = 1.0;
 
-  late final colorAnimation = ColorAnimation(
-    vsync: this,
-    initialValue: ColorAnimation.grey,
-    duration: Durations.short2,
-  );
   final states = WidgetStates();
   static final active = WidgetState.hovered | WidgetState.selected;
+
+  late final Subscription subscription;
 
   @override
   void initState() {
     super.initState();
+    SourceCard.color.attach(context);
+    SourceCard.elevation.attach(context);
     states.addListener(() {
-      colorAnimation.value =
-          active.isSatisfiedBy(states) ? ColorAnimation.offWhite : ColorAnimation.grey;
+      SourceCard.color.it.value =
+          active.isSatisfiedBy(states) ? SourceCard.offWhite : SourceCard.grey;
+    });
+    subscription = TheApproach.approaching.listen((approaching) {
+      SourceCard.elevation.it.value = approaching ? 0.0 : 5.0;
     });
   }
 
   @override
   void dispose() {
     states.dispose();
-    colorAnimation.dispose();
+    subscription.close();
     super.dispose();
   }
 
@@ -86,7 +81,7 @@ class RecursionCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recursions = RecursionCount.of(context);
+    final int recursions = RecursionCount.of(context);
     if (recursions > 6) {
       if (hasAncestor<DxTransition>(context)) {
         return const SizedBox.shrink();
@@ -108,32 +103,6 @@ class _RecursionCount extends KeyedSubtree {
   const _RecursionCount({required ValueKey<int> super.key, required super.child});
 }
 
-class _CardRecursion extends HookWidget {
-  const _CardRecursion();
-
-  @override
-  Widget build(BuildContext context) {
-    final color = useAnimationFrom<_SourceCardState, Color>((s) => s.colorAnimation);
-    const child = Center(
-      child: IgnorePointer(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: _ScreenSizedBox(
-            child: RecursionCount(),
-          ),
-        ),
-      ),
-    );
-
-    return AnimatedValue.transition(
-      useValueListenable(TheApproach.approaching) ? 0.0 : 5.0,
-      lerp: lerpDouble,
-      duration: Durations.medium1,
-      builder: (context, elevation) => _InnerSourceCard(elevation, color, child: child),
-    );
-  }
-}
-
 class _ScreenSizedBox extends StatelessWidget {
   const _ScreenSizedBox({required this.child});
 
@@ -145,28 +114,48 @@ class _ScreenSizedBox extends StatelessWidget {
   }
 }
 
-class _InnerSourceCard extends SingleChildRenderObjectWidget with RenderListenable {
-  const _InnerSourceCard(
-    this.elevation,
-    this.color, {
-    super.child,
-  });
+class _CardRecursion extends SingleChildRenderObjectWidget {
+  const _CardRecursion() : super(child: _child);
 
-  final ValueListenable<double> elevation;
-  final ValueListenable<Color> color;
+  static const _child = Center(
+    child: IgnorePointer(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: _ScreenSizedBox(
+          child: RecursionCount(),
+        ),
+      ),
+    ),
+  );
 
   @override
-  Listenable get listenable => Listenable.merge({elevation, color});
+  AnimatedCard createRenderObject(BuildContext context) => AnimatedCard();
+}
 
-  @override
-  EtherealCard createRenderObject(BuildContext context) {
-    return EtherealCard(elevation: elevation.value, color: color.value);
+class AnimatedCard extends EtherealCard {
+  AnimatedCard() : this._(SourceCard.color.it, SourceCard.elevation.it);
+
+  AnimatedCard._(this.colorAnimation, this.elevationAnimation)
+      : super(color: colorAnimation.value, elevation: elevationAnimation.value) {
+    colorAnimation.addListener(_colorListener);
+    elevationAnimation.addListener(_elevationListener);
+  }
+
+  final ValueListenable<Color> colorAnimation;
+  final ValueListenable<double> elevationAnimation;
+
+  void _colorListener() {
+    color = colorAnimation.value;
+  }
+
+  void _elevationListener() {
+    elevation = elevationAnimation.value;
   }
 
   @override
-  void updateRenderObject(BuildContext context, EtherealCard renderObject) {
-    renderObject
-      ..elevation = elevation.value
-      ..color = color.value;
+  void dispose() {
+    colorAnimation.removeListener(_colorListener);
+    elevationAnimation.removeListener(_elevationListener);
+    super.dispose();
   }
 }

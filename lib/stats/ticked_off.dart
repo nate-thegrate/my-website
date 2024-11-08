@@ -20,7 +20,7 @@ class _CodeSnippet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (background, foreground) = Focus.of(context).hasFocus
+    final (Color background, Color? foreground) = Focus.of(context).hasFocus
         ? (const Color(0xffe4ffff), PullRequest.color)
         : (const Color(0xfffaffff), null);
 

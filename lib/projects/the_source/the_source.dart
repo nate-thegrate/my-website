@@ -34,13 +34,13 @@ class TheApproach extends HookWidget implements Source {
 
   final Widget child;
 
-  static final approaching = Cubit(false);
+  static final approaching = Get.value(false);
 
-  static void approach() => approaching.value = true;
+  static void approach() => approaching.it.value = true;
 
   @override
   Widget build(BuildContext context) {
-    Matrix4 transform = Matrix4.identity();
+    var transform = Matrix4.identity();
     if (useTheApproach()) {
       transform = context.renderBox.getTransformTo(_Gateway.context.renderBox);
     }
@@ -85,7 +85,7 @@ class Dilation extends Curve {
 
 enum Journey { whiteVoid, sourceOfWisdom, activated }
 
-bool useTheApproach() => useValueListenable(TheApproach.approaching);
+bool useTheApproach() => Use.watch(TheApproach.approaching);
 Journey useTheSource() => useValueListenable(useMemoized(() => Source.provide().journey));
 
 class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
@@ -123,7 +123,7 @@ class _InnerSource extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final journey = useTheSource();
+    final Journey journey = useTheSource();
     const theSource = Text.rich(
       TextSpan(children: [
         TextSpan(text: 'Head over to'),
@@ -145,7 +145,7 @@ class _InnerSource extends HookWidget {
         duration: const Seconds(TheSource.endTransitionSeconds),
         curve: Curves.easeInExpo,
         builder: (context, t, child) {
-          final scale = t * 4 + 1;
+          final double scale = t * 4 + 1;
 
           return Transform(
             transform: Matrix4.identity()..scale(scale, scale),
@@ -184,7 +184,7 @@ class _GitHubButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final alpha = DefaultTextStyle.of(context).style.color!.a;
+    final double alpha = DefaultTextStyle.of(context).style.color!.a;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -216,7 +216,7 @@ class _Passage extends LeafRenderObjectWidget {
 
 class TheSource extends RenderBox with BiggestBox {
   TheSource() {
-    final theVoidProvides = Source.provide();
+    final TheSourceProvides theVoidProvides = Source.provide();
     journey = theVoidProvides.journey;
 
     void theVoid() {
@@ -229,7 +229,7 @@ class TheSource extends RenderBox with BiggestBox {
 
     journey.addListener(theVoid);
     ticker = theVoidProvides.createTicker(_tick)..start();
-    postFrameCallback(() => TheApproach.approaching.value = false);
+    postFrameCallback(() => TheApproach.approaching.it.value = false);
   }
 
   late final Cubit<Journey> journey;
@@ -260,9 +260,9 @@ class TheSource extends RenderBox with BiggestBox {
     totalElapsed = elapsed.inMicroseconds;
 
     if (activated case final tStart?) {
-      final remainingMs = endMs - totalElapsed;
+      final int remainingMs = endMs - totalElapsed;
       if (remainingMs <= 0) return apotheosis();
-      final stretched = math.sqrt(math.sqrt(remainingMs) * micros);
+      final double stretched = math.sqrt(math.sqrt(remainingMs) * micros);
       t = (2 * (tStart - totalElapsed) / stretched + tActivated) % 1;
       transition = Curves.easeOutExpo.transform(
         math.min(remainingMs / endTransitionMicroseconds * 1.5, 1),
@@ -283,9 +283,9 @@ class TheSource extends RenderBox with BiggestBox {
 
   void apotheosis() async {
     ticker.dispose();
-    await Future.delayed(Durations.short4);
+    await Future<void>.delayed(Durations.short4);
     launchUrlString('https://github.com/nate-thegrate/my-website');
-    await Future.delayed(Durations.long4);
+    await Future<void>.delayed(Durations.long4);
 
     Route.go(Route.home);
   }
@@ -300,13 +300,13 @@ class TheSource extends RenderBox with BiggestBox {
   void paint(PaintingContext context, Offset offset) {
     assert(offset == Offset.zero);
 
-    final rect = offset & size;
-    final canvas = context.canvas;
+    final Rect rect = offset & size;
+    final Canvas canvas = context.canvas;
     canvas.drawRect(rect, Paint()..color = const FromLight(baseLightness));
-    final minScale = 1 - transition + transition * minScaleFactor;
+    final double minScale = 1 - transition + transition * minScaleFactor;
     for (int i = 1; i <= rectCount; i++) {
-      final multiplier = i + t - 1;
-      final scale = math.min(
+      final double multiplier = i + t - 1;
+      final double scale = math.min(
         lerpDouble(inverseScaleFactor, 1, transition)! * (2 / 3 + 1 / (multiplier + 3)),
         1.0,
       );
@@ -324,7 +324,7 @@ class TheSource extends RenderBox with BiggestBox {
 
 extension type SourceRect._(Rect rect) implements Rect {
   factory SourceRect(Rect rect, {required double scale}) {
-    final Size(:width, :height) = rect.size;
+    final Size(:double width, :double height) = rect.size;
 
     final newRect = Rect.fromCenter(
       center: rect.center,

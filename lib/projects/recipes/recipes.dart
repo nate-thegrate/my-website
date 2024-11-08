@@ -87,7 +87,7 @@ class _FadeInButtons extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ignoring = !useDelayedActivation(6);
+    final bool ignoring = !useDelayedActivation(6);
     const row = Row(
       children: [
         Expanded(
@@ -150,7 +150,7 @@ class AnimatedText extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activated = useDelayedActivation(delay / 3);
+    final bool activated = useDelayedActivation(delay / 3);
 
     const duration = Seconds(0.8);
     return AnimatedSlide(
@@ -172,7 +172,7 @@ class _ComingSoon extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visible = useDelayedActivation(5);
+    final bool visible = useDelayedActivation(5);
 
     return Transform.rotate(
       angle: -0.5,
@@ -240,7 +240,7 @@ class _RenderSpringDrop extends RenderBox with BiggestBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final canvas = context.canvas;
+    final Canvas canvas = context.canvas;
 
     canvas
       ..save()
