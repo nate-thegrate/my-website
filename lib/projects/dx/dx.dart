@@ -1,8 +1,11 @@
 import 'package:nate_thegrate/the_good_stuff.dart';
 
+export 'animated_slide.dart';
+export 'animated_value.dart';
 export 'demo_button.dart';
 export 'dx_button.dart';
 export 'dx_card.dart';
+export 'render_colored_box.dart';
 export 'vs_code.dart';
 
 extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
@@ -29,28 +32,22 @@ extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
   }
 
   static const _child = DefaultTextStyle(
-    style: DxButton.style,
+    style: TextStyle(
+      inherit: false,
+      color: Colors.black87,
+      fontFamily: 'roboto mono',
+      fontSize: 22,
+      fontVariations: [FontVariation.weight(550)],
+    ),
     textAlign: TextAlign.center,
     child: SizedBox.expand(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Spacer(),
-          Expanded(
-            flex: 9,
-            child: DxButton(
-              Route.mapping,
-              child: Text('WidgetState\nMapping'),
-            ),
-          ),
+          Expanded(flex: 9, child: DxButton(Route.mapping, child: Text('WidgetState\nMapping'))),
           Spacer(),
-          Expanded(
-            flex: 9,
-            child: DxButton(
-              Route.animation,
-              child: Text('Animated\nValues'),
-            ),
-          ),
+          Expanded(flex: 9, child: DxButton(Route.animation, child: Text('Animated\nValues'))),
           Spacer(),
         ],
       ),
@@ -72,17 +69,16 @@ extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
       child: SizedBox.expand(
         child: DecoratedBox(
           decoration: DX.background,
-          child: DefaultTextStyle(
-            style: DxButton.style,
-            textAlign: TextAlign.center,
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: kToolbarHeight,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                    child: Row(spacing: 8.0, children: [
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: kToolbarHeight,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  child: Row(
+                    spacing: 8.0,
+                    children: [
                       SizedBox(
                         width: 40,
                         child: DxButton(
@@ -111,41 +107,36 @@ extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
                           child: Text('Animation'),
                         ),
                       ),
-                    ]),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: ClipPath(
-                    clipper: ShapeBorderClipper(shape: bodyBorder),
-                    child: SizedBox.expand(
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          DecoratedBox(
-                            decoration: Rekt(depth: 1.0, border: bodyBorder),
-                            position: DecorationPosition.foreground,
-                            child: ColoredBox(
-                              color: Color(0xff303030),
-                            ),
-                          ),
-                          Column(
-                            children: [
-                              CodeCaption(),
-                              Expanded(
-                                flex: 16,
-                                child: CodeSample(),
-                              ),
-                              DemoButton(),
-                              Spacer(),
-                            ],
-                          ),
-                        ],
-                      ),
+              ),
+              Expanded(
+                child: ClipPath(
+                  clipper: ShapeBorderClipper(shape: bodyBorder),
+                  child: SizedBox.expand(
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        DecoratedBox(
+                          decoration: Rekt(depth: 1.0, border: bodyBorder),
+                          position: DecorationPosition.foreground,
+                          child: ColoredBox(color: Color(0xff303030)),
+                        ),
+                        Column(
+                          children: [
+                            CodeCaption(),
+                            Expanded(flex: 16, child: CodeSample()),
+                            DemoButton(),
+                            Spacer(),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -162,10 +153,10 @@ class ApiToggle extends HookWidget {
   static final _animation = Cubit(false);
 
   static Cubit<bool> get toggle => switch (Route.current) {
-        Route.mapping => _mapping,
-        Route.animation => _animation,
-        _ => throw Error(),
-      };
+    Route.mapping => _mapping,
+    Route.animation => _animation,
+    _ => throw Error(),
+  };
 
   static bool of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<_ApiToggle>()!.showImprovedVersion;
@@ -178,10 +169,7 @@ class ApiToggle extends HookWidget {
       Route.animation => _animation,
       _ => throw Error(),
     };
-    return _ApiToggle(
-      showImprovedVersion: useValueListenable(toggle),
-      child: child,
-    );
+    return _ApiToggle(showImprovedVersion: useValueListenable(toggle), child: child);
   }
 }
 
@@ -204,21 +192,23 @@ class CodeCaption extends StatelessWidget {
     final bool newStuff = ApiToggle.of(context);
     final subtitle = newStuff ? 'after' : 'before';
     return Text.rich(
-      TextSpan(children: [
-        const TextSpan(text: '\n'),
-        TextSpan(
-          text: switch ((Route.of(context), newStuff)) {
-            (Route.mapping, true) => 'WidgetState mapping',
-            (Route.mapping, false) => 'Widget property resolver',
-            (Route.animation, true) => 'Animated Value',
-            (Route.animation, false) => 'Implicitly-animated Widget',
-            _ => throw Error(),
-          },
-          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        ),
-        const TextSpan(text: '\n\n', style: TextStyle(fontSize: 6)),
-        TextSpan(text: '($subtitle)\n', style: VsCode.defaultStyle),
-      ]),
+      TextSpan(
+        children: [
+          const TextSpan(text: '\n'),
+          TextSpan(
+            text: switch ((Route.of(context), newStuff)) {
+              (Route.mapping, true) => 'WidgetState mapping',
+              (Route.mapping, false) => 'Widget property resolver',
+              (Route.animation, true) => 'Animated Value',
+              (Route.animation, false) => 'Implicitly-animated Widget',
+              _ => throw Error(),
+            },
+            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          ),
+          const TextSpan(text: '\n\n', style: TextStyle(fontSize: 6)),
+          TextSpan(text: '($subtitle)\n', style: VsCode.defaultStyle),
+        ],
+      ),
       textAlign: TextAlign.center,
       style: const TextStyle(inherit: false, color: Colors.white),
     );
@@ -227,22 +217,17 @@ class CodeCaption extends StatelessWidget {
 
 extension type const CodeSample._(FittedBox _) implements FittedBox {
   const CodeSample()
-      : _ = const FittedBox(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(32, 8, 32, 32),
-            child: _CodeSample(),
-          ),
-        );
+    : _ = const FittedBox(
+        alignment: Alignment.topLeft,
+        child: Padding(padding: EdgeInsets.fromLTRB(32, 8, 32, 32), child: _CodeSample()),
+      );
 }
 
 class _CodeSample extends StatelessWidget {
   const _CodeSample();
 
   static final _themeData = ThemeData(
-    textSelectionTheme: const TextSelectionThemeData(
-      selectionColor: Color(0xff285078),
-    ),
+    textSelectionTheme: const TextSelectionThemeData(selectionColor: Color(0xff285078)),
   );
 
   @override
@@ -253,10 +238,7 @@ class _CodeSample extends StatelessWidget {
         Route.animation => const Size(720, 633),
         _ => throw Error(),
       },
-      child: Theme(
-        data: _themeData,
-        child: SelectionArea(child: VsCode.of(context)),
-      ),
+      child: Theme(data: _themeData, child: SelectionArea(child: VsCode.of(context))),
     );
   }
 }

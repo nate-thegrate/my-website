@@ -60,9 +60,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     widthAnimation.toggle(
       forward: (WidgetState.hovered | WidgetState.pressed).isSatisfiedBy(states),
     );
-    depthAnimation.toggle(
-      forward: states.contains(WidgetState.pressed),
-    );
+    depthAnimation.toggle(forward: states.contains(WidgetState.pressed));
 
     if (states.contains(WidgetState.selected) != prepareToLaunch) {
       setState(() => prepareToLaunch = !prepareToLaunch);
@@ -77,12 +75,8 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
       await Future<void>.delayed(Durations.medium1);
       if (!mounted) return;
 
-      states.removeAll(const {
-        WidgetState.selected,
-        WidgetState.hovered,
-        WidgetState.pressed,
-      });
-      Route.go(Route.dx, extra: const Projects());
+      states.removeAll(const {WidgetState.selected, WidgetState.hovered, WidgetState.pressed});
+      Route.go(Route.dx, extra: ProjectGrid.screen);
       await Future<void>.delayed(const Seconds(1));
 
       DxCard.launching.value = false;
@@ -117,10 +111,11 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     return Stached(
       direction: AxisDirection.right,
       child: LayoutBuilder(
-        builder: (context, constraints) => ListenableBuilder(
-          listenable: listenables,
-          builder: (context, _) => _build(context, constraints),
-        ),
+        builder:
+            (context, constraints) => ListenableBuilder(
+              listenable: listenables,
+              builder: (context, _) => _build(context, constraints),
+            ),
       ),
     );
   }
@@ -129,9 +124,10 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     final double width = widthCurved.value;
     const top = 5.0;
     const double bottom = -2.0;
-    final double elevation = prepareToLaunch
-        ? bottom
-        : lerpDouble(top, bottom, Curves.ease.transform(depthAnimation.value))!;
+    final double elevation =
+        prepareToLaunch
+            ? bottom
+            : lerpDouble(top, bottom, Curves.ease.transform(depthAnimation.value))!;
     final double altitude = math.max(elevation, 0.0);
     final double shadowSize = math.max(-elevation, 0.0);
 
@@ -163,7 +159,21 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
                       child: const Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: [DarkFlutterLogo(), DxText()],
+                          children: [
+                            FittedBox(
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(16, 0, 16, 36),
+                                child: SizedBox.square(dimension: 150, child: _FlutterLogo()),
+                              ),
+                            ),
+                            FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: SizedBox(width: 325, child: _DxText()),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -178,17 +188,6 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   }
 }
 
-extension type const DxText._(FittedBox _) implements FittedBox {
-  const DxText()
-      : _ = const FittedBox(
-          fit: BoxFit.fitWidth,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: SizedBox(width: 325, child: _DxText()),
-          ),
-        );
-}
-
 class _DxText extends HookWidget {
   const _DxText();
 
@@ -198,13 +197,15 @@ class _DxText extends HookWidget {
       useAnimationFrom<_DxCardState, ValueListenable<double>>((s) => s.widthCurved),
     );
     final int visibleLetters = (value * 10).round();
-    final textSpan = TextSpan(children: [
-      const TextSpan(text: '{ d'),
-      TextSpan(text: 'eveloper e'.substring(0, visibleLetters)),
-      const TextSpan(text: 'x'),
-      TextSpan(text: 'perience'.substring(0, math.min(visibleLetters, 8))),
-      const TextSpan(text: ' }'),
-    ]);
+    final textSpan = TextSpan(
+      children: [
+        const TextSpan(text: '{ d'),
+        TextSpan(text: 'eveloper e'.substring(0, visibleLetters)),
+        const TextSpan(text: 'x'),
+        TextSpan(text: 'perience'.substring(0, math.min(visibleLetters, 8))),
+        const TextSpan(text: ' }'),
+      ],
+    );
 
     return Text.rich(
       textSpan,
@@ -218,22 +219,6 @@ class _DxText extends HookWidget {
       ),
     );
   }
-}
-
-extension type const DarkFlutterLogo._(FittedBox _) implements FittedBox {
-  const DarkFlutterLogo() : this._(_widget);
-
-  static const _widget = FittedBox(
-    child: Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, 36),
-      child: SizedBox.square(
-        dimension: 150,
-        child: _FlutterLogo(),
-      ),
-    ),
-  );
-
-  static const color = Color(0xff202020);
 }
 
 class _FlutterLogo extends LeafRenderObjectWidget {
@@ -253,19 +238,20 @@ class _RenderFlutterLogo extends RenderBox {
     size = maxSize;
   }
 
-  static final _path = Path()
-    ..moveTo(62, 46)
-    ..lineTo(29, 73)
-    ..lineTo(62, 100)
-    ..lineTo(100, 100)
-    ..lineTo(67, 73)
-    ..lineTo(100, 46)
-    ..close()
-    ..moveTo(62, 0)
-    ..lineTo(0, 50)
-    ..lineTo(18, 66)
-    ..lineTo(100, 0)
-    ..close();
+  static final _path =
+      Path()
+        ..moveTo(62, 46)
+        ..lineTo(29, 73)
+        ..lineTo(62, 100)
+        ..lineTo(100, 100)
+        ..lineTo(67, 73)
+        ..lineTo(100, 46)
+        ..close()
+        ..moveTo(62, 0)
+        ..lineTo(0, 50)
+        ..lineTo(18, 66)
+        ..lineTo(100, 0)
+        ..close();
 
   @override
   void paint(PaintingContext context, Offset offset) {
@@ -273,7 +259,7 @@ class _RenderFlutterLogo extends RenderBox {
       ..save()
       ..translate(offset.dx, offset.dy)
       ..scale(scale * 0.8, scale)
-      ..drawPath(_path, Paint()..color = DarkFlutterLogo.color)
+      ..drawPath(_path, Paint()..color = const Color(0xff202020))
       ..restore();
   }
 }
@@ -321,11 +307,11 @@ class CardPainter extends BoxPainter {
 
 class DxTransition extends AnimatedSlide {
   const DxTransition({super.key})
-      : super(
-          offset: const Offset(0, 1.2),
-          initialOffset: Offset.zero,
-          duration: Durations.medium3,
-          curve: Curves.easeIn,
-          child: const Projects(),
-        );
+    : super(
+        offset: const Offset(0, 1.2),
+        initialOffset: Offset.zero,
+        duration: Durations.medium3,
+        curve: Curves.easeIn,
+        child: ProjectGrid.screen,
+      );
 }

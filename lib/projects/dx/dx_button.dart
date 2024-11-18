@@ -4,26 +4,11 @@ import 'dart:ui';
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 class DxButton extends StatefulWidget {
-  const DxButton(
-    this.route, {
-    super.key,
-    this.border = Rekt.defaultBorder,
-    required this.child,
-  });
+  const DxButton(this.route, {super.key, this.border = Rekt.defaultBorder, required this.child});
 
   final Route route;
-
   final OutlinedBorder border;
-
   final Widget child;
-
-  static const style = TextStyle(
-    inherit: false,
-    color: Colors.black87,
-    fontFamily: 'roboto mono',
-    fontSize: 22,
-    fontVariations: [FontVariation.weight(550)],
-  );
 
   @override
   State<DxButton> createState() => _DxButtonState();
@@ -52,10 +37,7 @@ class _DxButtonState extends State<DxButton> with SingleTickerProviderStateMixin
         child: FittedBox(
           child: SizedBox(
             width: 200,
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: _DepthTransition(),
-            ),
+            child: Padding(padding: EdgeInsets.all(16), child: _DepthTransition()),
           ),
         ),
       ),
@@ -71,20 +53,31 @@ class _DxButtonState extends State<DxButton> with SingleTickerProviderStateMixin
           child: RektTransition(
             depth: depth,
             border: border,
-            child: SplashBox(
-              child: InkWell(
-                onTap: () {
-                  if (Route.current case Route.animation || Route.mapping) {
-                    return Route.go(widget.route);
-                  }
-                  Rekt.getRekt(context);
-                },
-                overlayColor: const WidgetStateColor.fromMap({
-                  WidgetState.pressed: Color(0x24000000),
-                  WidgetState.hovered: Color(0x14000000),
-                  WidgetState.any: Colors.black12,
-                }),
-                child: interior,
+            child: Material(
+              type: MaterialType.transparency,
+              child: DefaultTextStyle(
+                style: const TextStyle(
+                  color: Colors.black87,
+                  inherit: false,
+                  fontFamily: 'roboto mono',
+                  fontSize: 22,
+                  fontVariations: [FontVariation.weight(550)],
+                ),
+                textAlign: TextAlign.center,
+                child: InkWell(
+                  onTap: () {
+                    if (Route.current case Route.animation || Route.mapping) {
+                      return Route.go(widget.route);
+                    }
+                    Rekt.getRekt(context);
+                  },
+                  overlayColor: const WidgetStateColor.fromMap({
+                    WidgetState.pressed: Color(0x24000000),
+                    WidgetState.hovered: Color(0x14000000),
+                    WidgetState.any: Colors.black12,
+                  }),
+                  child: interior,
+                ),
               ),
             ),
           ),
@@ -156,9 +149,9 @@ class RenderAnimatedDecoration<T> extends RenderDecoratedBox {
     required this.listenable,
     required this.computeDecoration,
   }) : super(
-          configuration: createLocalImageConfiguration(context),
-          decoration: computeDecoration(listenable.value),
-        ) {
+         configuration: createLocalImageConfiguration(context),
+         decoration: computeDecoration(listenable.value),
+       ) {
     listenable.addListener(_listener);
   }
 
@@ -194,8 +187,8 @@ final class Rekt extends Decoration {
   const Rekt({this.border = defaultBorder, required this.depth});
 
   Rekt.lerp(Rekt a, Rekt b, double t)
-      : border = OutlinedBorder.lerp(a.border, b.border, t)!,
-        depth = _lerpDouble(a.depth, b.depth, t);
+    : border = OutlinedBorder.lerp(a.border, b.border, t)!,
+      depth = _lerpDouble(a.depth, b.depth, t);
 
   final OutlinedBorder border;
   final double depth;
@@ -208,10 +201,8 @@ final class Rekt extends Decoration {
 
   static OverlayEntry? _entry;
   static ToggleAnimation? _animation;
-  static ToggleAnimation get animation => _animation ??= ToggleAnimation(
-        vsync: App.vsync,
-        duration: Durations.short3,
-      );
+  static ToggleAnimation get animation =>
+      _animation ??= ToggleAnimation(vsync: App.vsync, duration: Durations.short3);
   static void getRekt(BuildContext context) {
     final RenderBox box = context.renderBox;
     final Rect rect = box.localToGlobal(Offset.zero) & box.size;
@@ -222,17 +213,16 @@ final class Rekt extends Decoration {
     final Route route = apiButton.route;
     animation.forward();
     App.overlay.insert(
-      _entry = OverlayEntry(builder: (context) {
-        return SizedBox.expand(
-          child: FadeTransition(
-            opacity: animation,
-            child: DecoratedBox(
-              decoration: DX.background,
-              child: _RektTransition(rect, route),
+      _entry = OverlayEntry(
+        builder: (context) {
+          return SizedBox.expand(
+            child: FadeTransition(
+              opacity: animation,
+              child: DecoratedBox(decoration: DX.background, child: _RektTransition(rect, route)),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 
@@ -290,7 +280,7 @@ class _RektTransition extends LeafRenderObjectWidget {
   RenderBox createRenderObject(BuildContext context) => _RenderRekt(rect, route);
 }
 
-class _RenderRekt extends RenderBox with BiggestBox {
+class _RenderRekt extends BigBox {
   _RenderRekt(this.rect, this.route) {
     ticker = App.vsync.createTicker(_tick)..start();
   }

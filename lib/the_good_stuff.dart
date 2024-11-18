@@ -7,14 +7,7 @@ import 'main.dart';
 export 'package:flutter/foundation.dart';
 export 'package:flutter/gestures.dart';
 export 'package:flutter/material.dart'
-    hide
-        AnimationController,
-        ChangeNotifier,
-        LerpCallback,
-        Route,
-        ToggleAnimation,
-        ValueAnimation,
-        ValueNotifier;
+    hide AnimatedSlide, ChangeNotifier, Route, SlideTransition, ValueNotifier;
 export 'package:flutter/rendering.dart';
 export 'package:flutter/scheduler.dart';
 export 'package:get_hooked/get_hooked.dart';
@@ -23,18 +16,23 @@ export 'package:url_launcher/url_launcher_string.dart';
 
 export 'main.dart';
 
-extension Rebuild on State {
-  // ignore: invalid_use_of_protected_member, screw that
-  void rebuild() => setState(() {});
+mixin MarkNeedsBuild<T extends StatefulWidget> on State<T> {
+  late final rebuild = (context as Element).markNeedsBuild;
 }
 
 extension FindRenderBox on BuildContext {
   RenderBox get renderBox => findRenderObject()! as RenderBox;
 }
 
-mixin BiggestBox on RenderBox {
+class BigBox extends RenderBox {
   @override
-  void performLayout() => size = constraints.biggest;
+  bool get sizedByParent => true;
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) => constraints.biggest;
+
+  @override
+  void performResize() => size = constraints.biggest;
 }
 
 typedef Bloc = ChangeNotifier;
@@ -78,5 +76,5 @@ extension type WidgetStates._(_States _states) implements _States {
 
 class WidgetStatesProvider extends InheritedNotifier<WidgetStates> {
   const WidgetStatesProvider({super.key, required WidgetStates states, required super.child})
-      : super(notifier: states);
+    : super(notifier: states);
 }

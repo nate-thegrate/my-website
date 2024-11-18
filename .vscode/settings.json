@@ -9,4 +9,5 @@
             100
         ]
     },
+    "dart.autoImportCompletions": false,
 }

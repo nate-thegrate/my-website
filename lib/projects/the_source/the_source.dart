@@ -34,42 +34,42 @@ class TheApproach extends HookWidget implements Source {
 
   final Widget child;
 
-  static final approaching = Get.value(false);
+  static final approaching = Get.it(false);
 
-  static void approach() => approaching.it.value = true;
+  static final noTransform = Matrix4.identity();
+
+  static void approach() async {
+    approaching.value = true;
+    try {
+      await getZoom
+          .animateTo(1.0, curve: const Dilation(), duration: const Seconds(2.5))
+          .orCancel;
+    } on TickerCanceled {
+      return;
+    }
+    Route.go(Route.source);
+  }
+
+  static final getZoom = Get.vsync();
+
+  static Matrix4 lerpMatrix(Matrix4 a, Matrix4 b, double t) {
+    return Matrix4Tween(begin: a, end: b).transform(t);
+  }
 
   @override
   Widget build(BuildContext context) {
-    var transform = Matrix4.identity();
+    final ObjectRef<Matrix4?> transform = useRef(null);
     if (useTheApproach()) {
-      transform = context.renderBox.getTransformTo(_Gateway.context.renderBox);
+      transform.value ??= context.renderBox.getTransformTo(_Gateway.context.renderBox);
     }
-    return AnimatedValue.transition(
-      transform,
-      curve: const Dilation(),
-      duration: const Seconds(2.5),
-      lerp: MatrixUtils.lerp,
-      onEnd: () => Route.go(Route.source),
-      builder: (context, transform) => _Approach(transform: transform, child: child),
+    return MatrixTransition(
+      alignment: Alignment.topLeft,
+      animation: getZoom.hooked,
+      onTransform: (animationValue) {
+        return lerpMatrix(noTransform, transform.value ?? noTransform, getZoom.value);
+      },
+      child: child,
     );
-  }
-}
-
-class _Approach extends SingleChildRenderObjectWidget with RenderListenable {
-  const _Approach({required ValueListenable<Matrix4> transform, super.child})
-      : listenable = transform;
-
-  @override
-  final ValueListenable<Matrix4> listenable;
-
-  @override
-  RenderTransform createRenderObject(BuildContext context) {
-    return RenderTransform(transform: listenable.value);
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderTransform renderObject) {
-    renderObject.transform = listenable.value;
   }
 }
 
@@ -85,28 +85,22 @@ class Dilation extends Curve {
 
 enum Journey { whiteVoid, sourceOfWisdom, activated }
 
-bool useTheApproach() => Use.watch(TheApproach.approaching);
-Journey useTheSource() => useValueListenable(useMemoized(() => Source.provide().journey));
+final getJourney = Get.it(Journey.whiteVoid);
+
+bool useTheApproach() => Ref.watch(TheApproach.approaching);
 
 class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
   factory TheSourceProvides.provide() => const _Source().currentState!;
 
   TheSourceProvides.createState();
 
-  final journey = Cubit(Journey.whiteVoid);
-
-  @override
-  void dispose() {
-    journey.dispose();
-    super.dispose();
-  }
-
   static const _vessel = Stack(
     alignment: Alignment.center,
     children: [
       _Passage(),
-      FractionallySizedBox.scaled(
-        scale: TheSource.minScaleFactor,
+      FractionallySizedBox(
+        widthFactor: TheSource.minScaleFactor,
+        heightFactor: TheSource.minScaleFactor,
         child: _InnerSource(),
       ),
     ],
@@ -123,54 +117,69 @@ class _InnerSource extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Journey journey = useTheSource();
+    final Journey journey = Ref.watch(getJourney);
     const theSource = Text.rich(
-      TextSpan(children: [
-        TextSpan(text: 'Head over to'),
-        WidgetSpan(child: _GitHubButton()),
-        TextSpan(text: 'to\nsee '),
-        TextSpan(
-          text: 'the source ',
-          style: TextStyle(color: fromLight),
-        ),
-        TextSpan(text: 'code\nfor this website!'),
-      ]),
+      TextSpan(
+        children: [
+          TextSpan(text: 'Head over to'),
+          WidgetSpan(child: _GitHubButton()),
+          TextSpan(text: 'to\nsee '),
+          TextSpan(text: 'the source ', style: TextStyle(color: fromLight)),
+          TextSpan(text: 'code\nfor this website!'),
+        ],
+      ),
     );
 
-    return AnimatedToggle.builder(
-      journey != Journey.whiteVoid,
-      duration: const Seconds(TheSource.seconds),
-      builder: (context, value, child) => AnimatedToggle.builder(
-        journey == Journey.activated,
-        duration: const Seconds(TheSource.endTransitionSeconds),
-        curve: Curves.easeInExpo,
-        builder: (context, t, child) {
-          final double scale = t * 4 + 1;
-
-          return Transform(
-            transform: Matrix4.identity()..scale(scale, scale),
-            child: Opacity(opacity: 1 - t, child: child),
-          );
-        },
-        child: DefaultTextStyle(
-          style: TextStyle(
-            inherit: false,
-            color: fromLight.withValues(alpha: value),
-            fontSize: 32,
-            fontWeight: FontWeight.w600,
+    return AnimatedToggle.transition(
+      journey != Journey.activated,
+      duration: const Seconds(TheSource.endTransitionSeconds),
+      curve: Curves.easeInExpo,
+      builder: (context, animation) {
+        return MatrixTransition(
+          animation: animation,
+          onTransform: (t) {
+            final double scale = (1 - t) * 4 + 1;
+            return Matrix4.identity()..scale(scale, scale);
+          },
+          child: FadeTransition(
+            opacity: animation,
+            child: AnimatedToggle.builder(
+              journey != Journey.whiteVoid,
+              duration: const Seconds(TheSource.seconds),
+              builder: (context, value, child) {
+                return DefaultTextStyle(
+                  style: TextStyle(
+                    inherit: false,
+                    color: fromLight.withValues(alpha: value),
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  child: const _FadeIn(
+                    child: FittedBox(child: SizedBox(width: 375, height: 150, child: theSource)),
+                  ),
+                );
+              },
+            ),
           ),
-          textAlign: TextAlign.center,
-          child: child!,
-        ),
-      ),
-      child: const AnimatedOpacity(
-        opacity: 1.0,
-        initialOpacity: 0.0,
-        duration: Seconds(TheSource.transitionSeconds / 2),
-        child: FittedBox(
-          child: SizedBox(width: 375, height: 150, child: theSource),
-        ),
-      ),
+        );
+      },
+    );
+  }
+}
+
+class _FadeIn extends SingleChildRenderObjectWidget {
+  const _FadeIn({super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    final animation = AnimationController(
+      vsync: Vsync(),
+      duration: const Seconds(TheSource.transitionSeconds / 2),
+    );
+
+    return RenderAnimatedOpacity(
+      opacity: animation..forward().whenCompleteOrCancel(animation.dispose),
     );
   }
 }
@@ -179,7 +188,7 @@ class _GitHubButton extends StatelessWidget {
   const _GitHubButton();
 
   static void _viewTheSource() {
-    Source.provide().journey.value = Journey.activated;
+    getJourney.value = Journey.activated;
   }
 
   @override
@@ -214,10 +223,10 @@ class _Passage extends LeafRenderObjectWidget {
   TheSource createRenderObject(BuildContext context) => TheSource();
 }
 
-class TheSource extends RenderBox with BiggestBox {
+class TheSource extends BigBox {
   TheSource() {
     final TheSourceProvides theVoidProvides = Source.provide();
-    journey = theVoidProvides.journey;
+    journey = getJourney.hooked;
 
     void theVoid() {
       if (journey.value == Journey.activated) {
@@ -229,7 +238,7 @@ class TheSource extends RenderBox with BiggestBox {
 
     journey.addListener(theVoid);
     ticker = theVoidProvides.createTicker(_tick)..start();
-    postFrameCallback(() => TheApproach.approaching.it.value = false);
+    postFrameCallback(() => TheApproach.approaching.value = false);
   }
 
   late final Cubit<Journey> journey;
@@ -315,10 +324,7 @@ class TheSource extends RenderBox with BiggestBox {
         Paint()..color = FromLight(baseLightness + lightnessFactor * multiplier),
       );
     }
-    canvas.drawRect(
-      SourceRect(rect, scale: minScale),
-      Paint()..color = Colors.white,
-    );
+    canvas.drawRect(SourceRect(rect, scale: minScale), Paint()..color = Colors.white);
   }
 }
 

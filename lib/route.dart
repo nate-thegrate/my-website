@@ -134,7 +134,7 @@ final _goRouter = GoRouter(
         ),
         _GoRoute(
           Route.projects,
-          const _Page(Projects()),
+          const _Page(ProjectGrid.screen),
           routes: [
             GoRoute(
               path: Route.dx.name,

@@ -7,35 +7,39 @@ export 'recipes/recipes.dart';
 export 'the_source/the_source.dart';
 export 'the_source/the_source_card.dart';
 
-extension type const Projects._(TopBar _) implements TopBar {
-  const Projects() : _ = const TopBar(body: ProjectGrid());
-}
-
 class ProjectGrid extends Column {
   const ProjectGrid({super.key})
-      : super(children: const [
+    : super(
+        children: const [
           Spacer(),
           _Expanded(
-            Row(children: [
-              Spacer(),
-              _Expanded(ProjectButton(HuemanCard())),
-              Spacer(),
-              _Expanded(ProjectButton(DxCard())),
-              Spacer(),
-            ]),
+            Row(
+              children: [
+                Spacer(),
+                _Expanded(ProjectButton(HuemanCard())),
+                Spacer(),
+                _Expanded(ProjectButton(DxCard())),
+                Spacer(),
+              ],
+            ),
           ),
           Spacer(),
           _Expanded(
-            Row(children: [
-              Spacer(),
-              _Expanded(ProjectButton(RecipeCard())),
-              Spacer(),
-              _Expanded(SourceCard()),
-              Spacer(),
-            ]),
+            Row(
+              children: [
+                Spacer(),
+                _Expanded(ProjectButton(RecipeCard())),
+                Spacer(),
+                _Expanded(SourceCard()),
+                Spacer(),
+              ],
+            ),
           ),
           Spacer(),
-        ]);
+        ],
+      );
+
+  static const screen = TopBar(body: ProjectGrid());
 
   @override
   ProjectGridElement createElement() => ProjectGridElement(this);

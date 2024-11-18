@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:nate_thegrate/the_good_stuff.dart';
 
 export 'funderline.dart';
@@ -91,21 +89,26 @@ class DesktopHomePage extends HomePage {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text.rich(TextSpan(children: [
+              Text.rich(
                 TextSpan(
-                  text: 'Nate - the grate\n',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 32,
-                    height: 2.5,
-                    leadingDistribution: TextLeadingDistribution.even,
-                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Nate - the grate\n',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 32,
+                        height: 2.5,
+                        leadingDistribution: TextLeadingDistribution.even,
+                      ),
+                    ),
+                    TextSpan(
+                      text:
+                          'Thank you for visiting my website!\n'
+                          'This is where I showcase my passion for Flutter things 🙂',
+                    ),
+                  ],
                 ),
-                TextSpan(
-                  text: 'Thank you for visiting my website!\n'
-                      'This is where I showcase my passion for Flutter things 🙂',
-                ),
-              ])),
+              ),
               FunLink.contributions(),
               FunLink.projects(),
             ],
@@ -119,14 +122,12 @@ class DesktopHomePage extends HomePage {
 class HomePageElement extends SingleChildRenderObjectElement {
   HomePageElement(super.widget) {
     final entry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: 0,
-        left: 0,
-        child: FadeTransition(
-          opacity: opacity,
-          child: _FunPreview.box,
-        ),
-      ),
+      builder:
+          (context) => Positioned(
+            bottom: 0,
+            left: 0,
+            child: FadeTransition(opacity: opacity, child: _FunPreview.box),
+          ),
     );
 
     postFrameCallback(() => App.overlay.insert(entry));
@@ -210,24 +211,19 @@ class FunLink extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: SizedBox(
-              height: 1.5,
-              child: ColoredBox(key: route.key, color: FunLink.color),
-            ),
+            child: SizedBox(height: 1.5, child: ColoredBox(key: route.key, color: FunLink.color)),
           ),
           Text(
             '$route',
             style: TextStyle(
-              foreground: Paint()
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = 2.5
-                ..color = Colors.white,
+              foreground:
+                  Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 2.5
+                    ..color = Colors.white,
             ),
           ),
-          Text(
-            '$route',
-            style: const TextStyle(color: FunLink.color),
-          ),
+          Text('$route', style: const TextStyle(color: FunLink.color)),
           Positioned.fill(
             child: MouseRegion(
               cursor: SystemMouseCursors.click,

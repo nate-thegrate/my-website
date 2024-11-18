@@ -30,26 +30,35 @@ class _SourceCardState extends State<_SourceCard> {
   final states = WidgetStates();
   static final active = WidgetState.hovered | WidgetState.selected;
 
-  late final Subscription subscription;
-
   @override
   void initState() {
     super.initState();
-    SourceCard.color.attach(context);
-    SourceCard.elevation.attach(context);
+    SourceCard.color.vsync.ticker?.updateNotifier(context);
+    SourceCard.elevation.vsync.ticker?.updateNotifier(context);
     states.addListener(() {
-      SourceCard.color.it.value =
+      SourceCard.color.value =
           active.isSatisfiedBy(states) ? SourceCard.offWhite : SourceCard.grey;
     });
-    subscription = TheApproach.approaching.listen((approaching) {
-      SourceCard.elevation.it.value = approaching ? 0.0 : 5.0;
-    });
+    TheApproach.approaching.hooked.addListener(listener);
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    SourceCard.color.vsync.ticker?.updateNotifier(context);
+    SourceCard.elevation.vsync.ticker?.updateNotifier(context);
+  }
+
+  void listener() {
+    SourceCard.elevation.value = TheApproach.approaching.value ? 0.0 : 5.0;
   }
 
   @override
   void dispose() {
     states.dispose();
-    subscription.close();
+    SourceCard.color.vsync.context = null;
+    SourceCard.elevation.vsync.context = null;
+    TheApproach.approaching.hooked.removeListener(listener);
     super.dispose();
   }
 
@@ -91,10 +100,7 @@ class RecursionCount extends StatelessWidget {
 
     return SizedBox.fromSize(
       size: MediaQuery.sizeOf(context),
-      child: _RecursionCount(
-        key: ValueKey(recursions),
-        child: const ProjectGrid(),
-      ),
+      child: _RecursionCount(key: ValueKey(recursions), child: const ProjectGrid()),
     );
   }
 }
@@ -119,12 +125,7 @@ class _CardRecursion extends SingleChildRenderObjectWidget {
 
   static const _child = Center(
     child: IgnorePointer(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: _ScreenSizedBox(
-          child: RecursionCount(),
-        ),
-      ),
+      child: FittedBox(fit: BoxFit.cover, child: _ScreenSizedBox(child: RecursionCount())),
     ),
   );
 
@@ -133,10 +134,10 @@ class _CardRecursion extends SingleChildRenderObjectWidget {
 }
 
 class AnimatedCard extends EtherealCard {
-  AnimatedCard() : this._(SourceCard.color.it, SourceCard.elevation.it);
+  AnimatedCard() : this._(SourceCard.color.hooked, SourceCard.elevation.hooked);
 
   AnimatedCard._(this.colorAnimation, this.elevationAnimation)
-      : super(color: colorAnimation.value, elevation: elevationAnimation.value) {
+    : super(color: colorAnimation.value, elevation: elevationAnimation.value) {
     colorAnimation.addListener(_colorListener);
     elevationAnimation.addListener(_elevationListener);
   }

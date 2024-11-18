@@ -6,77 +6,71 @@ export 'delayed_activation_hook.dart';
 
 extension type const Recipes._(SizedBox _) implements SizedBox {
   const Recipes()
-      : _ = const SizedBox.expand(
-          child: ColoredBox(
-            color: RecipeCard.background,
-            child: DefaultTextStyle(
-              style: RecipeStyle(size: 36),
-              child: FittedBox(
-                child: SizedBox(
-                  width: 400,
-                  height: 500,
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      Align(
-                        alignment: Alignment(0, -0.6),
-                        child: DefaultTextStyle(
-                          style: TextStyle(
-                            inherit: false,
-                            color: Color(0xffb0b0b0),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 72,
-                          ),
-                          child: _ComingSoon(),
+    : _ = const SizedBox.expand(
+        child: ColoredBox(
+          color: RecipeCard.background,
+          child: DefaultTextStyle(
+            style: RecipeStyle(size: 36),
+            child: FittedBox(
+              child: SizedBox(
+                width: 400,
+                height: 500,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Align(
+                      alignment: Alignment(0, -0.6),
+                      child: DefaultTextStyle(
+                        style: TextStyle(
+                          inherit: false,
+                          color: Color(0xffb0b0b0),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 72,
                         ),
+                        child: _ComingSoon(),
                       ),
-                      Column(
-                        children: [
-                          SizedBox(height: 8),
-                          AnimatedText(0, 'delicious'),
-                          AnimatedText(1, 'affordable'),
-                          AnimatedText(2, 'whole grain'),
-                          AnimatedText(3, 'sugar-free'),
-                          AnimatedText(4, 'plant-based'),
-                          Expanded(
-                            child: _FadeInButtons(),
+                    ),
+                    Column(
+                      children: [
+                        SizedBox(height: 8),
+                        AnimatedText(0, 'delicious'),
+                        AnimatedText(1, 'affordable'),
+                        AnimatedText(2, 'whole grain'),
+                        AnimatedText(3, 'sugar-free'),
+                        AnimatedText(4, 'plant-based'),
+                        Expanded(child: _FadeInButtons()),
+                        DefaultTextStyle(
+                          style: RecipeStyle(size: 60),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(width: 10),
+                              AnimatedText(8.6, 'r'),
+                              AnimatedText(8.8, 'e'),
+                              AnimatedText(9.0, 'c'),
+                              AnimatedText(9.2, 'i'),
+                              AnimatedText(9.4, 'p'),
+                              AnimatedText(9.6, 'e'),
+                              AnimatedText(9.8, 's'),
+                            ],
                           ),
-                          DefaultTextStyle(
-                            style: RecipeStyle(size: 60),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(width: 10),
-                                AnimatedText(8.6, 'r'),
-                                AnimatedText(8.8, 'e'),
-                                AnimatedText(9.0, 'c'),
-                                AnimatedText(9.2, 'i'),
-                                AnimatedText(9.4, 'p'),
-                                AnimatedText(9.6, 'e'),
-                                AnimatedText(9.8, 's'),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                        ],
-                      ),
-                      SpringDrop(),
-                    ],
-                  ),
+                        ),
+                        SizedBox(height: 16),
+                      ],
+                    ),
+                    SpringDrop(),
+                  ],
                 ),
               ),
             ),
           ),
-        );
+        ),
+      );
 }
 
 class RecipeStyle extends TextStyle {
   const RecipeStyle({double? size, Color super.color = Colors.black})
-      : super(
-          inherit: false,
-          fontFamily: 'annie use your telescope',
-          fontSize: size,
-        );
+    : super(inherit: false, fontFamily: 'annie use your telescope', fontSize: size);
 }
 
 class _FadeInButtons extends HookWidget {
@@ -180,10 +174,7 @@ class _ComingSoon extends HookWidget {
         opacity: visible ? 0.5 : 0.0,
         duration: const Seconds(1),
         curve: Curves.easeInOutSine,
-        child: const Text(
-          'Coming soon!',
-          textAlign: TextAlign.center,
-        ),
+        child: const Text('Coming soon!', textAlign: TextAlign.center),
       ),
     );
   }
@@ -198,7 +189,7 @@ class SpringDrop extends LeafRenderObjectWidget {
   RenderBox createRenderObject(BuildContext context) => _RenderSpringDrop();
 }
 
-class _RenderSpringDrop extends RenderBox with BiggestBox {
+class _RenderSpringDrop extends BigBox {
   _RenderSpringDrop() {
     animation
       ..addListener(markNeedsPaint)
@@ -213,30 +204,27 @@ class _RenderSpringDrop extends RenderBox with BiggestBox {
     lerp: lerpDouble,
   );
 
-  @override
-  void performLayout() => size = constraints.biggest;
+  static final drop =
+      Path()
+        ..moveTo(5, 0)
+        ..cubicTo(6, 12.5, 10, 16, 10, 25)
+        ..arcToPoint(const Offset(0, 25), radius: const Radius.circular(5))
+        ..cubicTo(0, 16, 4, 18, 5, 0)
+        ..close();
 
-  static final drop = Path()
-    ..moveTo(5, 0)
-    ..cubicTo(6, 12.5, 10, 16, 10, 25)
-    ..arcToPoint(
-      const Offset(0, 25),
-      radius: const Radius.circular(5),
-    )
-    ..cubicTo(0, 16, 4, 18, 5, 0)
-    ..close();
-
-  static final crescent = Path()
-    ..moveTo(3, 22)
-    ..arcToPoint(const Offset(5.5, 28), radius: const Radius.circular(3.5), clockwise: false)
-    ..arcToPoint(const Offset(3, 22), radius: const Radius.circular(7));
+  static final crescent =
+      Path()
+        ..moveTo(3, 22)
+        ..arcToPoint(const Offset(5.5, 28), radius: const Radius.circular(3.5), clockwise: false)
+        ..arcToPoint(const Offset(3, 22), radius: const Radius.circular(7));
 
   static final fillSpring = Paint()..color = const Color(0xffa0ffd0);
   static final fillBlack = Paint()..color = Colors.black;
-  static final outline = Paint()
-    ..color = Colors.black
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 2;
+  static final outline =
+      Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
 
   @override
   void paint(PaintingContext context, Offset offset) {

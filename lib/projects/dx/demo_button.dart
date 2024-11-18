@@ -10,12 +10,21 @@ class DemoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Route.of(context) == Route.mapping ? const Mapping() : const PressToStretch();
+    return Route.of(context) == Route.mapping ? Demo.mapping : Demo.stretch;
   }
 }
 
-class Mapping extends StatelessWidget {
-  const Mapping({super.key});
+class Demo extends StatelessWidget {
+  const Demo._();
+  static const mapping = Demo._();
+
+  static const stretch = RepaintBoundary(
+    child: SizedBox(
+      width: double.infinity,
+      height: 100,
+      child: FractionallySizedBox(widthFactor: 1 / 3, child: _PressToStretch()),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +48,7 @@ class Mapping extends StatelessWidget {
           WidgetState.hovered: spring2,
           WidgetState.any: spring,
         }),
-        foregroundColor: WidgetStateMapper({
-          WidgetState.pressed: pink,
-          WidgetState.any: black,
-        }),
+        foregroundColor: WidgetStateMapper({WidgetState.pressed: pink, WidgetState.any: black}),
         overlayColor: WidgetStateMapper({
           WidgetState.pressed: pink2,
           WidgetState.hovered: clear,
@@ -91,20 +97,6 @@ class AnimatedStretch extends AnimatedValue<double> {
   }
 }
 
-extension type const PressToStretch._(RepaintBoundary _) implements RepaintBoundary {
-  const PressToStretch()
-      : _ = const RepaintBoundary(
-          child: SizedBox(
-            width: double.infinity,
-            height: 100,
-            child: FractionallySizedBox(
-              widthFactor: 1 / 3,
-              child: _PressToStretch(),
-            ),
-          ),
-        );
-}
-
 class _PressToStretch extends StatefulWidget {
   const _PressToStretch();
 
@@ -148,23 +140,25 @@ class _PressToStretchState extends State<_PressToStretch> {
       children: [
         Streeeetch(),
         Positioned.fill(
-          child: FractionallySizedBox.scaled(
-            scale: 3 / 4,
+          child: FractionallySizedBox(
+            widthFactor: 3 / 4,
+            heightFactor: 3 / 4,
             alignment: Alignment(0, 1 / 3),
             child: FittedBox(
               child: Text.rich(
-                TextSpan(children: [
-                  TextSpan(text: 'press & hold to\n'),
-                  TextSpan(
-                    text: 'stretch!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 44,
+                TextSpan(
+                  children: [
+                    TextSpan(text: 'press & hold to\n'),
+                    TextSpan(
+                      text: 'stretch!',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 44),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
                 style: TextStyle(
+                  inherit: false,
                   fontFamily: 'gaegu',
+                  color: Colors.black,
                   height: 1,
                   overflow: TextOverflow.visible,
                 ),
@@ -201,7 +195,7 @@ class Streeeetch extends LeafRenderObjectWidget {
   RenderBox createRenderObject(BuildContext context) => _Streeeetch();
 }
 
-class _Streeeetch extends RenderBox with BiggestBox {
+class _Streeeetch extends BigBox {
   static final yellowFill = Paint()..color = const Color(0xfff0ff30);
 
   @override
@@ -213,20 +207,21 @@ class _Streeeetch extends RenderBox with BiggestBox {
     final double squeeze = r / 4;
     final double firmness = h / 2;
 
-    final path = Path()
-      ..moveTo(0, r)
-      ..arcToPoint(Offset(r, 0), radius: radius)
-      ..cubicTo(firmness, 0, firmness, squeeze, w / 2, squeeze)
-      ..cubicTo(w - firmness, squeeze, w - firmness, 0, w - r, 0)
-      ..arcToPoint(Offset(w, r), radius: radius)
-      ..lineTo(w, h - r)
-      ..arcToPoint(Offset(w - r, h), radius: radius)
-      ..cubicTo(w - firmness, h, w - firmness, h - squeeze, w / 2, h - squeeze)
-      ..cubicTo(firmness, h - squeeze, firmness, h, r, h)
-      ..lineTo(r, h)
-      ..arcToPoint(Offset(0, h - r), radius: radius)
-      ..lineTo(0, r)
-      ..close();
+    final path =
+        Path()
+          ..moveTo(0, r)
+          ..arcToPoint(Offset(r, 0), radius: radius)
+          ..cubicTo(firmness, 0, firmness, squeeze, w / 2, squeeze)
+          ..cubicTo(w - firmness, squeeze, w - firmness, 0, w - r, 0)
+          ..arcToPoint(Offset(w, r), radius: radius)
+          ..lineTo(w, h - r)
+          ..arcToPoint(Offset(w - r, h), radius: radius)
+          ..cubicTo(w - firmness, h, w - firmness, h - squeeze, w / 2, h - squeeze)
+          ..cubicTo(firmness, h - squeeze, firmness, h, r, h)
+          ..lineTo(r, h)
+          ..arcToPoint(Offset(0, h - r), radius: radius)
+          ..lineTo(0, r)
+          ..close();
 
     context.canvas.drawPath(path.shift(offset), yellowFill);
   }

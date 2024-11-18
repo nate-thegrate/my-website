@@ -47,7 +47,7 @@ String parse(Map<String, dynamic> data) {
       'additions': additions as int,
       'deletions': deletions as int,
       'createdAt': createdAt as String,
-      'labels': {'nodes': labels as List<Map>},
+      'labels': {'nodes': labels as List},
     } = pr! as Map;
 
     final DateTime dateTime = DateTime.parse(createdAt);
@@ -69,7 +69,9 @@ String parse(Map<String, dynamic> data) {
     final String day = dateTime.day.toString().padLeft(2, '0');
     final int year = dateTime.year;
 
-    final bool refactor = labels.any((label) => label['name'] == 'refactor');
+    final bool refactor = labels.cast<Map<Object?, Object?>>().any(
+      (label) => label['name'] == 'refactor',
+    );
 
     final parsed = """\
   PullRequest(

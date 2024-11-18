@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -56,8 +55,16 @@ class _TopBar extends StatefulWidget {
   State<_TopBar> createState() => _TopBarState();
 }
 
-class _TopBarState extends State<_TopBar> {
-  late final gapAnimation = _topGap.attach(context)..addListener(rebuild);
+class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
+  final gapAnimation = _topGap;
+
+  @override
+  void initState() {
+    super.initState();
+    gapAnimation
+      ..vsync.context = context
+      ..hooked.addListener(rebuild);
+  }
 
   Timer? timer;
 
@@ -76,8 +83,8 @@ class _TopBarState extends State<_TopBar> {
   @override
   void dispose() {
     gapAnimation
-      ..stop()
-      ..removeListener(rebuild);
+      ..hooked.removeListener(rebuild)
+      ..vsync.context = null;
     super.dispose();
   }
 
@@ -120,16 +127,15 @@ class _TopBarState extends State<_TopBar> {
                           Text.rich(
                             maxLines: 1,
                             overflow: TextOverflow.clip,
-                            TextSpan(children: [
-                              TextSpan(
-                                text: 'N',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'N',
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
                                 ),
-                              ),
-                              TextSpan(text: 'ATE THE GRATE'),
-                            ]),
+                                TextSpan(text: 'ATE THE GRATE'),
+                              ],
+                            ),
                           ),
                           SizedBox(width: 2),
                         ],
@@ -160,10 +166,7 @@ class _TopBarState extends State<_TopBar> {
                 height: gapHeight,
                 child: const Stack(
                   fit: StackFit.expand,
-                  children: [
-                    ColoredBox(color: Color(0xff202020), child: _VoidGap()),
-                    BlurBox(),
-                  ],
+                  children: [ColoredBox(color: Color(0xff202020), child: _VoidGap()), BlurBox()],
                 ),
               ),
           ],
@@ -194,7 +197,7 @@ class TollsBox extends SingleChildRenderObjectWidget {
 
   @override
   RenderAnimatedConstraints createRenderObject(BuildContext context) {
-    return RenderAnimatedConstraints(_topGap.it);
+    return RenderAnimatedConstraints(_topGap.hooked);
   }
 
   @override
@@ -205,7 +208,7 @@ class TollsBox extends SingleChildRenderObjectWidget {
 
 class RenderAnimatedConstraints extends RenderConstrainedBox {
   RenderAnimatedConstraints(this.heightAnimation)
-      : super(additionalConstraints: _getConstraints(heightAnimation));
+    : super(additionalConstraints: _getConstraints(heightAnimation));
 
   @override
   void attach(PipelineOwner owner) {
@@ -229,10 +232,7 @@ class RenderAnimatedConstraints extends RenderConstrainedBox {
   final ValueListenable<double> heightAnimation;
 
   static BoxConstraints _getConstraints(ValueListenable<double> animation) {
-    return BoxConstraints.tightFor(
-      width: TollsBox.getWidth(),
-      height: 25 + animation.value / 2,
-    );
+    return BoxConstraints.tightFor(width: TollsBox.getWidth(), height: 25 + animation.value / 2);
   }
 
   void _listener() {
@@ -247,10 +247,7 @@ class BlurBox extends SingleChildRenderObjectWidget {
     return BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          if (route == Route.home) ...const [
-            Color(0xa0c09030),
-            Color(0x00f7b943),
-          ] else ...const [
+          if (route == Route.home) ...const [Color(0xa0c09030), Color(0x00f7b943)] else ...const [
             Color(0xa080ffff),
             Color(0x0000ffff),
           ],
@@ -331,21 +328,30 @@ class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMix
   }
 }
 
-class _PaddingTransition extends SingleChildRenderObjectWidget with RenderListenable {
-  const _PaddingTransition({super.child, required Animation<EdgeInsets> padding})
-      : listenable = padding;
+class _PaddingTransition extends SingleChildRenderObjectWidget {
+  const _PaddingTransition({required this.padding, super.child});
 
-  @override
-  final ValueListenable<EdgeInsets> listenable;
+  final ValueListenable<EdgeInsets> padding;
 
   @override
   RenderPadding createRenderObject(BuildContext context) {
-    return RenderPadding(padding: listenable.value);
+    return _RenderAnimatedPadding(paddingAnimation: padding);
+  }
+}
+
+class _RenderAnimatedPadding extends RenderPadding {
+  _RenderAnimatedPadding({required this.paddingAnimation})
+    : super(padding: paddingAnimation.value) {
+    paddingAnimation.addListener(listener);
   }
 
+  final ValueListenable<EdgeInsetsGeometry> paddingAnimation;
+  void listener() => padding = paddingAnimation.value;
+
   @override
-  void updateRenderObject(BuildContext context, RenderPadding renderObject) {
-    renderObject.padding = listenable.value;
+  void dispose() {
+    paddingAnimation.removeListener(listener);
+    super.dispose();
   }
 }
 
@@ -356,7 +362,7 @@ class _VoidGap extends LeafRenderObjectWidget {
   VoidGap createRenderObject(BuildContext context) => VoidGap();
 }
 
-class VoidGap extends RenderBox with BiggestBox {
+class VoidGap extends BigBox {
   VoidGap() {
     TopBar._focused.addListener(updateColor);
     updateColor();
@@ -364,11 +370,11 @@ class VoidGap extends RenderBox with BiggestBox {
   }
 
   static ValueAnimation<double> animation() => ValueAnimation<double>(
-        vsync: App.vsync,
-        initialValue: TopBar.position,
-        duration: Duration.zero,
-        lerp: lerpDouble,
-      );
+    vsync: App.vsync,
+    initialValue: TopBar.position,
+    duration: Duration.zero,
+    lerp: lerpDouble,
+  );
 
   void updateColor() {
     color = switch (TopBar.focused) {
@@ -383,9 +389,7 @@ class VoidGap extends RenderBox with BiggestBox {
   double lastPosition = TopBar.position;
   static const rectCount = 12;
   static const cycleFrames = 33;
-  final animations = [
-    for (int i = 0; i < rectCount; i++) animation(),
-  ];
+  final animations = [for (int i = 0; i < rectCount; i++) animation()];
 
   @override
   void dispose() {
@@ -460,7 +464,7 @@ class NoMoreCSS extends LeafRenderObjectWidget {
   RenderBox createRenderObject(BuildContext context) => RenderNoMoreCSS();
 }
 
-class RenderNoMoreCSS extends RenderBox with BiggestBox {
+class RenderNoMoreCSS extends BigBox {
   RenderNoMoreCSS() {
     ticker = App.vsync.createTicker(_tick)..start();
   }
@@ -522,7 +526,7 @@ class _BlankBox extends LeafRenderObjectWidget {
   RenderBox createRenderObject(BuildContext context) => Blank();
 }
 
-class Blank extends RenderBox with BiggestBox {
+class Blank extends BigBox {
   Blank();
 
   static const duration = Durations.short2;
