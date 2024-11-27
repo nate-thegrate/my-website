@@ -7,7 +7,11 @@ export 'top_bar/top_bar.dart';
 
 part 'route.dart';
 
-void main() => runApp(const App());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Route._current = Get.it(Route.fromUri(_goRouter.routerDelegate.currentConfiguration.uri));
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -22,12 +26,8 @@ class App extends StatelessWidget {
   static final _theme = ThemeData(
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: TopBar.background,
-    ),
-    textSelectionTheme: const TextSelectionThemeData(
-      selectionColor: TopBar.background,
-    ),
+    colorScheme: ColorScheme.fromSeed(seedColor: TopBar.background),
+    textSelectionTheme: const TextSelectionThemeData(selectionColor: TopBar.background),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: const Color(0xff0060ff),
@@ -37,14 +37,16 @@ class App extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4),
       ),
     ),
-    pageTransitionsTheme: const PageTransitionsTheme(builders: {
-      TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.fuchsia: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-    }),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.fuchsia: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+      },
+    ),
   );
 
   @override
