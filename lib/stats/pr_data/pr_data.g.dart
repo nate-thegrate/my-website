@@ -2,6 +2,13 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''Add `SafeArea` DartPad sample''',
+    url: '''https://github.com/flutter/flutter/pull/158019''',
+    date: 'Nov 01 2024',
+    diffs: (379, 6),
+    refactor: false,
+  ),
+  PullRequest(
     title: '''Fix `NestedScrollView` inner position logic''',
     url: '''https://github.com/flutter/flutter/pull/157756''',
     date: 'Oct 28 2024',
@@ -20,6 +27,13 @@ const flutterPRs = <PullRequest>[
     url: '''https://github.com/flutter/flutter/pull/157619''',
     date: 'Oct 25 2024',
     diffs: (9, 7),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Add `@protected` to public `State` method overrides''',
+    url: '''https://github.com/flutter/flutter/pull/157313''',
+    date: 'Oct 22 2024',
+    diffs: (223, 5),
     refactor: false,
   ),
   PullRequest(
@@ -70,6 +84,13 @@ const flutterPRs = <PullRequest>[
     date: 'Sep 05 2024',
     diffs: (357, 561),
     refactor: true,
+  ),
+  PullRequest(
+    title: '''"Fix failing checks" wiki page for new contributors''',
+    url: '''https://github.com/flutter/flutter/pull/154629''',
+    date: 'Sep 04 2024',
+    diffs: (140, 0),
+    refactor: false,
   ),
   PullRequest(
     title: '''Fix `WidgetStateProperty` documentation''',

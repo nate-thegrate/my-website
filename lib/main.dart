@@ -22,12 +22,8 @@ class App extends StatelessWidget {
   static final _theme = ThemeData(
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: TopBar.background,
-    ),
-    textSelectionTheme: const TextSelectionThemeData(
-      selectionColor: TopBar.background,
-    ),
+    colorScheme: ColorScheme.fromSeed(seedColor: TopBar.background),
+    textSelectionTheme: const TextSelectionThemeData(selectionColor: TopBar.background),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: const Color(0xff0060ff),
@@ -37,14 +33,16 @@ class App extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4),
       ),
     ),
-    pageTransitionsTheme: const PageTransitionsTheme(builders: {
-      TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.fuchsia: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-    }),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.fuchsia: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+      },
+    ),
   );
 
   @override

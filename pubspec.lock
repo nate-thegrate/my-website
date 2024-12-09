@@ -94,7 +94,7 @@ packages:
       path: "../get_hooked/packages/get_hooked"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.3.0"
   go_router:
     dependency: "direct main"
     description:

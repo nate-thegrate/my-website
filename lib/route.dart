@@ -19,6 +19,8 @@ enum Route {
 
   factory Route.fromUri(Uri uri) {
     final List<String> segments = uri.pathSegments;
+    if (segments.isEmpty) return home;
+
     final String name = switch (segments.last) {
       final String s when !s.contains('true') && !s.contains('false') => s,
       _ => segments[segments.length - 2],
@@ -36,7 +38,10 @@ enum Route {
   }
 
   static Route get current => _current.value;
-  static final _current = Cubit(home);
+  // ignore: unnecessary_late, it's necessary
+  static late final GetValue<Route> _current = Get.it(
+    Route.fromUri(_goRouter.routerDelegate.currentConfiguration.uri),
+  );
   static set current(Route newValue) {
     _current.value = newValue;
   }
@@ -103,7 +108,7 @@ class RouteProvider extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _RouteProvider(route: useValueListenable(Route._current), child: child);
+    return _RouteProvider(route: Ref.watch(Route._current), child: child);
   }
 }
 
@@ -121,17 +126,14 @@ final _goRouter = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
-      builder: mobile
-          ? (context, state) => const MobileHomePage()
-          : (context, state) => const DesktopHomePage(),
+      builder:
+          mobile
+              ? (context, state) => const MobileHomePage()
+              : (context, state) => const DesktopHomePage(),
       routes: [
         _GoRoute.redirect(Route.stats, '/stats/refactor=false'),
         _GoRoute.redirect(Route.refactorStats, '/stats/refactor=true'),
-        GoRoute(
-          name: Route.stats.name,
-          path: 'stats/:refactor',
-          pageBuilder: Stats.pageBuilder,
-        ),
+        GoRoute(name: Route.stats.name, path: 'stats/:refactor', pageBuilder: Stats.pageBuilder),
         _GoRoute(
           Route.projects,
           const _Page(ProjectGrid.screen),
@@ -160,8 +162,8 @@ class _Page extends NoTransitionPage<void> {
 
 extension type _GoRoute._(GoRoute _route) implements GoRoute {
   _GoRoute(Route route, Page<void> page, {List<RouteBase> routes = const []})
-      : _route = GoRoute(path: route.name, pageBuilder: (context, state) => page, routes: routes);
+    : _route = GoRoute(path: route.name, pageBuilder: (context, state) => page, routes: routes);
 
   _GoRoute.redirect(Route route, String uri)
-      : _route = GoRoute(path: route.name, redirect: (context, state) => uri);
+    : _route = GoRoute(path: route.name, redirect: (context, state) => uri);
 }

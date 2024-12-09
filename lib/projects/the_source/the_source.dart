@@ -137,6 +137,7 @@ class _InnerSource extends HookWidget {
       builder: (context, animation) {
         return MatrixTransition(
           animation: animation,
+          alignment: const Alignment(-0.25, -1),
           onTransform: (t) {
             final double scale = (1 - t) * 4 + 1;
             return Matrix4.identity()..scale(scale, scale);

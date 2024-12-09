@@ -191,7 +191,7 @@ class TollsBox extends SingleChildRenderObjectWidget {
   const TollsBox({super.key, super.child});
 
   static double getWidth([BuildContext? context]) {
-    final Size size = context != null ? MediaQuery.sizeOf(context) : App.screenSize;
+    final Size size = MediaQuery.sizeOf(context ?? HomePageElement.instance);
     return math.max(155.0, size.width / 3);
   }
 
