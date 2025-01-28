@@ -2,6 +2,55 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''[two_dimensional_scrollables] prepare for `const AnimationStyle`''',
+    url: '''https://github.com/flutter/packages/pull/8397''',
+    date: 'Jan 08 2025',
+    diffs: (6, 0),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''[CP-stable] Revert "Fix DropdownMenu does not rematch initialSelection when entries have changed"''',
+    url: '''https://github.com/flutter/flutter/pull/161177''',
+    date: 'Jan 06 2025',
+    diffs: (61, 198),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''`ImplicitlyAnimatedWidgetState` code cleanup''',
+    url: '''https://github.com/flutter/flutter/pull/160567''',
+    date: 'Dec 19 2024',
+    diffs: (10, 25),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''`const AnimationStyle`''',
+    url: '''https://github.com/flutter/flutter/pull/160564''',
+    date: 'Dec 19 2024',
+    diffs: (117, 114),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Fix `Stepper` connector not being properly displayed''',
+    url: '''https://github.com/flutter/flutter/pull/160193''',
+    date: 'Dec 12 2024',
+    diffs: (81, 8),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Fix `SafeArea` DartPad sample''',
+    url: '''https://github.com/flutter/flutter/pull/159344''',
+    date: 'Nov 22 2024',
+    diffs: (31, 2),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Merge queue screenshots''',
+    url: '''https://github.com/flutter/assets-for-api-docs/pull/254''',
+    date: 'Nov 15 2024',
+    diffs: (0, 0),
+    refactor: false,
+  ),
+  PullRequest(
     title: '''Add `SafeArea` DartPad sample''',
     url: '''https://github.com/flutter/flutter/pull/158019''',
     date: 'Nov 01 2024',
@@ -55,6 +104,13 @@ const flutterPRs = <PullRequest>[
     url: '''https://github.com/flutter/flutter/pull/155699''',
     date: 'Sep 25 2024',
     diffs: (105, 0),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Show issues in triage even if they've been assigned''',
+    url: '''https://github.com/flutter/flutter/pull/155615''',
+    date: 'Sep 24 2024',
+    diffs: (2, 2),
     refactor: false,
   ),
   PullRequest(
