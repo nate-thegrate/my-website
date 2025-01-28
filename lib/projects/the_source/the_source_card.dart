@@ -33,20 +33,11 @@ class _SourceCardState extends State<_SourceCard> {
   @override
   void initState() {
     super.initState();
-    SourceCard.color.vsync.ticker?.updateNotifier(context);
-    SourceCard.elevation.vsync.ticker?.updateNotifier(context);
     states.addListener(() {
       SourceCard.color.value =
           active.isSatisfiedBy(states) ? SourceCard.offWhite : SourceCard.grey;
     });
     TheApproach.approaching.hooked.addListener(listener);
-  }
-
-  @override
-  void activate() {
-    super.activate();
-    SourceCard.color.vsync.ticker?.updateNotifier(context);
-    SourceCard.elevation.vsync.ticker?.updateNotifier(context);
   }
 
   void listener() {
@@ -56,8 +47,6 @@ class _SourceCardState extends State<_SourceCard> {
   @override
   void dispose() {
     states.dispose();
-    SourceCard.color.vsync.context = null;
-    SourceCard.elevation.vsync.context = null;
     TheApproach.approaching.hooked.removeListener(listener);
     super.dispose();
   }

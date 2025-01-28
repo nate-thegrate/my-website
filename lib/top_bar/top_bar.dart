@@ -61,9 +61,7 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
   @override
   void initState() {
     super.initState();
-    gapAnimation
-      ..vsync.context = context
-      ..hooked.addListener(rebuild);
+    gapAnimation.hooked.addListener(rebuild);
   }
 
   Timer? timer;
@@ -82,9 +80,7 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
 
   @override
   void dispose() {
-    gapAnimation
-      ..hooked.removeListener(rebuild)
-      ..vsync.context = null;
+    gapAnimation.hooked.removeListener(rebuild);
     super.dispose();
   }
 
