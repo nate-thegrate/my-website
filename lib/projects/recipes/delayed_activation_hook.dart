@@ -20,7 +20,7 @@ class _DelayedActivationHook extends Hook<bool, double> {
   bool activated = false;
 
   @override
-  void initHook() async {
+  Future<void> initHook() async {
     await Future<void>.delayed(Seconds(data));
     if (!context.mounted) return;
 

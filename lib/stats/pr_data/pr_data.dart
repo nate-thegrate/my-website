@@ -22,7 +22,8 @@ class PullRequest extends StatelessWidget {
 
     final List<PullRequest> pulls = onlyRefactor ? refactorPRs : flutterPRs;
 
-    int additions = 0, deletions = 0;
+    int additions = 0;
+    int deletions = 0;
     for (final PullRequest(:diffs) in pulls) {
       additions += diffs.$1;
       deletions += diffs.$2;
@@ -39,7 +40,8 @@ class PullRequest extends StatelessWidget {
     return onlyRefactor ? _refactoring = pr : _overall = pr;
   }
 
-  static PullRequest? _overall, _refactoring;
+  static PullRequest? _overall;
+  static PullRequest? _refactoring;
 
   final String title;
   final bool _isTotal;
@@ -88,11 +90,7 @@ class PullRequest extends StatelessWidget {
       );
     }
 
-    final rightColumn = RightColumn(
-      diffs,
-      date,
-      key: GlobalObjectKey((diffs, url)),
-    );
+    final rightColumn = RightColumn(diffs, date, key: GlobalObjectKey((diffs, url)));
     final contents = Padding(
       padding: const EdgeInsets.symmetric(vertical: 1),
       child: Row(
@@ -158,11 +156,13 @@ class RightColumn extends StatelessWidget {
       final int delta = additions - deletions;
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Row(children: [
-          Diffs('+$additions', color: green),
-          Diffs('-$deletions', color: red),
-          Diffs('$delta', color: Colors.black),
-        ]),
+        child: Row(
+          children: [
+            Diffs('+$additions', color: green),
+            Diffs('-$deletions', color: red),
+            Diffs('$delta', color: Colors.black),
+          ],
+        ),
       );
     }
 

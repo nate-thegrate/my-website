@@ -11,7 +11,8 @@ import 'token.dart';
 
 void main() async {
   final String prList = await query('update_pull_requests/pr_query.gql');
-  final text = """\
+  final text =
+      """
 part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[$prList];
@@ -73,7 +74,8 @@ String parse(Map<String, dynamic> data) {
       (label) => label['name'] == 'refactor',
     );
 
-    final parsed = """\
+    final parsed =
+        """
   PullRequest(
     title: '''$title''',
     url: '''$url''',

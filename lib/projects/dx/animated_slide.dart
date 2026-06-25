@@ -12,7 +12,7 @@ class AnimatedSlide extends AnimatedValue<Offset> {
   }) : super(value: offset, initialValue: initialOffset, lerp: Offset.lerp);
 
   @override
-  Widget build(BuildContext context, Animation<Offset> animation) {
+  Widget build(BuildContext context, ValueListenable<Offset> animation) {
     return SlideTransition(slideAnimation: animation, child: child);
   }
 }

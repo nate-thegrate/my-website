@@ -6,7 +6,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                // "--wasm",
+                "--wasm",
             ],
         },
     ]

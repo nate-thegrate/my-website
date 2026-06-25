@@ -197,8 +197,7 @@ class _RenderSpringDrop extends BigBox {
   }
 
   final ValueAnimation<double> animation = ValueAnimation(
-    vsync: App.vsync,
-    initialValue: 0,
+    0,
     duration: SpringDrop.duration,
     curve: Curves.easeOutCubic,
     lerp: lerpDouble,

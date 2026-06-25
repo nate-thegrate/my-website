@@ -92,8 +92,12 @@ class AnimatedStretch extends AnimatedValue<double> {
   }
 
   @override
-  Widget build(BuildContext context, Animation<double> animation) {
-    return MatrixTransition(animation: animation, onTransform: _stretch, child: child);
+  Widget build(BuildContext context, ValueListenable<double> animation) {
+    return MatrixTransition(
+      animation: Animation.fromValueListenable(animation),
+      onTransform: _stretch,
+      child: child,
+    );
   }
 }
 

@@ -1,4 +1,4 @@
-part of 'main.dart';
+part of 'the_good_stuff.dart';
 
 final bool mobile = switch (defaultTargetPlatform) {
   TargetPlatform.android || TargetPlatform.iOS => true,
@@ -71,7 +71,7 @@ enum Route {
   }
 
   static Route? destination;
-  static void travel([_]) async {
+  static Future<void> travel([_]) async {
     destination = TopBar.focused;
     if (destination == current) return;
 
@@ -108,7 +108,7 @@ class RouteProvider extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _RouteProvider(route: Ref.watch(Route._current), child: child);
+    return _RouteProvider(route: ref.watch(Route._current), child: child);
   }
 }
 
@@ -126,10 +126,9 @@ final _goRouter = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
-      builder:
-          mobile
-              ? (context, state) => const MobileHomePage()
-              : (context, state) => const DesktopHomePage(),
+      builder: mobile
+          ? (context, state) => const MobileHomePage()
+          : (context, state) => const DesktopHomePage(),
       routes: [
         _GoRoute.redirect(Route.stats, '/stats/refactor=false'),
         _GoRoute.redirect(Route.refactorStats, '/stats/refactor=true'),

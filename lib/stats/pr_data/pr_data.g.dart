@@ -2,6 +2,62 @@ part of 'pr_data.dart';
 
 const flutterPRs = <PullRequest>[
   PullRequest(
+    title: '''Update TickerMode.getValuesNotifier to handle initialization during State.dispose''',
+    url: '''https://github.com/flutter/flutter/pull/185248''',
+    date: 'Apr 18 2026',
+    diffs: (73, 2),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''`SizedBox.square()`''',
+    url: '''https://github.com/flutter/flutter/pull/182731''',
+    date: 'Feb 22 2026',
+    diffs: (734, 1101),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''Clean up `animation_controller.dart`''',
+    url: '''https://github.com/flutter/flutter/pull/182338''',
+    date: 'Feb 12 2026',
+    diffs: (33, 49),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''`AnimationStyle` methods''',
+    url: '''https://github.com/flutter/flutter/pull/182333''',
+    date: 'Feb 12 2026',
+    diffs: (131, 10),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Eliminate rebuilds for Scaffold FAB animation''',
+    url: '''https://github.com/flutter/flutter/pull/182331''',
+    date: 'Feb 12 2026',
+    diffs: (56, 11),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''Factor out unnecessary `assert`s''',
+    url: '''https://github.com/flutter/flutter/pull/182042''',
+    date: 'Feb 06 2026',
+    diffs: (7, 14),
+    refactor: true,
+  ),
+  PullRequest(
+    title: '''Bugfix in the `absorbTicker` method''',
+    url: '''https://github.com/flutter/flutter/pull/181706''',
+    date: 'Jan 29 2026',
+    diffs: (23, 1),
+    refactor: false,
+  ),
+  PullRequest(
+    title: '''`WidgetStatesConstraint` as a mixin''',
+    url: '''https://github.com/flutter/flutter/pull/181704''',
+    date: 'Jan 29 2026',
+    diffs: (30, 28),
+    refactor: true,
+  ),
+  PullRequest(
     title: '''[two_dimensional_scrollables] prepare for `const AnimationStyle`''',
     url: '''https://github.com/flutter/packages/pull/8397''',
     date: 'Jan 08 2025',

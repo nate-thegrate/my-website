@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
+// ignore: avoid_implementing_value_types, personal preference
 sealed class Source implements Widget {
   const factory Source() = _Source;
   const factory Source.gateway() = _Gateway;
@@ -22,7 +23,11 @@ class _Source extends UniqueWidget<TheSourceProvides> implements Source {
 }
 
 class _Gateway extends SizedBox implements Source {
-  const _Gateway() : super.expand(key: _key, child: const ColoredBox(color: Colors.white));
+  const _Gateway()
+    : super.expand(
+        key: _key,
+        child: const ColoredBox(color: Colors.white),
+      );
 
   static const _key = GlobalObjectKey(_Gateway);
 
@@ -38,15 +43,14 @@ class TheApproach extends HookWidget implements Source {
 
   static final noTransform = Matrix4.identity();
 
-  static void approach() async {
+  static Future<void> approach() async {
     approaching.value = true;
     try {
-      await getZoom
-          .animateTo(1.0, curve: const Dilation(), duration: const Seconds(2.5))
-          .orCancel;
+      await getZoom.animateTo(1.0, curve: const Dilation(), duration: const Seconds(2.5)).orCancel;
     } on TickerCanceled {
       return;
     }
+    postFrameCallback(() => getZoom.value = 0);
     Route.go(Route.source);
   }
 
@@ -64,7 +68,7 @@ class TheApproach extends HookWidget implements Source {
     }
     return MatrixTransition(
       alignment: Alignment.topLeft,
-      animation: getZoom.hooked,
+      animation: Animation.fromValueListenable(getZoom),
       onTransform: (animationValue) {
         return lerpMatrix(noTransform, transform.value ?? noTransform, getZoom.value);
       },
@@ -87,7 +91,7 @@ enum Journey { whiteVoid, sourceOfWisdom, activated }
 
 final getJourney = Get.it(Journey.whiteVoid);
 
-bool useTheApproach() => Ref.watch(TheApproach.approaching);
+bool useTheApproach() => ref.watch(TheApproach.approaching);
 
 class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
   factory TheSourceProvides.provide() => const _Source().currentState!;
@@ -117,14 +121,17 @@ class _InnerSource extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Journey journey = Ref.watch(getJourney);
+    final Journey journey = ref.watch(getJourney);
     const theSource = Text.rich(
       TextSpan(
         children: [
           TextSpan(text: 'Head over to'),
           WidgetSpan(child: _GitHubButton()),
           TextSpan(text: 'to\nsee '),
-          TextSpan(text: 'the source ', style: TextStyle(color: fromLight)),
+          TextSpan(
+            text: 'the source ',
+            style: TextStyle(color: fromLight),
+          ),
           TextSpan(text: 'code\nfor this website!'),
         ],
       ),
@@ -136,14 +143,14 @@ class _InnerSource extends HookWidget {
       curve: Curves.easeInExpo,
       builder: (context, animation) {
         return MatrixTransition(
-          animation: animation,
+          animation: Animation.fromValueListenable(animation),
           alignment: const Alignment(-0.25, -1),
           onTransform: (t) {
             final double scale = (1 - t) * 4 + 1;
-            return Matrix4.identity()..scale(scale, scale);
+            return Matrix4.diagonal3Values(scale, scale, scale);
           },
           child: FadeTransition(
-            opacity: animation,
+            opacity: Animation.fromValueListenable(animation),
             child: AnimatedToggle.builder(
               journey != Journey.whiteVoid,
               duration: const Seconds(TheSource.seconds),
@@ -175,7 +182,7 @@ class _FadeIn extends SingleChildRenderObjectWidget {
   @override
   RenderObject createRenderObject(BuildContext context) {
     final animation = AnimationController(
-      vsync: Vsync(),
+      vsync: App.vsync,
       duration: const Seconds(TheSource.transitionSeconds / 2),
     );
 
@@ -271,7 +278,10 @@ class TheSource extends BigBox {
 
     if (activated case final tStart?) {
       final int remainingMs = endMs - totalElapsed;
-      if (remainingMs <= 0) return apotheosis();
+      if (remainingMs <= 0) {
+        apotheosis();
+        return;
+      }
       final double stretched = math.sqrt(math.sqrt(remainingMs) * micros);
       t = (2 * (tStart - totalElapsed) / stretched + tActivated) % 1;
       transition = Curves.easeOutExpo.transform(
@@ -291,7 +301,7 @@ class TheSource extends BigBox {
     markNeedsPaint();
   }
 
-  void apotheosis() async {
+  Future<void> apotheosis() async {
     ticker.dispose();
     await Future<void>.delayed(Durations.short4);
     launchUrlString('https://github.com/nate-thegrate/my-website');
@@ -308,6 +318,7 @@ class TheSource extends BigBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    // ignore: prefer_asserts_with_message, don't care
     assert(offset == Offset.zero);
 
     final Rect rect = offset & size;

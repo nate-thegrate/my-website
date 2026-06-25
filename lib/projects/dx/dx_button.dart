@@ -14,10 +14,10 @@ class DxButton extends StatefulWidget {
   State<DxButton> createState() => _DxButtonState();
 }
 
-class _DxButtonState extends State<DxButton> with SingleTickerProviderStateMixin {
+class _DxButtonState extends State<DxButton> with StateVsync {
   late final depth = ValueAnimation(
+    0.0,
     vsync: this,
-    initialValue: 0.0,
     duration: Durations.medium1,
     curve: Curves.ease,
     lerp: lerpDouble,
@@ -117,7 +117,9 @@ class _DepthTransition extends HookWidget {
   Widget build(BuildContext context) {
     return MatrixTransition(
       onTransform: _transformed,
-      animation: useAnimationFrom<_DxButtonState, ValueAnimation<double>>((s) => s.depth),
+      animation: Animation.fromValueListenable(
+        useAnimationFrom<_DxButtonState, ValueAnimation<double>>((s) => s.depth),
+      ),
       child: findWidget<DxButton>(context).child,
     );
   }
@@ -200,9 +202,9 @@ final class Rekt extends Decoration {
   static const defaultBorder = BeveledRectangleBorder(borderRadius: BorderRadius.all(_radius));
 
   static OverlayEntry? _entry;
-  static ToggleAnimation? _animation;
-  static ToggleAnimation get animation =>
-      _animation ??= ToggleAnimation(vsync: App.vsync, duration: Durations.short3);
+  static AnimationController? _animation;
+  static AnimationController get animation =>
+      _animation ??= AnimationController(vsync: App.vsync, duration: Durations.short3);
   static void getRekt(BuildContext context) {
     final RenderBox box = context.renderBox;
     final Rect rect = box.localToGlobal(Offset.zero) & box.size;
@@ -293,7 +295,7 @@ class _RenderRekt extends BigBox {
 
   static const transitionMicros = 1.0 * microPerSec;
 
-  void _tick(Duration elapsed) async {
+  Future<void> _tick(Duration elapsed) async {
     t = elapsed.inMicroseconds / transitionMicros;
     if (t >= 1) {
       ticker.dispose();
@@ -322,6 +324,7 @@ class _RenderRekt extends BigBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    // ignore: prefer_asserts_with_message, don't care
     assert(offset == Offset.zero);
     final targetRect = Rect.fromLTRB(0, kToolbarHeight, size.width, size.height);
 

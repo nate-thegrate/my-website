@@ -88,7 +88,7 @@ class AnimatedValue<T extends Object> extends StatefulWidget {
     Curve curve,
     LerpCallback<T>? lerp,
     VoidCallback? onEnd,
-    required AnimationBuilder<T> builder,
+    required Widget Function(BuildContext context, ValueListenable<T> animation) builder,
   }) = _AnimatedValueTransition<T>;
 
   /// Builds an animation using the provided [ValueWidgetBuilder].
@@ -148,7 +148,7 @@ class AnimatedValue<T extends Object> extends StatefulWidget {
   /// {@macro flutter.widgets.ProxyWidget.child}
   final Widget? child;
 
-  Widget build(BuildContext context, Animation<T> animation) => child!;
+  Widget build(BuildContext context, ValueListenable<T> animation) => child!;
 
   /// It's possible to use custom [RenderBox] and [RenderObjectWidget] classes
   /// in place of existing Flutter widgets.
@@ -162,18 +162,17 @@ class AnimatedValue<T extends Object> extends StatefulWidget {
   AnimatedValueState<T> createState() => AnimatedValueState<T>();
 }
 
-class AnimatedValueState<T extends Object> extends State<AnimatedValue<T>>
-    with SingleTickerProviderStateMixin {
+class AnimatedValueState<T extends Object> extends State<AnimatedValue<T>> with StateVsync {
   late final ValueAnimation<T> animation = ValueAnimation<T>(
+    widget.initialValue ?? widget.value,
     vsync: this,
-    initialValue: widget.initialValue ?? widget.value,
     duration: widget.duration,
     curve: widget.curve,
     lerp: widget.lerp,
   );
 
-  void _statusUpdate(AnimationStatus status) {
-    if (status.isCompleted) {
+  void _statusUpdate() {
+    if (animation.status.value.isCompleted) {
       widget.onEnd?.call();
     }
   }
@@ -186,7 +185,7 @@ class AnimatedValueState<T extends Object> extends State<AnimatedValue<T>>
     if (widget.initialValue != null) {
       animation.animateTo(widget.value);
     }
-    animation.addStatusListener(_statusUpdate);
+    animation.status.addListener(_statusUpdate);
   }
 
   @protected
@@ -253,10 +252,10 @@ class _AnimatedValueTransition<T extends Object> extends AnimatedValue<T> {
          lerp: lerp ?? ValueAnimation.lerpCallbackOfExactType<T>(),
        );
 
-  final AnimationBuilder<T> builder;
+  final Widget Function(BuildContext context, ValueListenable<T> animation) builder;
 
   @override
-  Widget build(BuildContext context, Animation<T> animation) {
+  Widget build(BuildContext context, ValueListenable<T> animation) {
     return builder(context, animation);
   }
 }
@@ -267,7 +266,7 @@ class _AnimatedValueTransition<T extends Object> extends AnimatedValue<T> {
 /// {@tool snippet}
 /// [AnimatedToggle] is an `extension type` that wraps [AnimatedValue].
 /// For more precise control over the speed & curve of the toggling animation,
-/// consider using a [StatefulWidget] with a [ToggleAnimation] as part
+/// consider using a [StatefulWidget] with a [AnimationController] as part
 /// of its [State].
 ///
 /// ```dart
@@ -279,7 +278,7 @@ class _AnimatedValueTransition<T extends Object> extends AnimatedValue<T> {
 /// }
 ///
 /// class _MyToggleState extends State<MyToggle> with SingleTickerProviderStateMixin {
-///   late final ToggleAnimation _toggleAnimation = ToggleAnimation(
+///   late final AnimationController _toggleAnimation = AnimationController(
 ///     vsync: this,
 ///     duration: Durations.medium1,
 ///   );
@@ -324,7 +323,7 @@ extension type AnimatedToggle(AnimatedValue<double> _widget) implements Animated
     bool animateOnCreate = false,
     required Duration duration,
     Curve curve = Curves.linear,
-    required AnimationBuilder<double> builder,
+    required Widget Function(BuildContext context, ValueListenable<double> animation) builder,
     VoidCallback? onEnd,
   }) : _widget = AnimatedValue<double>.transition(
          forward ? 1.0 : 0.0,

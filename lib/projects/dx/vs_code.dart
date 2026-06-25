@@ -10,12 +10,12 @@ enum Character {
   quote;
 
   factory Character.from(int code) => switch (code) {
-        39 => quote,
-        46 => dot,
-        >= 48 && <= 57 => number,
-        >= 64 && <= 122 => letter,
-        _ => plain,
-      };
+    39 => quote,
+    46 => dot,
+    >= 48 && <= 57 => number,
+    >= 64 && <= 122 => letter,
+    _ => plain,
+  };
 
   static List<(Character, String)> split(String input) {
     final result = <(Character, String)>[];
@@ -68,13 +68,14 @@ extension type VsCode._(TextSpan _textSpan) implements TextSpan {
         TextSpan(
           text: snippet,
           style: TextStyle(
-              color: switch (type) {
-            Character.plain => _plain,
-            Character.quote => _string,
-            Character.number => _number,
-            Character.letter => _wordColor(snippet),
-            Character.dot => throw Error(),
-          }),
+            color: switch (type) {
+              Character.plain => _plain,
+              Character.quote => _string,
+              Character.number => _number,
+              Character.letter => _wordColor(snippet),
+              Character.dot => throw Error(),
+            },
+          ),
         ),
     ];
 
@@ -109,7 +110,7 @@ extension type VsCode._(TextSpan _textSpan) implements TextSpan {
     };
   }
 
-  static const _mapping = '''\
+  static const _mapping = '''
 final elevation = WidgetStateMapper({
   WidgetState.hovered & ~WidgetState.pressed: 3.0,
   WidgetState.any: 0.0,
@@ -137,7 +138,7 @@ const button = FilledButton(
 );
 ''';
 
-  static const _resolveWith = '''\
+  static const _resolveWith = '''
 final elevation = WidgetStateProperty.resolveWith((states) {
   return states.contains(WidgetState.hovered)
      && !states.contains(WidgetState.pressed)
@@ -174,7 +175,7 @@ final button = FilledButton(
 );
 ''';
 
-  static const _animatedValue = '''\
+  static const _animatedValue = '''
 class AnimatedStretch extends AnimatedValue<double> {
   const AnimatedStretch({
     super.key,
@@ -195,7 +196,7 @@ class AnimatedStretch extends AnimatedValue<double> {
   }
 }
 ''';
-  static const _implicitlyAnimatedWidget = '''\
+  static const _implicitlyAnimatedWidget = '''
 class AnimatedStretch extends ImplicitlyAnimatedWidget {
   const AnimatedStretch({
     super.key,

@@ -103,18 +103,18 @@ class _ProjectButtonState extends State<_ProjectButton> {
     super.dispose();
   }
 
-  void hover([_]) async {
+  Future<void> hover([_]) async {
     states.add(WidgetState.hovered);
   }
 
-  void endHover([_]) async {
+  Future<void> endHover([_]) async {
     if (!states.contains(WidgetState.selected)) {
       _hide();
     }
     states.removeAll(const {WidgetState.hovered, WidgetState.pressed});
   }
 
-  void handleDownpress([_]) async {
+  Future<void> handleDownpress([_]) async {
     states.addAll(const {WidgetState.hovered, WidgetState.pressed});
     _show();
   }
@@ -125,7 +125,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
         : states.remove(WidgetState.hovered);
   }
 
-  void handlePressEnd([_]) async {
+  Future<void> handlePressEnd([_]) async {
     if (states.contains(WidgetState.hovered)) {
       states.add(WidgetState.selected);
     }

@@ -38,9 +38,9 @@ class _DxCard extends StatefulWidget {
 }
 
 class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
-  late final widthAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
-  late final depthAnimation = ToggleAnimation(vsync: this, duration: Durations.short1);
-  late final launchAnimation = ToggleAnimation(vsync: this, duration: Durations.medium1);
+  late final widthAnimation = AnimationController(vsync: this, duration: Durations.medium1);
+  late final depthAnimation = AnimationController(vsync: this, duration: Durations.short1);
+  late final launchAnimation = AnimationController(vsync: this, duration: Durations.medium1);
 
   late final widthCurved = CurvedAnimation(
     parent: widthAnimation,
@@ -53,14 +53,14 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
 
   bool prepareToLaunch = false;
 
-  void _updateAnimations() async {
+  Future<void> _updateAnimations() async {
     final WidgetStates? states = this.states;
     if (states == null) return;
 
-    widthAnimation.toggle(
-      forward: (WidgetState.hovered | WidgetState.pressed).isSatisfiedBy(states),
-    );
-    depthAnimation.toggle(forward: states.contains(WidgetState.pressed));
+    (WidgetState.hovered | WidgetState.pressed).isSatisfiedBy(states)
+        ? widthAnimation.forward()
+        : widthAnimation.reverse();
+    states.contains(WidgetState.pressed) ? depthAnimation.forward() : depthAnimation.reverse();
 
     if (states.contains(WidgetState.selected) != prepareToLaunch) {
       setState(() => prepareToLaunch = !prepareToLaunch);
@@ -111,11 +111,10 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     return Stached(
       direction: AxisDirection.right,
       child: LayoutBuilder(
-        builder:
-            (context, constraints) => ListenableBuilder(
-              listenable: listenables,
-              builder: (context, _) => _build(context, constraints),
-            ),
+        builder: (context, constraints) => ListenableBuilder(
+          listenable: listenables,
+          builder: (context, _) => _build(context, constraints),
+        ),
       ),
     );
   }
@@ -124,10 +123,9 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     final double width = widthCurved.value;
     const top = 5.0;
     const double bottom = -2.0;
-    final double elevation =
-        prepareToLaunch
-            ? bottom
-            : lerpDouble(top, bottom, Curves.ease.transform(depthAnimation.value))!;
+    final double elevation = prepareToLaunch
+        ? bottom
+        : lerpDouble(top, bottom, Curves.ease.transform(depthAnimation.value))!;
     final double altitude = math.max(elevation, 0.0);
     final double shadowSize = math.max(-elevation, 0.0);
 
@@ -238,20 +236,19 @@ class _RenderFlutterLogo extends RenderBox {
     size = maxSize;
   }
 
-  static final _path =
-      Path()
-        ..moveTo(62, 46)
-        ..lineTo(29, 73)
-        ..lineTo(62, 100)
-        ..lineTo(100, 100)
-        ..lineTo(67, 73)
-        ..lineTo(100, 46)
-        ..close()
-        ..moveTo(62, 0)
-        ..lineTo(0, 50)
-        ..lineTo(18, 66)
-        ..lineTo(100, 0)
-        ..close();
+  static final _path = Path()
+    ..moveTo(62, 46)
+    ..lineTo(29, 73)
+    ..lineTo(62, 100)
+    ..lineTo(100, 100)
+    ..lineTo(67, 73)
+    ..lineTo(100, 46)
+    ..close()
+    ..moveTo(62, 0)
+    ..lineTo(0, 50)
+    ..lineTo(18, 66)
+    ..lineTo(100, 0)
+    ..close();
 
   @override
   void paint(PaintingContext context, Offset offset) {

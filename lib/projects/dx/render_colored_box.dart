@@ -2,9 +2,7 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 /// The [RenderObject] created by [ColoredBox], copy-pasted and made public :)
 class RenderColoredBox extends RenderProxyBoxWithHitTestBehavior {
-  RenderColoredBox({required Color color})
-      : _color = color,
-        super(behavior: HitTestBehavior.opaque);
+  RenderColoredBox({required this._color}) : super(behavior: HitTestBehavior.opaque);
 
   /// The fill color for this render object.
   Color get color => _color;

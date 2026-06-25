@@ -274,7 +274,7 @@ class Indicator extends StatefulWidget {
   State<Indicator> createState() => _IndicatorState();
 }
 
-class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMixin {
+class _IndicatorState extends State<Indicator> with StateVsync {
   EdgeInsets get _padding {
     final double tollsWidth = TollsBox.getWidth(context);
     final double othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
@@ -288,8 +288,8 @@ class _IndicatorState extends State<Indicator> with SingleTickerProviderStateMix
   }
 
   late final padding = ValueAnimation(
+    _padding,
     vsync: this,
-    initialValue: _padding,
     duration: Durations.short3,
     curve: Curves.ease,
     lerp: EdgeInsets.lerp,
@@ -365,12 +365,8 @@ class VoidGap extends BigBox {
     ticker.start();
   }
 
-  static ValueAnimation<double> animation() => ValueAnimation<double>(
-    vsync: App.vsync,
-    initialValue: TopBar.position,
-    duration: Duration.zero,
-    lerp: lerpDouble,
-  );
+  static ValueAnimation<double> animation() =>
+      ValueAnimation<double>(TopBar.position, duration: Duration.zero, lerp: lerpDouble);
 
   void updateColor() {
     color = switch (TopBar.focused) {

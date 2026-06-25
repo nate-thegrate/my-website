@@ -46,7 +46,7 @@ abstract class RenderFunder extends RenderBox {
 
   Route get route;
 
-  final ToggleAnimation controller = ToggleAnimation(
+  final controller = AnimationController(
     vsync: App.vsync,
     duration: const Seconds(1.75),
     reverseDuration: const Seconds(0.75),
@@ -127,7 +127,7 @@ class _RenderStatsFunderline extends RenderFunder {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final ToggleAnimation(:AnimationStatus status, value: double t) = controller;
+    final AnimationController(:AnimationStatus status, value: double t) = controller;
     final Canvas canvas = context.canvas;
 
     if (status.isForwardOrCompleted) {
@@ -136,25 +136,16 @@ class _RenderStatsFunderline extends RenderFunder {
       final double y = Curves.easeInOutQuart.transform(math.max((t - 1) * 1.25 + 1, 0));
 
       final Rect rect = Rect.lerp(start, targetRect, x)!;
-      final Color color = Color.lerp(
-        FunLink.color,
-        PullRequest.borderColor,
-        Curves.easeOutSine.transform(t),
-      )!;
+      final Color color =
+          Color.lerp(FunLink.color, PullRequest.borderColor, Curves.easeOutSine.transform(t))!;
 
       canvas.drawRect(start, Paint()..color = Colors.white);
-      canvas.drawRect(
-        fullScreen,
-        Paint()..color = Stats.background.withValues(alpha: alpha),
-      );
+      canvas.drawRect(fullScreen, Paint()..color = Stats.background.withValues(alpha: alpha));
       if (y == 0) {
         canvas.drawRect(rect, Paint()..color = color);
       } else {
         for (int i = -2; i < rowsDown; i++) {
-          canvas.drawRect(
-            rect.translate(0, y * (i * spacing - 8.5)),
-            Paint()..color = color,
-          );
+          canvas.drawRect(rect.translate(0, y * (i * spacing - 8.5)), Paint()..color = color);
         }
       }
     } else {
@@ -199,7 +190,7 @@ class _RenderProjectFunderline extends RenderFunder {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final ToggleAnimation(:AnimationStatus status, value: double t) = controller;
+    final AnimationController(:AnimationStatus status, value: double t) = controller;
     final Rect rect;
     final Color color;
 

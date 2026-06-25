@@ -38,9 +38,7 @@ class MobileHomePage extends HomePage {
           dimension: 200,
           child: ClipPath(
             clipper: ShapeBorderClipper(
-              shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(96)),
-              ),
+              shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(96))),
             ),
             child: ColoredBox(
               color: TopBar.background,
@@ -54,11 +52,17 @@ class MobileHomePage extends HomePage {
         Spacer(),
         SizedBox(
           width: 200,
-          child: FittedBox(fit: BoxFit.fitWidth, child: Text('NATE', style: textStyle)),
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text('NATE', style: textStyle),
+          ),
         ),
         SizedBox(
           width: 200,
-          child: FittedBox(fit: BoxFit.fitWidth, child: Text('THE GRATE', style: textStyle)),
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text('THE GRATE', style: textStyle),
+          ),
         ),
         Spacer(flex: 3),
         FilledButton(style: buttonStyle, onPressed: stats, child: Text('stats')),
@@ -122,12 +126,11 @@ class DesktopHomePage extends HomePage {
 class HomePageElement extends SingleChildRenderObjectElement {
   HomePageElement(super.widget) {
     final entry = OverlayEntry(
-      builder:
-          (context) => Positioned(
-            bottom: 0,
-            left: 0,
-            child: FadeTransition(opacity: opacity, child: _FunPreview.box),
-          ),
+      builder: (context) => Positioned(
+        bottom: 0,
+        left: 0,
+        child: FadeTransition(opacity: opacity, child: _FunPreview.box),
+      ),
     );
 
     postFrameCallback(() => App.overlay.insert(entry));
@@ -138,7 +141,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
   static HomePageElement? _instance;
   static HomePageElement get instance => _instance ??= key.currentContext! as HomePageElement;
 
-  void show([String? message]) async {
+  Future<void> show([String? message]) async {
     if (--fricksToGive > 0) {
       if (message != null) {
         text.value = message;
@@ -155,7 +158,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
     }
   }
 
-  void hide([_]) async {
+  Future<void> hide([_]) async {
     if (fricksToGive == 0) return;
 
     final String currentText = text.value;
@@ -183,7 +186,7 @@ class HomePageElement extends SingleChildRenderObjectElement {
 
   final text = Cubit('');
 
-  final opacity = ToggleAnimation(
+  final opacity = AnimationController(
     vsync: App.vsync,
     duration: Durations.short1,
     reverseDuration: Durations.long1,
@@ -211,16 +214,18 @@ class FunLink extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: SizedBox(height: 1.5, child: ColoredBox(key: route.key, color: FunLink.color)),
+            child: SizedBox(
+              height: 1.5,
+              child: ColoredBox(key: route.key, color: FunLink.color),
+            ),
           ),
           Text(
             '$route',
             style: TextStyle(
-              foreground:
-                  Paint()
-                    ..style = PaintingStyle.stroke
-                    ..strokeWidth = 2.5
-                    ..color = Colors.white,
+              foreground: Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 2.5
+                ..color = Colors.white,
             ),
           ),
           Text('$route', style: const TextStyle(color: FunLink.color)),
@@ -260,7 +265,7 @@ class _FunPreview extends HookWidget {
   const _FunPreview();
 
   static void touch([PointerEvent? _]) {
-    final HomePageElement(:ValueNotifier<String> text, :ToggleAnimation opacity) =
+    final HomePageElement(:ValueNotifier<String> text, :AnimationController opacity) =
         HomePageElement.instance;
 
     if (text.value.contains('...')) {
