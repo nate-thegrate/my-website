@@ -101,7 +101,7 @@ enum Route {
   String toString() => name;
 }
 
-class RouteProvider extends HookWidget {
+class RouteProvider extends RefWidget {
   const RouteProvider({super.key, required this.child});
 
   final Widget child;

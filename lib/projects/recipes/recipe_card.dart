@@ -174,7 +174,7 @@ class _StacheCubit extends Cubit<bool> {
   _StacheCubit() : super(false);
 }
 
-class Stache extends HookWidget {
+class Stache extends RefWidget {
   const Stache({super.key, required this.child});
 
   final Widget child;
@@ -188,7 +188,7 @@ class Stache extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Stache(value: useValueListenable(_stache), child: child);
+    return _Stache(value: ref.watch(_stache), child: child);
   }
 }
 

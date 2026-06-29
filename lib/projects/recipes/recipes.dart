@@ -27,7 +27,7 @@ extension type const Recipes._(SizedBox _) implements SizedBox {
                           fontWeight: FontWeight.bold,
                           fontSize: 72,
                         ),
-                        child: _ComingSoon(),
+                        child: DelayedActivation(_comingSoon, delay: 5),
                       ),
                     ),
                     Column(
@@ -66,6 +66,18 @@ extension type const Recipes._(SizedBox _) implements SizedBox {
           ),
         ),
       );
+
+  static Widget _comingSoon(BuildContext context, bool visible) {
+    return Transform.rotate(
+      angle: -0.5,
+      child: AnimatedOpacity(
+        opacity: visible ? 0.5 : 0.0,
+        duration: const Seconds(1),
+        curve: Curves.easeInOutSine,
+        child: const Text('Coming soon!', textAlign: TextAlign.center),
+      ),
+    );
+  }
 }
 
 class RecipeStyle extends TextStyle {
@@ -73,15 +85,13 @@ class RecipeStyle extends TextStyle {
     : super(inherit: false, fontFamily: 'annie use your telescope', fontSize: size);
 }
 
-class _FadeInButtons extends HookWidget {
-  const _FadeInButtons();
+class _FadeInButtons extends DelayedActivation {
+  const _FadeInButtons() : super(_builder, delay: 6);
 
   static void view() => launchUrlString('https://recipes.nate-thegrate.com/');
   static void back() => Route.go(Route.projects);
 
-  @override
-  Widget build(BuildContext context) {
-    final bool ignoring = !useDelayedActivation(6);
+  static Widget _builder(BuildContext context, bool visible) {
     const row = Row(
       children: [
         Expanded(
@@ -107,9 +117,7 @@ class _FadeInButtons extends HookWidget {
             foregroundColor: WidgetStatePropertyAll(Colors.black),
             padding: WidgetStatePropertyAll(EdgeInsets.fromLTRB(28, 12, 28, 16)),
             shape: WidgetStatePropertyAll(
-              ContinuousRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.elliptical(40, 32)),
-              ),
+              ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.elliptical(40, 32))),
             ),
             side: WidgetStatePropertyAll(BorderSide(width: 2)),
             overlayColor: WidgetStateMapper({
@@ -125,9 +133,9 @@ class _FadeInButtons extends HookWidget {
     );
 
     return IgnorePointer(
-      ignoring: ignoring,
+      ignoring: !visible,
       child: AnimatedOpacity(
-        opacity: ignoring ? 0 : 1,
+        opacity: visible ? 1 : 0,
         duration: Durations.long4,
         curve: Curves.easeInOutSine,
         child: row,
@@ -136,7 +144,7 @@ class _FadeInButtons extends HookWidget {
   }
 }
 
-class AnimatedText extends HookWidget {
+class AnimatedText extends StatelessWidget {
   const AnimatedText(this.delay, this.text, {super.key});
 
   final String text;
@@ -144,37 +152,20 @@ class AnimatedText extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool activated = useDelayedActivation(delay / 3);
-
     const duration = Seconds(0.8);
-    return AnimatedSlide(
-      offset: activated ? Offset.zero : const Offset(0, -0.25),
-      duration: duration,
-      curve: Curves.easeOutCubic,
-      child: AnimatedOpacity(
-        opacity: activated ? 1 : 0,
+
+    return DelayedActivation(
+      delay: delay / 3,
+      (context, activated) => AnimatedSlide(
+        offset: activated ? Offset.zero : const Offset(0, -0.25),
         duration: duration,
-        curve: Curves.easeInOutSine,
-        child: Text(text),
-      ),
-    );
-  }
-}
-
-class _ComingSoon extends HookWidget {
-  const _ComingSoon();
-
-  @override
-  Widget build(BuildContext context) {
-    final bool visible = useDelayedActivation(5);
-
-    return Transform.rotate(
-      angle: -0.5,
-      child: AnimatedOpacity(
-        opacity: visible ? 0.5 : 0.0,
-        duration: const Seconds(1),
-        curve: Curves.easeInOutSine,
-        child: const Text('Coming soon!', textAlign: TextAlign.center),
+        curve: Curves.easeOutCubic,
+        child: AnimatedOpacity(
+          opacity: activated ? 1 : 0,
+          duration: duration,
+          curve: Curves.easeInOutSine,
+          child: Text(text),
+        ),
       ),
     );
   }
@@ -203,27 +194,24 @@ class _RenderSpringDrop extends BigBox {
     lerp: lerpDouble,
   );
 
-  static final drop =
-      Path()
-        ..moveTo(5, 0)
-        ..cubicTo(6, 12.5, 10, 16, 10, 25)
-        ..arcToPoint(const Offset(0, 25), radius: const Radius.circular(5))
-        ..cubicTo(0, 16, 4, 18, 5, 0)
-        ..close();
+  static final drop = Path()
+    ..moveTo(5, 0)
+    ..cubicTo(6, 12.5, 10, 16, 10, 25)
+    ..arcToPoint(const Offset(0, 25), radius: const Radius.circular(5))
+    ..cubicTo(0, 16, 4, 18, 5, 0)
+    ..close();
 
-  static final crescent =
-      Path()
-        ..moveTo(3, 22)
-        ..arcToPoint(const Offset(5.5, 28), radius: const Radius.circular(3.5), clockwise: false)
-        ..arcToPoint(const Offset(3, 22), radius: const Radius.circular(7));
+  static final crescent = Path()
+    ..moveTo(3, 22)
+    ..arcToPoint(const Offset(5.5, 28), radius: const Radius.circular(3.5), clockwise: false)
+    ..arcToPoint(const Offset(3, 22), radius: const Radius.circular(7));
 
   static final fillSpring = Paint()..color = const Color(0xffa0ffd0);
   static final fillBlack = Paint()..color = Colors.black;
-  static final outline =
-      Paint()
-        ..color = Colors.black
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
+  static final outline = Paint()
+    ..color = Colors.black
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2;
 
   @override
   void paint(PaintingContext context, Offset offset) {

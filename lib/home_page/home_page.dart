@@ -261,7 +261,7 @@ class FunLink extends StatelessWidget {
   }
 }
 
-class _FunPreview extends HookWidget {
+class _FunPreview extends RefWidget {
   const _FunPreview();
 
   static void touch([PointerEvent? _]) {
@@ -295,12 +295,8 @@ class _FunPreview extends HookWidget {
     ),
   );
 
-  static String useFunPreview() {
-    return useValueListenable(useMemoized(() => HomePageElement.instance.text));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Text(useFunPreview());
+    return Text(ref.watch(HomePageElement.instance.text));
   }
 }

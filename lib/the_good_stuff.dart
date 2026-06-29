@@ -100,11 +100,6 @@ extension ToggleCubit on Cubit<bool> {
   void toggle() => value = !value;
 }
 
-T useAnimationFrom<S extends State, T>(T Function(S s) s) {
-  final BuildContext context = useContext();
-  return useMemoized(() => s(context.findAncestorStateOfType<S>()!));
-}
-
 T findWidget<T extends Widget>(BuildContext context) {
   return context.findAncestorWidgetOfExactType<T>()!;
 }

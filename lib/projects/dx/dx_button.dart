@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class DxButton extends StatefulWidget {
+class DxButton extends StatefulRefWidget {
   const DxButton(this.route, {super.key, this.border = Rekt.defaultBorder, required this.child});
 
   final Route route;
@@ -14,10 +14,10 @@ class DxButton extends StatefulWidget {
   State<DxButton> createState() => _DxButtonState();
 }
 
-class _DxButtonState extends State<DxButton> with StateVsync {
-  late final depth = ValueAnimation(
+class _DxButtonState extends State<DxButton> {
+  late final _depth = ValueAnimation(
     0.0,
-    vsync: this,
+    vsync: vsync,
     duration: Durations.medium1,
     curve: Curves.ease,
     lerp: lerpDouble,
@@ -25,7 +25,7 @@ class _DxButtonState extends State<DxButton> with StateVsync {
 
   @override
   void dispose() {
-    depth.dispose();
+    _depth.dispose();
     super.dispose();
   }
 
@@ -45,13 +45,13 @@ class _DxButtonState extends State<DxButton> with StateVsync {
     final OutlinedBorder border = widget.border;
 
     return MouseRegion(
-      onEnter: (event) => depth.value = 0.98,
-      onExit: (event) => depth.value = 0.0,
+      onEnter: (event) => _depth.value = 0.98,
+      onExit: (event) => _depth.value = 0.0,
       child: RepaintBoundary(
         child: ClipPath(
           clipper: ShapeBorderClipper(shape: border),
           child: RektTransition(
-            depth: depth,
+            depth: _depth,
             border: border,
             child: Material(
               type: MaterialType.transparency,
@@ -106,7 +106,7 @@ class RouteHighlight extends SingleChildRenderObjectWidget {
   }
 }
 
-class _DepthTransition extends HookWidget {
+class _DepthTransition extends RefWidget {
   const _DepthTransition();
 
   static Matrix4 _transformed(double depth) {
@@ -118,7 +118,7 @@ class _DepthTransition extends HookWidget {
     return MatrixTransition(
       onTransform: _transformed,
       animation: Animation.fromValueListenable(
-        useAnimationFrom<_DxButtonState, ValueAnimation<double>>((s) => s.depth),
+        context.findAncestorStateOfType<_DxButtonState>()!._depth,
       ),
       child: findWidget<DxButton>(context).child,
     );

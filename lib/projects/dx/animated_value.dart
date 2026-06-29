@@ -68,7 +68,7 @@ typedef AnimationBuilder<T> = Widget Function(BuildContext context, Animation<T>
 ///  * [AnimatedSize], which automatically transitions its size over a given
 ///    duration.
 ///  * [AnimatedSwitcher], which fades from one widget to another.
-class AnimatedValue<T extends Object> extends StatefulWidget {
+class AnimatedValue<T extends Object> extends StatefulRefWidget {
   const AnimatedValue({
     super.key,
     required this.value,
@@ -162,10 +162,10 @@ class AnimatedValue<T extends Object> extends StatefulWidget {
   AnimatedValueState<T> createState() => AnimatedValueState<T>();
 }
 
-class AnimatedValueState<T extends Object> extends State<AnimatedValue<T>> with StateVsync {
+class AnimatedValueState<T extends Object> extends State<AnimatedValue<T>> {
   late final ValueAnimation<T> animation = ValueAnimation<T>(
     widget.initialValue ?? widget.value,
-    vsync: this,
+    vsync: vsync,
     duration: widget.duration,
     curve: widget.curve,
     lerp: widget.lerp,
@@ -295,7 +295,6 @@ class _AnimatedValueTransition<T extends Object> extends AnimatedValue<T> {
 /// {@end-tool}
 extension type AnimatedToggle(AnimatedValue<double> _widget) implements AnimatedValue<double> {
   AnimatedToggle.builder(
-    // ignore: avoid_positional_boolean_parameters, frick that
     bool forward, {
     Key? key,
     bool animateOnCreate = false,
@@ -317,7 +316,6 @@ extension type AnimatedToggle(AnimatedValue<double> _widget) implements Animated
        );
 
   AnimatedToggle.transition(
-    // ignore: avoid_positional_boolean_parameters, frick that
     bool forward, {
     Key? key,
     bool animateOnCreate = false,

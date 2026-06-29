@@ -144,15 +144,15 @@ extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
   );
 }
 
-class ApiToggle extends HookWidget {
+class ApiToggle extends RefWidget {
   const ApiToggle({super.key, required this.child});
 
   final Widget child;
 
-  static final _mapping = Cubit(false);
-  static final _animation = Cubit(false);
+  static final _mapping = Get.it(false);
+  static final _animation = Get.it(false);
 
-  static Cubit<bool> get toggle => switch (Route.current) {
+  static GetValue<bool> get toggle => switch (Route.current) {
     Route.mapping => _mapping,
     Route.animation => _animation,
     _ => throw Error(),
@@ -169,7 +169,7 @@ class ApiToggle extends HookWidget {
       Route.animation => _animation,
       _ => throw Error(),
     };
-    return _ApiToggle(showImprovedVersion: useValueListenable(toggle), child: child);
+    return _ApiToggle(showImprovedVersion: ref.watch(toggle), child: child);
   }
 }
 
@@ -238,7 +238,10 @@ class _CodeSample extends StatelessWidget {
         Route.animation => const Size(720, 633),
         _ => throw Error(),
       },
-      child: Theme(data: _themeData, child: SelectionArea(child: VsCode.of(context))),
+      child: Theme(
+        data: _themeData,
+        child: SelectionArea(child: VsCode.of(context)),
+      ),
     );
   }
 }

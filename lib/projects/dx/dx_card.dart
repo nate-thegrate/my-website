@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:nate_thegrate/the_good_stuff.dart';
 
-class DxCard extends HookWidget {
+class DxCard extends RefWidget {
   const DxCard({super.key});
 
   static final launching = Cubit(false);
@@ -15,7 +15,7 @@ class DxCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return _ApiLaunchProvider(
-      launch: RecursionCount.of(context) == 0 && useValueListenable(launching),
+      launch: RecursionCount.of(context) == 0 && ref.watch(launching),
       child: const _DxCard(),
     );
   }
@@ -32,6 +32,8 @@ class _ApiLaunchProvider extends InheritedWidget {
 
 class _DxCard extends StatefulWidget {
   const _DxCard();
+
+  static final width = ScopedGet<double>();
 
   @override
   State<_DxCard> createState() => _DxCardState();
@@ -110,10 +112,13 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
     }
     return Stached(
       direction: AxisDirection.right,
-      child: LayoutBuilder(
-        builder: (context, constraints) => ListenableBuilder(
-          listenable: listenables,
-          builder: (context, _) => _build(context, constraints),
+      child: GetScope(
+        substitutes: {Substitution(_DxCard.width, widthCurved), },
+        child: LayoutBuilder(
+          builder: (context, constraints) => ListenableBuilder(
+            listenable: listenables,
+            builder: (context, _) => _build(context, constraints),
+          ),
         ),
       ),
     );
@@ -186,14 +191,12 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
   }
 }
 
-class _DxText extends HookWidget {
+class _DxText extends RefWidget {
   const _DxText();
 
   @override
   Widget build(BuildContext context) {
-    final double value = useValueListenable(
-      useAnimationFrom<_DxCardState, ValueListenable<double>>((s) => s.widthCurved),
-    );
+    final double value = ref.watch(_DxCard.width);
     final int visibleLetters = (value * 10).round();
     final textSpan = TextSpan(
       children: [

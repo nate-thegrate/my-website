@@ -34,7 +34,7 @@ class _Gateway extends SizedBox implements Source {
   static BuildContext get context => _key.currentContext!;
 }
 
-class TheApproach extends HookWidget implements Source {
+class TheApproach extends StatefulRefWidget implements Source {
   const TheApproach({super.key, required this.child});
 
   final Widget child;
@@ -61,18 +61,28 @@ class TheApproach extends HookWidget implements Source {
   }
 
   @override
+  State<TheApproach> createState() => _TheApproachState();
+}
+
+class _TheApproachState extends State<TheApproach> {
+  Matrix4? transform;
+
+  @override
   Widget build(BuildContext context) {
-    final ObjectRef<Matrix4?> transform = useRef(null);
     if (useTheApproach()) {
-      transform.value ??= context.renderBox.getTransformTo(_Gateway.context.renderBox);
+      transform ??= context.renderBox.getTransformTo(_Gateway.context.renderBox);
     }
     return MatrixTransition(
       alignment: Alignment.topLeft,
-      animation: Animation.fromValueListenable(getZoom),
+      animation: Animation.fromValueListenable(TheApproach.getZoom),
       onTransform: (animationValue) {
-        return lerpMatrix(noTransform, transform.value ?? noTransform, getZoom.value);
+        return TheApproach.lerpMatrix(
+          TheApproach.noTransform,
+          transform ?? TheApproach.noTransform,
+          TheApproach.getZoom.value,
+        );
       },
-      child: child,
+      child: widget.child,
     );
   }
 }
@@ -114,7 +124,7 @@ class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
   Widget build(BuildContext context) => _vessel;
 }
 
-class _InnerSource extends HookWidget {
+class _InnerSource extends RefWidget {
   const _InnerSource();
 
   static const fromLight = FromLight(0.8);

@@ -1,4 +1,4 @@
-import 'package:nate_thegrate/the_good_stuff.dart';
+import 'package:flutter/material.dart';
 
 class Seconds extends Duration {
   const Seconds(double seconds)
@@ -7,26 +7,25 @@ class Seconds extends Duration {
 
 const microPerSec = Duration.microsecondsPerSecond;
 
-bool useDelayedActivation(double seconds) {
-  return use(
-    _DelayedActivationHook.new,
-    data: seconds,
-    key: null,
-    debugLabel: 'useDelayedActivation',
-  );
-}
+class DelayedActivation extends StatefulWidget {
+  const DelayedActivation(this.builder, {required this.delay, super.key});
 
-class _DelayedActivationHook extends Hook<bool, double> {
-  bool activated = false;
+  final double delay;
+  final Widget Function(BuildContext context, bool active) builder;
 
   @override
-  Future<void> initHook() async {
-    await Future<void>.delayed(Seconds(data));
-    if (!context.mounted) return;
+  State<DelayedActivation> createState() => _DelayedActivationState();
+}
 
-    setState(() => activated = true);
+class _DelayedActivationState extends State<DelayedActivation> {
+  bool active = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Seconds(widget.delay), () => setState(() => active = true));
   }
 
   @override
-  bool build() => activated;
+  Widget build(BuildContext context) => widget.builder(context, active);
 }

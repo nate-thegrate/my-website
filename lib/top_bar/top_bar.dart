@@ -162,7 +162,10 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
                 height: gapHeight,
                 child: const Stack(
                   fit: StackFit.expand,
-                  children: [ColoredBox(color: Color(0xff202020), child: _VoidGap()), BlurBox()],
+                  children: [
+                    ColoredBox(color: Color(0xff202020), child: _VoidGap()),
+                    BlurBox(),
+                  ],
                 ),
               ),
           ],
@@ -176,7 +179,10 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
         style: Theme.of(context).textTheme.bodyMedium!,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [appBar, Expanded(child: findWidget<TopBar>(context).body)],
+          children: [
+            appBar,
+            Expanded(child: findWidget<TopBar>(context).body),
+          ],
         ),
       ),
     );
@@ -267,14 +273,14 @@ class BlurBox extends SingleChildRenderObjectWidget {
   }
 }
 
-class Indicator extends StatefulWidget {
+class Indicator extends StatefulRefWidget {
   const Indicator({super.key});
 
   @override
   State<Indicator> createState() => _IndicatorState();
 }
 
-class _IndicatorState extends State<Indicator> with StateVsync {
+class _IndicatorState extends State<Indicator> {
   EdgeInsets get _padding {
     final double tollsWidth = TollsBox.getWidth(context);
     final double othersWidth = MediaQuery.sizeOf(context).width - tollsWidth;
@@ -289,7 +295,7 @@ class _IndicatorState extends State<Indicator> with StateVsync {
 
   late final padding = ValueAnimation(
     _padding,
-    vsync: this,
+    vsync: vsync,
     duration: Durations.short3,
     curve: Curves.ease,
     lerp: EdgeInsets.lerp,
