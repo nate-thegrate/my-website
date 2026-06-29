@@ -14,8 +14,9 @@ dependencies:
   meta: ^1.15.0
   url_launcher: ^6.3.1
   collection_notifiers: ^1.1.0
-  get_hooked:
-    path: ../get_hooked/packages/get_hooked
+  get_hooked: ^0.4.0
+  # get_hooked:
+  #   path: ../get_hooked/packages/get_hooked
 
 dev_dependencies:
   flutter_test:
