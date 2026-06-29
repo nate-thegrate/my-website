@@ -148,7 +148,7 @@ final elevation = WidgetStateProperty.resolveWith((states) {
 
 final button = FilledButton(
   style: ButtonStyle(
-    backgroundColor: WidgetStateProperty.resolveWith((states) {
+    backgroundColor: .resolveWith((states) {
       if (states.contains(WidgetState.pressed)) {
         return black;
       }
@@ -157,10 +157,10 @@ final button = FilledButton(
       }
       return spring;
     }),
-    foregroundColor: WidgetStateProperty.resolveWith(
+    foregroundColor: .resolveWith(
       (states) => states.contains(WidgetState.pressed) ? pink : black,
     ),
-    overlayColor: WidgetStateProperty.resolveWith((states) {
+    overlayColor: .resolveWith((states) {
       if (states.contains(WidgetState.pressed)) {
         return pink2;
       }
@@ -238,7 +238,7 @@ class _AnimatedStretchState extends AnimatedWidgetBaseState<AnimatedStretch> {
     inherit: false,
     fontFamily: 'roboto mono',
     color: _plain,
-    overflow: TextOverflow.clip,
+    overflow: .clip,
   );
   static Text of(BuildContext context) {
     final String text = switch ((Route.of(context), ApiToggle.of(context))) {
@@ -253,7 +253,7 @@ class _AnimatedStretchState extends AnimatedWidgetBaseState<AnimatedStretch> {
       VsCode._fromText(text),
       style: defaultStyle,
       softWrap: false,
-      textAlign: TextAlign.left,
+      textAlign: .left,
     );
   }
 }

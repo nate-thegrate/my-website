@@ -35,7 +35,7 @@ class HuemanCard extends StatelessWidget {
               ),
               style: TextStyle(
                 fontFamily: 'gaegu',
-                fontWeight: FontWeight.bold,
+                fontWeight: .bold,
                 fontSize: 64,
                 color: Color(0xff6c4b00),
                 shadows: [Shadow(color: Color(0x80002040), blurRadius: 2)],
@@ -46,7 +46,7 @@ class HuemanCard extends StatelessWidget {
             flex: 128,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: .circle,
                 gradient: SweepGradient(
                   colors: [
                     Color(0xffff0000),
@@ -87,7 +87,7 @@ class HuemanCard extends StatelessWidget {
     });
 
     return Stached(
-      direction: AxisDirection.left,
+      direction: .left,
       child: AnimatedScale(
         scale: scale.resolve(states),
         duration: ProjectButton.duration,
@@ -100,7 +100,7 @@ class HuemanCard extends StatelessWidget {
             shadowColor: (WidgetState.pressed | WidgetState.hovered).isSatisfiedBy(states)
                 ? Colors.black
                 : Colors.black45,
-            color: Color.lerp(const Color(0xffeef3f8), Colors.white, value)!,
+            color: .lerp(const Color(0xffeef3f8), Colors.white, value)!,
             child: Center(
               child: Opacity(opacity: 1 - math.min(value * 2, 1), child: child),
             ),

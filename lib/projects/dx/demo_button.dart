@@ -72,7 +72,9 @@ class Demo extends StatelessWidget {
           ),
         ),
       ),
-      child: const RepaintBoundary(child: SizedBox(height: 100, child: Center(child: button))),
+      child: const RepaintBoundary(
+        child: SizedBox(height: 100, child: Center(child: button)),
+      ),
     );
   }
 }
@@ -155,7 +157,7 @@ class _PressToStretchState extends State<_PressToStretch> {
                     TextSpan(text: 'press & hold to\n'),
                     TextSpan(
                       text: 'stretch!',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 44),
+                      style: TextStyle(fontWeight: .bold, fontSize: 44),
                     ),
                   ],
                 ),
@@ -164,9 +166,9 @@ class _PressToStretchState extends State<_PressToStretch> {
                   fontFamily: 'gaegu',
                   color: Colors.black,
                   height: 1,
-                  overflow: TextOverflow.visible,
+                  overflow: .visible,
                 ),
-                textAlign: TextAlign.center,
+                textAlign: .center,
                 maxLines: 2,
               ),
             ),
@@ -179,7 +181,7 @@ class _PressToStretchState extends State<_PressToStretch> {
       onPanDown: waiting ? null : tension,
       onPanEnd: waiting ? null : release,
       child: MouseRegion(
-        cursor: waiting ? MouseCursor.defer : SystemMouseCursors.click,
+        cursor: waiting ? .defer : SystemMouseCursors.click,
         child: AnimatedStretch(
           stretch: stretch,
           duration: duration,
@@ -211,21 +213,20 @@ class _Streeeetch extends BigBox {
     final double squeeze = r / 4;
     final double firmness = h / 2;
 
-    final path =
-        Path()
-          ..moveTo(0, r)
-          ..arcToPoint(Offset(r, 0), radius: radius)
-          ..cubicTo(firmness, 0, firmness, squeeze, w / 2, squeeze)
-          ..cubicTo(w - firmness, squeeze, w - firmness, 0, w - r, 0)
-          ..arcToPoint(Offset(w, r), radius: radius)
-          ..lineTo(w, h - r)
-          ..arcToPoint(Offset(w - r, h), radius: radius)
-          ..cubicTo(w - firmness, h, w - firmness, h - squeeze, w / 2, h - squeeze)
-          ..cubicTo(firmness, h - squeeze, firmness, h, r, h)
-          ..lineTo(r, h)
-          ..arcToPoint(Offset(0, h - r), radius: radius)
-          ..lineTo(0, r)
-          ..close();
+    final path = Path()
+      ..moveTo(0, r)
+      ..arcToPoint(Offset(r, 0), radius: radius)
+      ..cubicTo(firmness, 0, firmness, squeeze, w / 2, squeeze)
+      ..cubicTo(w - firmness, squeeze, w - firmness, 0, w - r, 0)
+      ..arcToPoint(Offset(w, r), radius: radius)
+      ..lineTo(w, h - r)
+      ..arcToPoint(Offset(w - r, h), radius: radius)
+      ..cubicTo(w - firmness, h, w - firmness, h - squeeze, w / 2, h - squeeze)
+      ..cubicTo(firmness, h - squeeze, firmness, h, r, h)
+      ..lineTo(r, h)
+      ..arcToPoint(Offset(0, h - r), radius: radius)
+      ..lineTo(0, r)
+      ..close();
 
     context.canvas.drawPath(path.shift(offset), yellowFill);
   }

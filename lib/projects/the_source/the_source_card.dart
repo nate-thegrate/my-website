@@ -13,7 +13,7 @@ class SourceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     if (RecursionCount.of(context) > 0) return const _CardRecursion();
 
-    return const Stached(direction: AxisDirection.right, child: _SourceCard());
+    return const Stached(direction: .right, child: _SourceCard());
   }
 }
 
@@ -34,8 +34,7 @@ class _SourceCardState extends State<_SourceCard> {
   void initState() {
     super.initState();
     states.addListener(() {
-      SourceCard.color.value =
-          active.isSatisfiedBy(states) ? SourceCard.offWhite : SourceCard.grey;
+      SourceCard.color.value = active.isSatisfiedBy(states) ? SourceCard.offWhite : SourceCard.grey;
     });
     TheApproach.approaching.hooked.addListener(listener);
   }
@@ -62,7 +61,7 @@ class _SourceCardState extends State<_SourceCard> {
           Source.approach();
           states.add(WidgetState.selected);
         },
-        behavior: HitTestBehavior.opaque,
+        behavior: .opaque,
         child: const _CardRecursion(),
       ),
     );
@@ -114,7 +113,10 @@ class _CardRecursion extends SingleChildRenderObjectWidget {
 
   static const _child = Center(
     child: IgnorePointer(
-      child: FittedBox(fit: BoxFit.cover, child: _ScreenSizedBox(child: RecursionCount())),
+      child: FittedBox(
+        fit: .cover,
+        child: _ScreenSizedBox(child: RecursionCount()),
+      ),
     ),
   );
 

@@ -151,7 +151,7 @@ class _ProjectButtonState extends State<_ProjectButton> {
           onPanDown: handleDownpress,
           onPanUpdate: handlePan,
           onPanEnd: handlePressEnd,
-          behavior: HitTestBehavior.opaque,
+          behavior: .opaque,
           child: widget.child,
         ),
       ),
@@ -176,13 +176,11 @@ class ProjectCardTemplate extends PhysicalShape {
     super.elevation = 5.0,
     required super.color,
     super.shadowColor = Colors.black45,
-    super.clipBehavior = Clip.antiAlias,
+    super.clipBehavior = .antiAlias,
     required Widget super.child,
   }) : super(clipper: const ShapeBorderClipper(shape: shape));
 
-  static const shape = ContinuousRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(16.0)),
-  );
+  static const shape = ContinuousRectangleBorder(borderRadius: .all(Radius.circular(16.0)));
 
   @override
   RenderPhysicalShape createRenderObject(BuildContext context) {
@@ -199,7 +197,7 @@ class ProjectCardTemplate extends PhysicalShape {
 class EtherealCard extends RenderPhysicalShape {
   EtherealCard({
     super.clipper = const ShapeBorderClipper(shape: ProjectCardTemplate.shape),
-    super.clipBehavior = Clip.antiAlias,
+    super.clipBehavior = .antiAlias,
     required super.elevation,
     required super.color,
     super.shadowColor = Colors.black45,

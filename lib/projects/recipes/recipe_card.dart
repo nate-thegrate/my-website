@@ -79,7 +79,7 @@ class _RecipeCardState extends State<RecipeCard> with TickerProviderStateMixin {
       curve: Curves.ease,
       builder: (context, t, child) {
         final card = ProjectCardTemplate(
-          clipBehavior: Clip.none,
+          clipBehavior: .none,
           elevation: 5 * (1 - t),
           color: RecipeCard.background,
           child: Center(
@@ -151,7 +151,7 @@ class Stached extends StatelessWidget {
       AxisDirection.down => const Offset(0, 2),
     };
 
-    final Offset stash = Stache.of(context) ? offset : Offset.zero;
+    final Offset stash = Stache.of(context) ? offset : .zero;
 
     return AnimatedSlide(
       offset: stash,

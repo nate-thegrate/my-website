@@ -11,10 +11,7 @@ extension type const Stats._(TopBar _) implements TopBar {
     final String? param = state.pathParameters['refactor'];
 
     return NoTransitionPage(
-      child: Refactoring(
-        refactor: param != null && param.endsWith('true'),
-        child: const Stats(),
-      ),
+      child: Refactoring(refactor: param != null && param.endsWith('true'), child: const Stats()),
     );
   }
 
@@ -26,7 +23,7 @@ extension type const Stats._(TopBar _) implements TopBar {
 
 class Refactoring extends InheritedWidget {
   const Refactoring({required this.refactor, required super.child})
-      : super(key: const GlobalObjectKey(Refactoring));
+    : super(key: const GlobalObjectKey(Refactoring));
 
   final bool refactor;
 
@@ -67,48 +64,42 @@ class _StatsState extends State<_Stats> {
   Widget build(BuildContext context) {
     final bool refactoring = Refactoring.of(context);
     final padding = EdgeInsets.symmetric(
-      horizontal: math.max(
-        Stats.insets,
-        (MediaQuery.sizeOf(context).width - Stats.maxWidth) / 2,
-      ),
+      horizontal: math.max(Stats.insets, (MediaQuery.sizeOf(context).width - Stats.maxWidth) / 2),
     );
     final slivers = <Widget>[
       SliverMainAxisGroup(
         slivers: [
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _TableHeader(refactoring: refactoring),
-          ),
+          SliverPersistentHeader(pinned: true, delegate: _TableHeader(refactoring: refactoring)),
           SliverFixedExtentList.list(
             itemExtent: Stats.itemExtent,
             children: refactoring ? refactorPRs : flutterPRs,
           ),
         ],
       ),
-      SliverLayoutBuilder(builder: (context, constraints) {
-        final SliverConstraints(
-          :double precedingScrollExtent,
-          :double viewportMainAxisExtent,
-          :double remainingPaintExtent,
-        ) = constraints;
+      SliverLayoutBuilder(
+        builder: (context, constraints) {
+          final SliverConstraints(
+            :double precedingScrollExtent,
+            :double viewportMainAxisExtent,
+            :double remainingPaintExtent,
+          ) = constraints;
 
-        targetExtent = precedingScrollExtent + 36.0 - viewportMainAxisExtent;
+          targetExtent = precedingScrollExtent + 36.0 - viewportMainAxisExtent;
 
-        Widget? total;
-        if (remainingPaintExtent >= 36.0) {
-          total = PullRequest.total(onlyRefactor: refactoring);
-        }
-        return SliverToBoxAdapter(child: SizedBox(height: 36.0, child: total));
-      }),
+          Widget? total;
+          if (remainingPaintExtent >= 36.0) {
+            total = PullRequest.total(onlyRefactor: refactoring);
+          }
+          return SliverToBoxAdapter(child: SizedBox(height: 36.0, child: total));
+        },
+      ),
       const SliverToBoxAdapter(
         child: SizedBox(
           width: double.infinity,
           height: 200,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: PullRequest.borderColor),
-              ),
+              border: Border(top: BorderSide(color: PullRequest.borderColor)),
             ),
             child: Center(child: _RefactorButton()),
           ),
@@ -119,7 +110,7 @@ class _StatsState extends State<_Stats> {
     return ColoredBox(
       color: Stats.background,
       child: Stack(
-        alignment: Alignment.bottomCenter,
+        alignment: .bottomCenter,
         children: [
           CustomScrollView(
             controller: controller,
@@ -198,19 +189,17 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
       child: DefaultTextStyle(
         style: TextStyle(
           color: RightColumn.dateColor(darker: shrinkOffset > 0),
-          fontWeight: FontWeight.w600,
+          fontWeight: .w600,
         ),
         child: const SizedBox(
           width: RightColumn.dateWidth,
-          child: Center(
-            child: Text('date'),
-          ),
+          child: Center(child: Text('date')),
         ),
       ),
     );
 
     final header = DefaultTextStyle(
-      style: const TextStyle(fontWeight: FontWeight.w600),
+      style: const TextStyle(fontWeight: .w600),
       child: Row(
         key: const GlobalObjectKey('header'),
         children: [
@@ -222,7 +211,7 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
                     : 'Flutter framework contributions',
                 style: const TextStyle(color: Colors.black87),
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                overflow: .ellipsis,
               ),
             ),
           ),
@@ -233,9 +222,7 @@ class _TableHeader extends SliverPersistentHeaderDelegate {
 
     if (shrinkOffset == 0) {
       return DecoratedBox(
-        decoration: const BoxDecoration(
-          border: Border(bottom: PullRequest.border),
-        ),
+        decoration: const BoxDecoration(border: Border(bottom: PullRequest.border)),
         child: header,
       );
     }
@@ -250,25 +237,18 @@ class _RefactorButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool onlyRefactorPRs = Refactoring.of(context);
 
-    const WidgetStatePropertyAll<EdgeInsets> padding =
-        WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 18));
+    const WidgetStatePropertyAll<EdgeInsets> padding = WidgetStatePropertyAll(
+      EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+    );
     const boringStyle = ButtonStyle(
-      side: WidgetStatePropertyAll(
-        BorderSide(width: 2, color: Color(0xff80a0a0)),
-      ),
-      backgroundColor: WidgetStateMapper<Color?>({
-        WidgetState.selected: Color(0xffc0e0e0),
-      }),
+      side: WidgetStatePropertyAll(BorderSide(width: 2, color: Color(0xff80a0a0))),
+      backgroundColor: WidgetStateMapper<Color?>({WidgetState.selected: Color(0xffc0e0e0)}),
       foregroundColor: WidgetStatePropertyAll(Color(0xff406060)),
       padding: padding,
     );
     const refactorStyle = ButtonStyle(
-      side: WidgetStatePropertyAll(
-        BorderSide(width: 2, color: Color(0xff80ffff)),
-      ),
-      backgroundColor: WidgetStateMapper<Color?>({
-        WidgetState.selected: Color(0xff80ffff),
-      }),
+      side: WidgetStatePropertyAll(BorderSide(width: 2, color: Color(0xff80ffff))),
+      backgroundColor: WidgetStateMapper<Color?>({WidgetState.selected: Color(0xff80ffff)}),
       foregroundColor: WidgetStatePropertyAll(Colors.black),
       overlayColor: WidgetStateMapper({
         WidgetState.pressed: Color(0x4000c0c0),

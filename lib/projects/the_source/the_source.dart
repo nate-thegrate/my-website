@@ -73,7 +73,7 @@ class _TheApproachState extends State<TheApproach> {
       transform ??= context.renderBox.getTransformTo(_Gateway.context.renderBox);
     }
     return MatrixTransition(
-      alignment: Alignment.topLeft,
+      alignment: .topLeft,
       animation: Animation.fromValueListenable(TheApproach.getZoom),
       onTransform: (animationValue) {
         return TheApproach.lerpMatrix(
@@ -109,7 +109,7 @@ class TheSourceProvides extends State<_Source> with TickerProviderStateMixin {
   TheSourceProvides.createState();
 
   static const _vessel = Stack(
-    alignment: Alignment.center,
+    alignment: .center,
     children: [
       _Passage(),
       FractionallySizedBox(
@@ -170,9 +170,9 @@ class _InnerSource extends RefWidget {
                     inherit: false,
                     color: fromLight.withValues(alpha: value),
                     fontSize: 32,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: .w600,
                   ),
-                  textAlign: TextAlign.center,
+                  textAlign: .center,
                   child: const _FadeIn(
                     child: FittedBox(child: SizedBox(width: 375, height: 150, child: theSource)),
                   ),
@@ -214,7 +214,7 @@ class _GitHubButton extends StatelessWidget {
     final double alpha = DefaultTextStyle.of(context).style.color!.a;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const .symmetric(horizontal: 4),
       child: TextButton(
         onPressed: alpha > 0 ? _viewTheSource : null,
         child: Text(

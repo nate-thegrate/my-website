@@ -11,17 +11,12 @@ export 'vs_code.dart';
 extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
   const DX() : _ = const DecoratedBox(decoration: background, child: _child);
 
-  const DX.stack() : _ = const Stack(fit: StackFit.expand, children: [DX(), DxTransition()]);
+  const DX.stack() : _ = const Stack(fit: .expand, children: [DX(), DxTransition()]);
 
   static const bgImage = AssetImage('assets/images/gradient.png');
   static const background = BoxDecoration(
     color: Color(0xff28ffff),
-    image: DecorationImage(
-      alignment: Alignment.topLeft,
-      fit: BoxFit.fill,
-      image: bgImage,
-      filterQuality: FilterQuality.none,
-    ),
+    image: DecorationImage(alignment: .topLeft, fit: .fill, image: bgImage, filterQuality: .none),
   );
 
   static Page<void> pageBuilder(BuildContext context, GoRouterState state) {
@@ -39,10 +34,10 @@ extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
       fontSize: 22,
       fontVariations: [FontVariation.weight(550)],
     ),
-    textAlign: TextAlign.center,
+    textAlign: .center,
     child: SizedBox.expand(
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: .spaceEvenly,
         children: [
           Spacer(),
           Expanded(flex: 9, child: DxButton(Route.mapping, child: Text('WidgetState\nMapping'))),
@@ -58,12 +53,8 @@ extension type const DX._(RenderObjectWidget _) implements RenderObjectWidget {
 extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
   const DemoScreen() : this._(_widget);
 
-  static const buttonBorder = BeveledRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(12)),
-  );
-  static const bodyBorder = BeveledRectangleBorder(
-    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-  );
+  static const buttonBorder = BeveledRectangleBorder(borderRadius: .all(Radius.circular(12)));
+  static const bodyBorder = BeveledRectangleBorder(borderRadius: .vertical(top: .circular(16)));
   static const _widget = RouteProvider(
     child: ApiToggle(
       child: SizedBox.expand(
@@ -75,7 +66,7 @@ extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
                 width: double.infinity,
                 height: kToolbarHeight,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  padding: .symmetric(vertical: 8.0, horizontal: 16.0),
                   child: Row(
                     spacing: 8.0,
                     children: [
@@ -116,11 +107,11 @@ extension type const DemoScreen._(RouteProvider _) implements RouteProvider {
                   clipper: ShapeBorderClipper(shape: bodyBorder),
                   child: SizedBox.expand(
                     child: Stack(
-                      fit: StackFit.expand,
+                      fit: .expand,
                       children: [
                         DecoratedBox(
                           decoration: Rekt(depth: 1.0, border: bodyBorder),
-                          position: DecorationPosition.foreground,
+                          position: .foreground,
                           child: ColoredBox(color: Color(0xff303030)),
                         ),
                         Column(
@@ -203,13 +194,13 @@ class CodeCaption extends StatelessWidget {
               (Route.animation, false) => 'Implicitly-animated Widget',
               _ => throw Error(),
             },
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 32, fontWeight: .bold),
           ),
           const TextSpan(text: '\n\n', style: TextStyle(fontSize: 6)),
           TextSpan(text: '($subtitle)\n', style: VsCode.defaultStyle),
         ],
       ),
-      textAlign: TextAlign.center,
+      textAlign: .center,
       style: const TextStyle(inherit: false, color: Colors.white),
     );
   }
@@ -218,8 +209,8 @@ class CodeCaption extends StatelessWidget {
 extension type const CodeSample._(FittedBox _) implements FittedBox {
   const CodeSample()
     : _ = const FittedBox(
-        alignment: Alignment.topLeft,
-        child: Padding(padding: EdgeInsets.fromLTRB(32, 8, 32, 32), child: _CodeSample()),
+        alignment: .topLeft,
+        child: Padding(padding: .fromLTRB(32, 8, 32, 32), child: _CodeSample()),
       );
 }
 

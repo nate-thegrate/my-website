@@ -111,9 +111,9 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
       return const SizedBox.shrink();
     }
     return Stached(
-      direction: AxisDirection.right,
+      direction: .right,
       child: GetScope(
-        substitutes: {Substitution(_DxCard.width, widthCurved), },
+        substitutes: {Substitution(_DxCard.width, widthCurved)},
         child: LayoutBuilder(
           builder: (context, constraints) => ListenableBuilder(
             listenable: listenables,
@@ -144,7 +144,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
         maxHeight: height,
         child: PhysicalShape(
           clipper: const ShapeBorderClipper(shape: ProjectCardTemplate.shape),
-          clipBehavior: Clip.antiAlias,
+          clipBehavior: .antiAlias,
           color: Colors.transparent,
           elevation: altitude,
           child: Center(
@@ -153,7 +153,7 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
               child: DecoratedBox(
                 decoration: CardDecoration(shadowSize),
                 child: FittedBox(
-                  fit: BoxFit.fitHeight,
+                  fit: .fitHeight,
                   child: SizedBox(
                     width: overflowWidth,
                     height: height,
@@ -161,18 +161,18 @@ class _DxCardState extends State<_DxCard> with TickerProviderStateMixin {
                       offset: Offset(0, -elevation / 5),
                       child: const Center(
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisSize: .min,
                           children: [
                             FittedBox(
                               child: Padding(
-                                padding: EdgeInsets.fromLTRB(16, 0, 16, 36),
+                                padding: .fromLTRB(16, 0, 16, 36),
                                 child: SizedBox.square(dimension: 150, child: _FlutterLogo()),
                               ),
                             ),
                             FittedBox(
-                              fit: BoxFit.fitWidth,
+                              fit: .fitWidth,
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: .symmetric(horizontal: 8),
                                 child: SizedBox(width: 325, child: _DxText()),
                               ),
                             ),
@@ -210,9 +210,9 @@ class _DxText extends RefWidget {
 
     return Text.rich(
       textSpan,
-      textAlign: TextAlign.center,
+      textAlign: .center,
       maxLines: 1,
-      overflow: TextOverflow.visible,
+      overflow: .visible,
       style: const TextStyle(
         fontFamily: 'roboto mono',
         fontSize: 22,
@@ -290,8 +290,8 @@ class CardPainter extends BoxPainter {
       Paint()
         ..shader = const LinearGradient(
           colors: [Color(0xffa8eaff), Color(0xffc0d0ff)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: .topLeft,
+          end: .bottomRight,
         ).createShader(rect),
     );
     canvas.drawPath(
@@ -309,7 +309,7 @@ class DxTransition extends AnimatedSlide {
   const DxTransition({super.key})
     : super(
         offset: const Offset(0, 1.2),
-        initialOffset: Offset.zero,
+        initialOffset: .zero,
         duration: Durations.medium3,
         curve: Curves.easeIn,
         child: ProjectGrid.screen,

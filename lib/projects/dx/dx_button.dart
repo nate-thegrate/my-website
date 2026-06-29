@@ -37,7 +37,7 @@ class _DxButtonState extends State<DxButton> {
         child: FittedBox(
           child: SizedBox(
             width: 200,
-            child: Padding(padding: EdgeInsets.all(16), child: _DepthTransition()),
+            child: Padding(padding: .all(16), child: _DepthTransition()),
           ),
         ),
       ),
@@ -54,7 +54,7 @@ class _DxButtonState extends State<DxButton> {
             depth: _depth,
             border: border,
             child: Material(
-              type: MaterialType.transparency,
+              type: .transparency,
               child: DefaultTextStyle(
                 style: const TextStyle(
                   color: Colors.black87,
@@ -63,7 +63,7 @@ class _DxButtonState extends State<DxButton> {
                   fontSize: 22,
                   fontVariations: [FontVariation.weight(550)],
                 ),
-                textAlign: TextAlign.center,
+                textAlign: .center,
                 child: InkWell(
                   onTap: () {
                     if (Route.current case Route.animation || Route.mapping) {
@@ -71,7 +71,7 @@ class _DxButtonState extends State<DxButton> {
                     }
                     Rekt.getRekt(context);
                   },
-                  overlayColor: const WidgetStateColor.fromMap({
+                  overlayColor: const .fromMap({
                     WidgetState.pressed: Color(0x24000000),
                     WidgetState.hovered: Color(0x14000000),
                     WidgetState.any: Colors.black12,
@@ -199,7 +199,7 @@ final class Rekt extends Decoration {
   static const depressed = Rekt(depth: 1.0);
 
   static const _radius = Radius.circular(16);
-  static const defaultBorder = BeveledRectangleBorder(borderRadius: BorderRadius.all(_radius));
+  static const defaultBorder = BeveledRectangleBorder(borderRadius: .all(_radius));
 
   static OverlayEntry? _entry;
   static AnimationController? _animation;
@@ -318,9 +318,7 @@ class _RenderRekt extends BigBox {
     }
   }
 
-  static const _targetBorder = BeveledRectangleBorder(
-    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-  );
+  static const _targetBorder = BeveledRectangleBorder(borderRadius: .vertical(top: .circular(16)));
 
   @override
   void paint(PaintingContext context, Offset offset) {

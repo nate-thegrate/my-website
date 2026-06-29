@@ -38,15 +38,15 @@ class App extends StatelessWidget {
   static Size get screenSize => WidgetsBinding.instance.renderViews.first.size;
 
   static final _theme = ThemeData(
-    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    materialTapTargetSize: .shrinkWrap,
     scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(seedColor: TopBar.background),
+    colorScheme: .fromSeed(seedColor: TopBar.background),
     textSelectionTheme: const TextSelectionThemeData(selectionColor: TopBar.background),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: const Color(0xff0060ff),
-        shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        shape: const ContinuousRectangleBorder(borderRadius: .all(Radius.circular(16))),
+        padding: const .symmetric(horizontal: 4),
       ),
     ),
     pageTransitionsTheme: const PageTransitionsTheme(

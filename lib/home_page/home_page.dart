@@ -16,7 +16,7 @@ class MobileHomePage extends HomePage {
     inherit: false,
     color: Color(0xff202020),
     fontSize: 18,
-    fontWeight: FontWeight.w600,
+    fontWeight: .w600,
     height: 1,
   );
   static const buttonStyle = ButtonStyle(
@@ -38,12 +38,12 @@ class MobileHomePage extends HomePage {
           dimension: 200,
           child: ClipPath(
             clipper: ShapeBorderClipper(
-              shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(96))),
+              shape: ContinuousRectangleBorder(borderRadius: .all(Radius.circular(96))),
             ),
             child: ColoredBox(
               color: TopBar.background,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(18, 21, 24, 24),
+                padding: .fromLTRB(18, 21, 24, 24),
                 child: Image(image: AssetImage('assets/images/tolls.png')),
               ),
             ),
@@ -53,14 +53,14 @@ class MobileHomePage extends HomePage {
         SizedBox(
           width: 200,
           child: FittedBox(
-            fit: BoxFit.fitWidth,
+            fit: .fitWidth,
             child: Text('NATE', style: textStyle),
           ),
         ),
         SizedBox(
           width: 200,
           child: FittedBox(
-            fit: BoxFit.fitWidth,
+            fit: .fitWidth,
             child: Text('THE GRATE', style: textStyle),
           ),
         ),
@@ -86,12 +86,12 @@ class DesktopHomePage extends HomePage {
       height: 1.125,
     ),
     child: Padding(
-      padding: EdgeInsets.all(16),
+      padding: .all(16),
       child: SelectionArea(
         child: MouseRegion(
           cursor: SystemMouseCursors.basic,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               Text.rich(
                 TextSpan(
@@ -99,10 +99,10 @@ class DesktopHomePage extends HomePage {
                     TextSpan(
                       text: 'Nate - the grate\n',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: .bold,
                         fontSize: 32,
                         height: 2.5,
-                        leadingDistribution: TextLeadingDistribution.even,
+                        leadingDistribution: .even,
                       ),
                     ),
                     TextSpan(
@@ -206,9 +206,9 @@ class FunLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16),
+      padding: const .only(top: 16),
       child: Stack(
-        alignment: Alignment.bottomCenter,
+        alignment: .bottomCenter,
         children: [
           Positioned(
             bottom: 0,
@@ -243,7 +243,7 @@ class FunLink extends StatelessWidget {
               },
               onExit: preview.hide,
               child: TapRegion(
-                behavior: HitTestBehavior.opaque,
+                behavior: .opaque,
                 onTapInside: (event) {
                   preview.opacity.value = 0;
                   if (event.buttons != kSecondaryMouseButton) {
@@ -282,15 +282,12 @@ class _FunPreview extends RefWidget {
           top: BorderSide(width: 0.5, color: Colors.black12),
           right: BorderSide(width: 0.5, color: Colors.black12),
         ),
-        borderRadius: BorderRadius.only(topRight: Radius.circular(4)),
+        borderRadius: .only(topRight: .circular(4)),
         color: Color(0xffe6f0ff),
       ),
       child: DefaultTextStyle(
         style: TextStyle(inherit: false, color: Colors.black87),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          child: _FunPreview(),
-        ),
+        child: Padding(padding: .symmetric(horizontal: 6, vertical: 3), child: _FunPreview()),
       ),
     ),
   );

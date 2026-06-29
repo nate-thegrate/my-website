@@ -2,13 +2,12 @@ import 'package:nate_thegrate/the_good_stuff.dart';
 
 extension type TickedOff._(TextSpan _span) implements TextSpan {
   TickedOff(String input)
-      : _span = _cache[input] ??= TextSpan(children: [
+    : _span = _cache[input] ??= TextSpan(
+        children: [
           for (final (index, snippet) in input.split('`').indexed)
-            if (index.isEven)
-              TextSpan(text: snippet)
-            else
-              WidgetSpan(child: _CodeSnippet(snippet)),
-        ]);
+            if (index.isEven) TextSpan(text: snippet) else WidgetSpan(child: _CodeSnippet(snippet)),
+        ],
+      );
 
   static final _cache = <String, TextSpan>{};
 }
@@ -27,18 +26,14 @@ class _CodeSnippet extends StatelessWidget {
     return Transform.translate(
       offset: const Offset(0, 0.5),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(4.0),
+        borderRadius: .circular(4.0),
         child: ColoredBox(
           color: background,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding: const .symmetric(horizontal: 4.0),
             child: Text(
               snippet,
-              style: TextStyle(
-                fontSize: 12,
-                fontFamily: 'roboto mono',
-                color: foreground,
-              ),
+              style: TextStyle(fontSize: 12, fontFamily: 'roboto mono', color: foreground),
             ),
           ),
         ),

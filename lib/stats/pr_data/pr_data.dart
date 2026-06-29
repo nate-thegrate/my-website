@@ -82,32 +82,27 @@ class PullRequest extends StatelessWidget {
     if (_isTotal) {
       text = Text('$prCount contributions', style: textStyle);
     } else {
-      text = Text.rich(
-        TickedOff(title),
-        style: textStyle,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      );
+      text = Text.rich(TickedOff(title), style: textStyle, maxLines: 1, overflow: .ellipsis);
     }
 
     final rightColumn = RightColumn(diffs, date, key: GlobalObjectKey((diffs, url)));
     final contents = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
+      padding: const .symmetric(vertical: 1),
       child: Row(
         children: [
           const SizedBox(width: 8),
           if (_isTotal)
             Padding(
-              padding: const EdgeInsets.only(right: 12),
+              padding: const .only(right: 12),
               child: Text(
                 title,
-                style: textStyle.copyWith(fontWeight: FontWeight.w600),
+                style: textStyle.copyWith(fontWeight: .w600),
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                overflow: .ellipsis,
               ),
             ),
           Expanded(
-            child: Align(alignment: Alignment.centerLeft, child: text),
+            child: Align(alignment: .centerLeft, child: text),
           ),
           if (focused) rightColumn else ColoredBox(color: Colors.white54, child: rightColumn),
         ],
@@ -122,7 +117,7 @@ class PullRequest extends StatelessWidget {
         border: border,
       ),
       child: MouseRegion(
-        cursor: focused ? SystemMouseCursors.click : MouseCursor.defer,
+        cursor: focused ? SystemMouseCursors.click : .defer,
         onEnter: focus,
         onHover: focus,
         onExit: (_) => Future.microtask(() => focusNode?.unfocus()),
@@ -154,7 +149,7 @@ class RightColumn extends StatelessWidget {
       final (int additions, int deletions) = diffs;
       final int delta = additions - deletions;
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        padding: const .symmetric(vertical: 4.0),
         child: Row(
           children: [
             Diffs('+$additions', color: green),
@@ -191,7 +186,7 @@ class Diffs extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontSize: hasAncestor<SliverPersistentHeader>(context) ? 18 : 14,
-      fontWeight: FontWeight.w600,
+      fontWeight: .w600,
       color: color,
     );
 

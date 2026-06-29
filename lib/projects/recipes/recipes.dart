@@ -16,7 +16,7 @@ extension type const Recipes._(SizedBox _) implements SizedBox {
                 width: 400,
                 height: 500,
                 child: Stack(
-                  alignment: Alignment.bottomCenter,
+                  alignment: .bottomCenter,
                   children: [
                     Align(
                       alignment: Alignment(0, -0.6),
@@ -24,7 +24,7 @@ extension type const Recipes._(SizedBox _) implements SizedBox {
                         style: TextStyle(
                           inherit: false,
                           color: Color(0xffb0b0b0),
-                          fontWeight: FontWeight.bold,
+                          fontWeight: .bold,
                           fontSize: 72,
                         ),
                         child: DelayedActivation(_comingSoon, delay: 5),
@@ -42,7 +42,7 @@ extension type const Recipes._(SizedBox _) implements SizedBox {
                         DefaultTextStyle(
                           style: RecipeStyle(size: 60),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: .center,
                             children: [
                               SizedBox(width: 10),
                               AnimatedText(8.6, 'r'),
@@ -74,7 +74,7 @@ extension type const Recipes._(SizedBox _) implements SizedBox {
         opacity: visible ? 0.5 : 0.0,
         duration: const Seconds(1),
         curve: Curves.easeInOutSine,
-        child: const Text('Coming soon!', textAlign: TextAlign.center),
+        child: const Text('Coming soon!', textAlign: .center),
       ),
     );
   }
@@ -104,7 +104,7 @@ class _FadeInButtons extends DelayedActivation {
                 overlayColor: WidgetStatePropertyAll(Colors.white54),
                 side: WidgetStateMapper({
                   WidgetState.hovered: BorderSide(width: 2),
-                  WidgetState.any: BorderSide.none,
+                  WidgetState.any: .none,
                 }),
               ),
               onPressed: back,
@@ -117,7 +117,7 @@ class _FadeInButtons extends DelayedActivation {
             foregroundColor: WidgetStatePropertyAll(Colors.black),
             padding: WidgetStatePropertyAll(EdgeInsets.fromLTRB(28, 12, 28, 16)),
             shape: WidgetStatePropertyAll(
-              ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.elliptical(40, 32))),
+              ContinuousRectangleBorder(borderRadius: .all(Radius.elliptical(40, 32))),
             ),
             side: WidgetStatePropertyAll(BorderSide(width: 2)),
             overlayColor: WidgetStateMapper({
@@ -197,14 +197,14 @@ class _RenderSpringDrop extends BigBox {
   static final drop = Path()
     ..moveTo(5, 0)
     ..cubicTo(6, 12.5, 10, 16, 10, 25)
-    ..arcToPoint(const Offset(0, 25), radius: const Radius.circular(5))
+    ..arcToPoint(const Offset(0, 25), radius: const .circular(5))
     ..cubicTo(0, 16, 4, 18, 5, 0)
     ..close();
 
   static final crescent = Path()
     ..moveTo(3, 22)
-    ..arcToPoint(const Offset(5.5, 28), radius: const Radius.circular(3.5), clockwise: false)
-    ..arcToPoint(const Offset(3, 22), radius: const Radius.circular(7));
+    ..arcToPoint(const Offset(5.5, 28), radius: const .circular(3.5), clockwise: false)
+    ..arcToPoint(const Offset(3, 22), radius: const .circular(7));
 
   static final fillSpring = Paint()..color = const Color(0xffa0ffd0);
   static final fillBlack = Paint()..color = Colors.black;

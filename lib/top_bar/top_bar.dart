@@ -103,31 +103,31 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
           DefaultTextStyle(
             style: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w600,
+              fontWeight: .w600,
               color: Colors.black,
               letterSpacing: 0.25,
             ),
             child: IgnorePointer(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: .stretch,
                 children: [
                   Center(
                     child: TollsBox(
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: .center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.fromLTRB(0, 2, 8, 0),
+                            padding: .fromLTRB(0, 2, 8, 0),
                             child: Image(image: AssetImage('assets/images/tolls.png')),
                           ),
                           Text.rich(
                             maxLines: 1,
-                            overflow: TextOverflow.clip,
+                            overflow: .clip,
                             TextSpan(
                               children: [
                                 TextSpan(
                                   text: 'N',
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                                  style: TextStyle(fontSize: 15, fontWeight: .normal),
                                 ),
                                 TextSpan(text: 'ATE THE GRATE'),
                               ],
@@ -161,7 +161,7 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
                 width: double.infinity,
                 height: gapHeight,
                 child: const Stack(
-                  fit: StackFit.expand,
+                  fit: .expand,
                   children: [
                     ColoredBox(color: Color(0xff202020), child: _VoidGap()),
                     BlurBox(),
@@ -178,7 +178,7 @@ class _TopBarState extends State<_TopBar> with MarkNeedsBuild {
       child: DefaultTextStyle(
         style: Theme.of(context).textTheme.bodyMedium!,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: .stretch,
           children: [
             appBar,
             Expanded(child: findWidget<TopBar>(context).body),
@@ -257,8 +257,8 @@ class BlurBox extends SingleChildRenderObjectWidget {
           Colors.white,
         ],
         stops: const [0.0, 0.25, 0.75, 1.0],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+        begin: .topCenter,
+        end: .bottomCenter,
       ),
     );
   }
@@ -372,7 +372,7 @@ class VoidGap extends BigBox {
   }
 
   static ValueAnimation<double> animation() =>
-      ValueAnimation<double>(TopBar.position, duration: Duration.zero, lerp: lerpDouble);
+      ValueAnimation<double>(TopBar.position, duration: .zero, lerp: lerpDouble);
 
   void updateColor() {
     color = switch (TopBar.focused) {
@@ -445,7 +445,7 @@ class _RouteButton extends StatelessWidget {
       child: Center(
         child: Text(
           route.name.toUpperCase(),
-          textAlign: TextAlign.center,
+          textAlign: .center,
           style: const TextStyle(letterSpacing: 0.5),
         ),
       ),
