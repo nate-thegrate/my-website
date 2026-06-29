@@ -114,20 +114,19 @@ class PullRequest extends StatelessWidget {
       ),
     );
 
-    return MouseRegion(
-      cursor: focused ? SystemMouseCursors.click : MouseCursor.defer,
-      onEnter: focus,
-      onHover: focus,
-      onExit: (_) => Future.microtask(() => focusNode?.unfocus()),
-      child: GestureDetector(
-        onTap: () => launchUrlString(url),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: focused ? Colors.white70 : Colors.transparent,
-            border: border,
-          ),
-          child: contents,
-        ),
+    if (_isTotal) return contents;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: focused ? Colors.white70 : Colors.transparent,
+        border: border,
+      ),
+      child: MouseRegion(
+        cursor: focused ? SystemMouseCursors.click : MouseCursor.defer,
+        onEnter: focus,
+        onHover: focus,
+        onExit: (_) => Future.microtask(() => focusNode?.unfocus()),
+        child: GestureDetector(onTap: () => launchUrlString(url), child: contents),
       ),
     );
   }
