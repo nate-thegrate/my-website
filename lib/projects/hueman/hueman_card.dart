@@ -10,51 +10,57 @@ class HuemanCard extends StatelessWidget {
       width: 225,
       height: 240,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
+        spacing: 16,
         children: [
-          Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: 'H',
-                  style: TextStyle(color: Color(0xffff0000)),
-                ),
-                TextSpan(
-                  text: 'U',
-                  style: TextStyle(color: Color(0xffffff00)),
-                ),
-                TextSpan(
-                  text: 'E',
-                  style: TextStyle(color: Color(0xff0060ff)),
-                ),
-                TextSpan(text: 'man'),
-              ],
-            ),
-            style: TextStyle(
-              fontFamily: 'gaegu',
-              fontWeight: FontWeight.bold,
-              fontSize: 64,
-              color: Color(0xff6c4b00),
-              shadows: [Shadow(color: Color(0x80002040), blurRadius: 2)],
-            ),
-          ),
-          SizedBox(height: 16),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: SweepGradient(
-                colors: [
-                  Color(0xffff0000),
-                  Color(0xffff00ff),
-                  Color(0xff0000ff),
-                  Color(0xff00ffff),
-                  Color(0xff00ff00),
-                  Color(0xffffff00),
-                  Color(0xffff0000),
+          Expanded(
+            flex: 112,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'H',
+                    style: TextStyle(color: Color(0xffff0000)),
+                  ),
+                  TextSpan(
+                    text: 'U',
+                    style: TextStyle(color: Color(0xffffff00)),
+                  ),
+                  TextSpan(
+                    text: 'E',
+                    style: TextStyle(color: Color(0xff0060ff)),
+                  ),
+                  TextSpan(text: 'man'),
                 ],
               ),
+              style: TextStyle(
+                fontFamily: 'gaegu',
+                fontWeight: FontWeight.bold,
+                fontSize: 64,
+                color: Color(0xff6c4b00),
+                shadows: [Shadow(color: Color(0x80002040), blurRadius: 2)],
+              ),
             ),
-            child: SizedBox.square(dimension: 128),
+          ),
+          Flexible(
+            flex: 128,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: SweepGradient(
+                  colors: [
+                    Color(0xffff0000),
+                    Color(0xffff00ff),
+                    Color(0xff0000ff),
+                    Color(0xff00ffff),
+                    Color(0xff00ff00),
+                    Color(0xffffff00),
+                    Color(0xffff0000),
+                  ],
+                ),
+              ),
+              child: SizedBox.square(dimension: 128),
+            ),
           ),
         ],
       ),
